@@ -173,6 +173,14 @@ export class MapView extends BaseMap {
     }
 
     /**
+     * Draws the cave foreground
+     * @param {DrawParameters} parameters
+     */
+    drawCaveForegroundLayer(parameters) {
+        this.drawVisibleChunks(parameters, MapChunkView.prototype.drawCaveForegroundLayer);
+    }
+
+    /**
      * Draws the map overlay
      * @param {DrawParameters} parameters
      */

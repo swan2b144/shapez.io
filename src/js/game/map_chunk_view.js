@@ -296,4 +296,15 @@ export class MapChunkView extends MapChunk {
         systems.staticMapEntities.drawWiresChunk(parameters, this);
         systems.wiredPins.drawChunk(parameters, this);
     }
+
+    /**
+     * Draws the cave layer
+     * @param {DrawParameters} parameters
+     */
+    drawCaveForegroundLayer(parameters) {
+        const systems = this.root.systemMgr.systems;
+        systems.wire.drawChunk(parameters, this);
+        systems.staticMapEntities.drawWiresChunk(parameters, this);
+        systems.wiredPins.drawChunk(parameters, this);
+    }
 }

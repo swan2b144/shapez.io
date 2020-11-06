@@ -103,8 +103,8 @@ export class HUDLayerPreview extends BaseHUDPart {
      * @param {number} scale 1 / zoomLevel
      */
     renderPreview(parameters, worldPos, scale) {
-        if (this.root.currentLayer !== "regular") {
-            // Only supporting wires right now
+        if (this.root.currentLayer === "regular") {
+            // Only not supporting regular right now
             return;
         }
 

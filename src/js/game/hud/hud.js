@@ -50,6 +50,10 @@ import { HUDStandaloneAdvantages } from "./parts/standalone_advantages";
 import { HUDCatMemes } from "./parts/cat_memes";
 import { HUDTutorialVideoOffer } from "./parts/tutorial_video_offer";
 
+// ModZ
+import { HUDCaveOverlay } from "./parts/cave_overlay";
+import { HUDCaveToolbar } from "./parts/cave_toolbar";
+
 export class GameHUD {
     /**
      * @param {GameRoot} root
@@ -90,6 +94,9 @@ export class GameHUD {
             wireInfo: new HUDWireInfo(this.root),
             leverToggle: new HUDLeverToggle(this.root),
 
+            // ModZ
+            caveToolbar: new HUDCaveToolbar(this.root),
+
             // Must always exist
             pinnedShapes: new HUDPinnedShapes(this.root),
             notifications: new HUDNotifications(this.root),
@@ -104,6 +111,9 @@ export class GameHUD {
 
             minerHighlight: new HUDMinerHighlight(this.root),
             tutorialVideoOffer: new HUDTutorialVideoOffer(this.root),
+
+            // ModZ
+            caveOverlay: new HUDCaveOverlay(this.root),
 
             // Typing hints
             /* typehints:start */

@@ -439,10 +439,16 @@ export class GameCore {
 
             // Green wires overlay
             root.hud.parts.wiresOverlay.draw(params);
+            root.hud.parts.caveOverlay.draw(params);
 
             if (this.root.currentLayer === "wires") {
                 // Static map entities
                 root.map.drawWiresForegroundLayer(params);
+            }
+
+            if (this.root.currentLayer === "cave") {
+                // Static map entities
+                root.map.drawCaveForegroundLayer(params);
             }
         }
 

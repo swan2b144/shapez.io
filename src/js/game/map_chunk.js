@@ -75,6 +75,7 @@ export class MapChunk {
         this.containedEntitiesByLayer = {
             regular: [],
             wires: [],
+            cave: [],
         };
 
         /**

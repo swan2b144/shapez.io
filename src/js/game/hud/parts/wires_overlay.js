@@ -28,15 +28,30 @@ export class HUDWiresOverlay extends BaseHUDPart {
      * Switches between layers
      */
     switchLayers() {
-        if (this.root.currentLayer === "regular") {
-            if (
-                this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers) ||
-                (G_IS_DEV && globalConfig.debug.allBuildingsUnlocked)
-            ) {
-                this.root.currentLayer = "wires";
-            }
-        } else {
-            this.root.currentLayer = "regular";
+        switch (this.root.currentLayer) {
+            case "regular":
+                if (
+                    this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers) ||
+                    (G_IS_DEV && globalConfig.debug.allBuildingsUnlocked)
+                ) {
+                    this.root.currentLayer = "wires";
+                } else {
+                    this.root.currentLayer = "regular";
+                }
+                break;
+            case "wires":
+                if (
+                    this.root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers) ||
+                    (G_IS_DEV && globalConfig.debug.allBuildingsUnlocked)
+                ) {
+                    this.root.currentLayer = "cave";
+                } else {
+                    this.root.currentLayer = "regular";
+                }
+                break;
+            case "cave":
+                this.root.currentLayer = "regular";
+                break;
         }
         this.root.signals.editModeChanged.dispatch(this.root.currentLayer);
     }
