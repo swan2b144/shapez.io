@@ -143,8 +143,15 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
 
         const variant = this.currentVariant.get();
 
-        this.buildingInfoElements.label.innerHTML = T.buildings[metaBuilding.id][variant].name;
-        this.buildingInfoElements.descText.innerHTML = T.buildings[metaBuilding.id][variant].description;
+        if (T.buildings[metaBuilding.id][variant] && (!T.buildings[metaBuilding.id][variant].name || !T.buildings[metaBuilding.id][variant].description)) {
+            T.buildings[metaBuilding.id][variant].name = "undefined";
+            T.buildings[metaBuilding.id][variant].description = "undefined";
+        }
+
+        if (T.buildings[metaBuilding.id][variant]) {
+            this.buildingInfoElements.label.innerHTML = T.buildings[metaBuilding.id][variant].name;
+            this.buildingInfoElements.descText.innerHTML = T.buildings[metaBuilding.id][variant].description;
+        }
 
         const layer = this.root.currentLayer;
 
