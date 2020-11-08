@@ -31,6 +31,8 @@ export const gBuildingVariants = {
  */
 const variantsCache = new Map();
 
+let buildingCode = 1000;
+
 /**
  * Registers a new variant
  * @param {number} code
@@ -44,6 +46,10 @@ export function registerBuildingVariant(
     variant = "default" /* @TODO: Circular dependency, actually its defaultBuildingVariant */,
     rotationVariant = 0
 ) {
+    if (code == 0) {
+        code = buildingCode;
+        buildingCode += 1;
+    }
     assert(!gBuildingVariants[code], "Duplicate id: " + code);
     gBuildingVariants[code] = {
         metaClass: meta,

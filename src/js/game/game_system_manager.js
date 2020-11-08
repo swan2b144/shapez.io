@@ -20,11 +20,14 @@ import { ConstantSignalSystem } from "./systems/constant_signal";
 import { LogicGateSystem } from "./systems/logic_gate";
 import { LeverSystem } from "./systems/lever";
 import { DisplaySystem } from "./systems/display";
-import { WirelessDisplaySystem } from "./systems/wireless_display";
 import { ItemProcessorOverlaysSystem } from "./systems/item_processor_overlays";
 import { BeltReaderSystem } from "./systems/belt_reader";
 import { FilterSystem } from "./systems/filter";
 import { ItemProducerSystem } from "./systems/item_producer";
+
+// ModZ
+import { WirelessDisplaySystem } from "./systems/wireless_display";
+import { ProgrammableBalancerSystem } from "./systems/balancer";
 
 const logger = createLogger("game_system_manager");
 
@@ -89,9 +92,6 @@ export class GameSystemManager {
             /** @type {DisplaySystem} */
             display: null,
 
-            /** @type {WirelessDisplaySystem} */
-            wirelessDisplay: null,
-
             /** @type {ItemProcessorOverlaysSystem} */
             itemProcessorOverlays: null,
 
@@ -103,6 +103,14 @@ export class GameSystemManager {
 
             /** @type {ItemProducerSystem} */
             itemProducer: null,
+
+            // ModZ
+
+            /** @type {WirelessDisplaySystem} */
+            wirelessDisplay: null,
+
+            /** @type {ProgrammableBalancerSystem} */
+            programmableBalancer: null,
 
             /* typehints:end */
         };
@@ -166,9 +174,12 @@ export class GameSystemManager {
         add("beltReader", BeltReaderSystem);
 
         add("display", DisplaySystem);
-        add("wirelessDisplay", WirelessDisplaySystem);
 
         add("itemProcessorOverlays", ItemProcessorOverlaysSystem);
+
+        // ModZ
+        add("wirelessDisplay", WirelessDisplaySystem);
+        add("programmableBalancer", ProgrammableBalancerSystem);
 
         logger.log("📦 There are", this.systemUpdateOrder.length, "game systems");
     }

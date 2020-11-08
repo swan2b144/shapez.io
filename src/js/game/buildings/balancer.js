@@ -9,6 +9,7 @@ import { enumHubGoalRewards } from "../tutorial_goals";
 import { T } from "../../translations";
 import { formatItemsPerSecond, generateMatrixRotations } from "../../core/utils";
 import { BeltUnderlaysComponent } from "../components/belt_underlays";
+import { ProgrammableBalancerComponent } from "../components/balancer";
 
 /** @enum {string} */
 export const enumBalancerVariants = {
@@ -16,6 +17,7 @@ export const enumBalancerVariants = {
     mergerInverse: "merger-inverse",
     splitter: "splitter",
     splitterInverse: "splitter-inverse",
+    programmableBalancer: "programmable-balancer",
 };
 
 const overlayMatrices = {
@@ -24,6 +26,7 @@ const overlayMatrices = {
     [enumBalancerVariants.mergerInverse]: generateMatrixRotations([0, 1, 0, 1, 1, 0, 0, 1, 0]),
     [enumBalancerVariants.splitter]: generateMatrixRotations([0, 1, 0, 0, 1, 1, 0, 1, 0]),
     [enumBalancerVariants.splitterInverse]: generateMatrixRotations([0, 1, 0, 1, 1, 0, 0, 1, 0]),
+    [enumBalancerVariants.programmableBalancer]: generateMatrixRotations([0, 1, 0, 0, 1, 1, 0, 1, 0]),
 };
 
 export class MetaBalancerBuilding extends MetaBuilding {
@@ -39,6 +42,7 @@ export class MetaBalancerBuilding extends MetaBuilding {
             case enumBalancerVariants.mergerInverse:
             case enumBalancerVariants.splitter:
             case enumBalancerVariants.splitterInverse:
+            case enumBalancerVariants.programmableBalancer:
                 return new Vector(1, 1);
             default:
                 assertAlways(false, "Unknown balancer variant: " + variant);
@@ -72,6 +76,7 @@ export class MetaBalancerBuilding extends MetaBuilding {
             case enumBalancerVariants.mergerInverse:
             case enumBalancerVariants.splitter:
             case enumBalancerVariants.splitterInverse:
+            case enumBalancerVariants.programmableBalancer:
                 speedMultiplier = 1;
         }
 
@@ -88,14 +93,21 @@ export class MetaBalancerBuilding extends MetaBuilding {
      * @param {GameRoot} root
      */
     getAvailableVariants(root) {
+        this.programmableBalancerMod = root.app.settings.getAllSettings().programmableBalancerMod;
+
         let available = [defaultBuildingVariant];
 
-        if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_merger)) {
-            available.push(enumBalancerVariants.merger, enumBalancerVariants.mergerInverse);
-        }
-
-        if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_splitter)) {
-            available.push(enumBalancerVariants.splitter, enumBalancerVariants.splitterInverse);
+        // Dont unlock compact balancers if there is programmable balancer already.
+        if (!this.programmableBalancerMod) {
+            if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_merger)) {
+                available.push(enumBalancerVariants.merger, enumBalancerVariants.mergerInverse);
+            }
+    
+            if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_splitter)) {
+                available.push(enumBalancerVariants.splitter, enumBalancerVariants.splitterInverse);
+            }
+        } else if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_merger)) {
+            available.push(enumBalancerVariants.programmableBalancer);
         }
 
         return available;
@@ -221,6 +233,24 @@ export class MetaBalancerBuilding extends MetaBuilding {
                 entity.components.BeltUnderlays.underlays = [
                     { pos: new Vector(0, 0), direction: enumDirection.top },
                 ];
+
+                break;
+            }
+            case enumBalancerVariants.programmableBalancer: {
+                entity.components.ItemAcceptor.setSlots([]);
+
+                entity.components.ItemEjector.setSlots([]);
+
+                entity.components.BeltUnderlays.underlays = [
+                    { pos: new Vector(0, 0), direction: enumDirection.top },
+                    { pos: new Vector(0, 0), direction: enumDirection.right },
+                    { pos: new Vector(0, 0), direction: enumDirection.bottom },
+                    { pos: new Vector(0, 0), direction: enumDirection.left },
+                ];
+
+                if (!entity.components.ProgrammableBalancer) {
+                    entity.addComponent(new ProgrammableBalancerComponent({}));
+                }
 
                 break;
             }

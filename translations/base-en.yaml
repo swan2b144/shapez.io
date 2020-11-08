@@ -261,6 +261,10 @@ dialogs:
             Enter used <strong>channel name</strong>
         descShortKey: or enter new <strong>channel name</strong>
 
+    editBalancer:
+        title: Program Sides
+        descShortKey: Select sides based on input/output</strong>
+
     editSignal:
         title: Set Signal
         descItems: >-
@@ -579,6 +583,10 @@ buildings:
         splitter-inverse:
             name: Splitter (compact)
             description: Splits one conveyor belt into two.
+
+        programmable-balancer:
+            name: Programmable Balancer
+            description: Select which side will be input which will be output (1 means input 0 means output) - You can only use 1 or 0.
 
     cutter:
         default:
@@ -1073,6 +1081,11 @@ settings:
             title: Opens Wireless Display Mod
             description: >-
                 Adds wireless display to the game (By Shrimp The Shrimp).
+
+        programmableBalancerMod:
+            title: Opens Programmable Balancer Mod
+            description: >-
+                You can control balancers with this mod. (By Shrimp The Shrimp).        
 
         disableCutDeleteWarnings:
             title: Disable Cut/Delete Warnings

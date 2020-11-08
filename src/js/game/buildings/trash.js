@@ -63,5 +63,7 @@ export class MetaTrashBuilding extends MetaBuilding {
                 processorType: enumItemProcessorTypes.trash,
             })
         );
+
+        console.log(entity.components.ItemAcceptor);
     }
 }

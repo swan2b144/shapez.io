@@ -19,8 +19,13 @@ import { DisplayComponent } from "./components/display";
 import { BeltReaderComponent } from "./components/belt_reader";
 import { FilterComponent } from "./components/filter";
 import { ItemProducerComponent } from "./components/item_producer";
+
+// ModZ
+
 import { WirelessDisplayComponent } from "./components/wireless_display";
 import { WirelessCodeComponent } from "./components/wireless_code";
+import { ProgrammableBalancerComponent } from "./components/balancer";
+
 /* typehints:end */
 
 /**
@@ -91,11 +96,16 @@ export class EntityComponentStorage {
         /** @type {FilterComponent} */
         this.Filter;
 
+        // ModZ
+
         /** @type {ItemProducerComponent} */
         this.ItemProducer;
 
         /** @type {WirelessCodeComponent} */
         this.WirelessCode;
+
+        /** @type {ProgrammableBalancerComponent} */
+        this.ProgrammableBalancer;
 
         /* typehints:end */
     }

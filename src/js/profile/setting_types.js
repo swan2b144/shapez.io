@@ -224,7 +224,6 @@ export class BoolSetting extends BaseSetting {
      */
     getHtml(app) {
         const available = this.getIsAvailable(app);
-        console.log(this.id);
         return `
         <div class="setting cardbox ${available ? "enabled" : "disabled"}">
             ${available ? "" : `<span class="standaloneOnlyHint">${T.demo.settingNotAvailable}</span>`}
