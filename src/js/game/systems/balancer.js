@@ -27,6 +27,17 @@ export class ProgrammableBalancerSystem extends GameSystemWithFilter {
         this.root.signals.entityManuallyPlaced.add(this.channelSignalValue, this);
     }
 
+    update() {
+        for (const entity in this.allEntities) {
+            if (this.allEntities[entity].components.ItemAcceptor.slots.length == 0) {
+                this.fixComponents(this.allEntities[entity]);
+                console.log("---------------------");
+                console.log(this.allEntities[entity].components.ProgrammableBalancer.word);
+                console.log(this.allEntities[entity])
+            }
+        }
+    }
+
     /**
      * Tests word for balancer
      * @param { string } word 
@@ -34,6 +45,10 @@ export class ProgrammableBalancerSystem extends GameSystemWithFilter {
     testSignal(word) {
         // If word isn't 4 letter it will return false
         if (word.length != 4) {
+            return false;
+        }
+
+        if (word == "1111" || word == "0000") {
             return false;
         }
 
@@ -51,6 +66,8 @@ export class ProgrammableBalancerSystem extends GameSystemWithFilter {
             }
         }
 
+        this.word = word;
+
         // If it passes all tests return true
         return true;
     }
@@ -60,28 +77,31 @@ export class ProgrammableBalancerSystem extends GameSystemWithFilter {
      * @param {*} entity 
      */
     fixComponents(entity) {
-        const AcceptorSlots = [];
-        const EjectorSlots = [];
-        for (const side in this.sides) {
-            if (this.sides[side] == 1) {
-                AcceptorSlots.push({
-                    pos: new Vector(0, 0),
-                    directions: [enumDirection[side]],
-                });
-            } else if (this.sides[side] == 0) { 
-                EjectorSlots.push({
-                    pos: new Vector(0, 0),
-                    direction: enumDirection[side],
-                });
+        if (entity.components.ProgrammableBalancer.word) {
+            this.testSignal(entity.components.ProgrammableBalancer.word);
+            const AcceptorSlots = [];
+            const EjectorSlots = [];
+            for (const side in this.sides) {
+                if (this.sides[side] == 1) {
+                    AcceptorSlots.push({
+                        pos: new Vector(0, 0),
+                        directions: [enumDirection[side]],
+                    });
+                } else if (this.sides[side] == 0) { 
+                    EjectorSlots.push({
+                        pos: new Vector(0, 0),
+                        direction: enumDirection[side],
+                    });
+                }
             }
-        }
-
-        if (entity.components.ItemAcceptor) {
-            entity.components.ItemAcceptor.setSlots(AcceptorSlots);
-        }
-
-        if (entity.components.ItemEjector) {
-            entity.components.ItemEjector.setSlots(EjectorSlots);
+    
+            if (entity.components.ItemAcceptor) {
+                entity.components.ItemAcceptor.setSlots(AcceptorSlots);
+            }
+    
+            if (entity.components.ItemEjector) {
+                entity.components.ItemEjector.setSlots(EjectorSlots);
+            }
         }
     }
 
@@ -134,6 +154,8 @@ export class ProgrammableBalancerSystem extends GameSystemWithFilter {
                 if (signalValueInput.getValue()) {
                     this.fixComponents(entity);
                 }
+
+                entity.components.ProgrammableBalancer.word = this.word;
             };
 
             dialog.buttonSignals.ok.add(closeHandler);

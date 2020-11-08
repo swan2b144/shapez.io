@@ -10,25 +10,15 @@ export class ProgrammableBalancerComponent extends Component {
 
     static getSchema() {
         return {
-            signal: types.nullable(typeItemSingleton),
+            word: types.string,
         };
     }
 
     /**
-     * Copy the current state to another component
-     * @param {ProgrammableBalancerComponent} otherComponent
+     * @param {String=} sides
      */
-    copyAdditionalStateTo(otherComponent) {
-        otherComponent.signal = this.signal;
-    }
-
-    /**
-     *
-     * @param {object} param0
-     * @param {BaseItem=} param0.signal The signal to store
-     */
-    constructor({ signal = null }) {
+    constructor(word = null) {
         super();
-        this.signal = signal;
+        this.word = word;
     }
 }
