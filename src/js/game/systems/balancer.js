@@ -15,7 +15,7 @@ import { T } from "../../translations";
 import { Entity } from "../entity";
 import { ProgrammableBalancerComponent } from "../components/balancer";
 import { THEME} from "../theme";
-import { enumDirection, Vector } from "../../core/vector";
+import { enumDirection, Vector, enumDirectionToVector } from "../../core/vector";
 import { ItemAcceptorComponent } from "../components/item_acceptor";
 import { ItemEjectorComponent } from "../components/item_ejector";
 import { isEntityName } from "typescript";
@@ -24,6 +24,7 @@ export class ProgrammableBalancerSystem extends GameSystemWithFilter {
     constructor(root) {
         super(root, [ProgrammableBalancerComponent]);
 
+        this.root.signals.postLoadHook.add(this.fixAllComponents, this);
         this.root.signals.entityManuallyPlaced.add(this.channelSignalValue, this);
     }
 
@@ -31,10 +32,13 @@ export class ProgrammableBalancerSystem extends GameSystemWithFilter {
         for (const entity in this.allEntities) {
             if (this.allEntities[entity].components.ItemAcceptor.slots.length == 0) {
                 this.fixComponents(this.allEntities[entity]);
-                console.log("---------------------");
-                console.log(this.allEntities[entity].components.ProgrammableBalancer.word);
-                console.log(this.allEntities[entity])
             }
+        }
+    }
+
+    fixAllComponents() {
+        for (let i = 0; i < this.allEntities.length; ++i) {
+            this.fixComponents(this.allEntities[i]);
         }
     }
 

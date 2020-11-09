@@ -147,6 +147,20 @@ export class MetaBuilding {
      * @returns {AtlasSprite}
      */
     getBlueprintSprite(rotationVariant = 0, variant = defaultBuildingVariant) {
+        const sprite = Loader.getSprite(
+            "sprites/blueprints/" +
+                this.id +
+                (variant === defaultBuildingVariant ? "" : "-" + variant) +
+                ".png"
+        );
+        if (sprite.spriteName == "not-found") {
+            return Loader.getSprite(
+                "sprites/buildings/" +
+                    this.id +
+                    (variant === defaultBuildingVariant ? "" : "-" + variant) +
+                    ".png"
+            );
+        }
         return Loader.getSprite(
             "sprites/blueprints/" +
                 this.id +
