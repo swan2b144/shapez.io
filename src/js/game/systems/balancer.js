@@ -1,12 +1,4 @@
-import { globalConfig } from "../../core/config";
-import { Loader } from "../../core/loader";
-import { BaseItem } from "../base_item";
-import { enumColors } from "../colors";
-import { WirelessDisplayComponent } from "../components/wireless_display";
 import { GameSystemWithFilter } from "../game_system_with_filter";
-import { isTrueItem } from "../items/boolean_item";
-import { ColorItem, COLOR_ITEM_SINGLETONS } from "../items/color_item";
-import { MapChunkView } from "../map_chunk_view";
 import { THIRDPARTY_URLS } from "../../core/config";
 import { DialogWithForm } from "../../core/modal_dialog_elements";
 import { FormElementInput, FormElementItemChooser } from "../../core/modal_dialog_forms";
@@ -14,11 +6,7 @@ import { fillInLinkIntoTranslation } from "../../core/utils";
 import { T } from "../../translations";
 import { Entity } from "../entity";
 import { ProgrammableBalancerComponent } from "../components/balancer";
-import { THEME} from "../theme";
 import { enumDirection, Vector, enumDirectionToVector } from "../../core/vector";
-import { ItemAcceptorComponent } from "../components/item_acceptor";
-import { ItemEjectorComponent } from "../components/item_ejector";
-import { isEntityName } from "typescript";
 
 export class ProgrammableBalancerSystem extends GameSystemWithFilter {
     constructor(root) {
@@ -29,8 +17,9 @@ export class ProgrammableBalancerSystem extends GameSystemWithFilter {
     }
 
     update() {
+        this.recomputeCacheFull();
         for (const entity in this.allEntities) {
-            if (this.allEntities[entity].components.ItemAcceptor.slots.length == 0) {
+            if (this.allEntities[entity].components.ItemEjector.slots.length == 0) {
                 this.fixComponents(this.allEntities[entity]);
             }
         }
@@ -74,6 +63,85 @@ export class ProgrammableBalancerSystem extends GameSystemWithFilter {
 
         // If it passes all tests return true
         return true;
+    }
+
+    /**
+     * Recomputes the whole cache after the game has loaded
+     */
+    recomputeCacheFull() {
+        for (let i = 0; i < this.allEntities.length; ++i) {
+            const entity = this.allEntities[i];
+            this.recomputeSingleEntityCache(entity);
+        }
+    }
+
+    /**
+     * @param {Entity} entity
+     */
+    recomputeSingleEntityCache(entity) {
+        const ejectorComp = entity.components.ItemEjector;
+        const staticComp = entity.components.StaticMapEntity;
+
+        for (let slotIndex = 0; slotIndex < ejectorComp.slots.length; ++slotIndex) {
+            const ejectorSlot = ejectorComp.slots[slotIndex];
+
+            // Clear the old cache.
+            ejectorSlot.cachedDestSlot = null;
+            ejectorSlot.cachedTargetEntity = null;
+            ejectorSlot.cachedBeltPath = null;
+
+            // Figure out where and into which direction we eject items
+            const ejectSlotWsTile = staticComp.localTileToWorld(ejectorSlot.pos);
+            const ejectSlotWsDirection = staticComp.localDirectionToWorld(ejectorSlot.direction);
+            const ejectSlotWsDirectionVector = enumDirectionToVector[ejectSlotWsDirection];
+            const ejectSlotTargetWsTile = ejectSlotWsTile.add(ejectSlotWsDirectionVector);
+
+            // Try to find the given acceptor component to take the item
+            // Since there can be cross layer dependencies, check on all layers
+            const targetEntities = this.root.map.getLayersContentsMultipleXY(
+                ejectSlotTargetWsTile.x,
+                ejectSlotTargetWsTile.y
+            );
+
+            for (let i = 0; i < targetEntities.length; ++i) {
+                const targetEntity = targetEntities[i];
+
+                const targetStaticComp = targetEntity.components.StaticMapEntity;
+                const targetBeltComp = targetEntity.components.Belt;
+
+                // Check for belts (special case)
+                if (targetBeltComp) {
+                    const beltAcceptingDirection = targetStaticComp.localDirectionToWorld(enumDirection.top);
+                    if (ejectSlotWsDirection === beltAcceptingDirection) {
+                        ejectorSlot.cachedTargetEntity = targetEntity;
+                        ejectorSlot.cachedBeltPath = targetBeltComp.assignedPath;
+                        break;
+                    }
+                }
+
+                // Check for item acceptors
+                const targetAcceptorComp = targetEntity.components.ItemAcceptor;
+                if (!targetAcceptorComp) {
+                    // Entity doesn't accept items
+                    continue;
+                }
+
+                const matchingSlot = targetAcceptorComp.findMatchingSlot(
+                    targetStaticComp.worldToLocalTile(ejectSlotTargetWsTile),
+                    targetStaticComp.worldDirectionToLocal(ejectSlotWsDirection)
+                );
+
+                if (!matchingSlot) {
+                    // No matching slot found
+                    continue;
+                }
+
+                // A slot can always be connected to one other slot only
+                ejectorSlot.cachedTargetEntity = targetEntity;
+                ejectorSlot.cachedDestSlot = matchingSlot;
+                break;
+            }
+        }
     }
 
     /**

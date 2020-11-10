@@ -15,7 +15,7 @@ export class ProgrammableBalancerComponent extends Component {
     }
 
     /**
-     * @param {String=} sides
+     * @param {string} word
      */
     constructor(word = null) {
         super();

@@ -96,7 +96,10 @@ export class ItemEjectorComponent extends Component {
      * @returns {boolean}
      */
     canEjectOnSlot(slotIndex) {
-        assert(slotIndex >= 0 && slotIndex < this.slots.length, "Invalid ejector slot: " + slotIndex);
+        //assert(slotIndex >= 0 && slotIndex < this.slots.length, "Invalid ejector slot: " + slotIndex);
+        if (!this.slots[slotIndex] || this.slots.length == 0) {
+            return null;
+        }
         return !this.slots[slotIndex].item;
     }
 

@@ -245,19 +245,16 @@ export class MetaBalancerBuilding extends MetaBuilding {
                     entity.addComponent(new ProgrammableBalancerComponent());
                 }
 
-                entity.components.ItemEjector.setSlots([
-                    { pos: new Vector(0, 0), direction: enumDirection.top },
-                    { pos: new Vector(0, 0), direction: enumDirection.right },
-                    { pos: new Vector(0, 0), direction: enumDirection.bottom },
-                    { pos: new Vector(0, 0), direction: enumDirection.left },
+                entity.components.ItemAcceptor.setSlots([{ 
+                    pos: new Vector(0, 0), 
+                    directions: [
+                        enumDirection.top,
+                        enumDirection.right,
+                        enumDirection.bottom,
+                        enumDirection.left,
+                    ] 
+                },
                 ]);
-
-                entity.components.BeltUnderlays.underlays = [
-                    { pos: new Vector(0, 0), direction: enumDirection.top },
-                    { pos: new Vector(0, 0), direction: enumDirection.right },
-                    { pos: new Vector(0, 0), direction: enumDirection.bottom },
-                    { pos: new Vector(0, 0), direction: enumDirection.left },
-                ];
 
                 break;
             }
