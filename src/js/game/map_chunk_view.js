@@ -71,6 +71,7 @@ export class MapChunkView extends MapChunk {
         systems.wirelessDisplay.drawChunk(parameters, this);
         systems.storage.drawChunk(parameters, this);
         systems.itemProcessorOverlays.drawChunk(parameters, this);
+        systems.programmableBalancer.drawChunk(parameters);
     }
 
     /**

@@ -13,8 +13,7 @@ export class WirelessCodeComponent extends Component {
     }
 
     /**
-     *
-     * @param {object} id
+     * @param {string} id
      */
     constructor(id) {
         super();

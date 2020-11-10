@@ -163,9 +163,9 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
 
     /**
      * Computes the color below the current tile
-     * @returns {number}
+     * @returns {string}
      */
-    computeColorBelowTile() {
+    computeChannelBelowTile() {
         const mousePosition = this.root.app.mousePosition;
         if (!mousePosition) {
             // Not on screen
@@ -213,7 +213,7 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
         for (let i = 0; i < contents.length; ++i) {
             const entity_a = contents[i];
             if (entity_a && entity_a.components.WirelessDisplay) {
-                const below = this.computeColorBelowTile();
+                const below = this.computeChannelBelowTile();
                 if (below) {
                     // We have something below our tile
                     const mousePosition = this.root.app.mousePosition;

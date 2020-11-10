@@ -6,7 +6,15 @@ import { fillInLinkIntoTranslation } from "../../core/utils";
 import { T } from "../../translations";
 import { Entity } from "../entity";
 import { ProgrammableBalancerComponent } from "../components/balancer";
-import { enumDirection, Vector, enumDirectionToVector } from "../../core/vector";
+import { 
+    enumDirection, Vector, 
+    enumDirectionToVector,
+    enumDirectionToAngle,
+    enumInvertedDirections,
+} from "../../core/vector";
+import { Loader } from "../../core/loader";
+import { drawRotatedSprite } from "../../core/draw_utils";
+import { DrawParameters } from "../../core/draw_parameters";
 
 export class ProgrammableBalancerSystem extends GameSystemWithFilter {
     constructor(root) {
@@ -254,6 +262,190 @@ export class ProgrammableBalancerSystem extends GameSystemWithFilter {
 
                 this.root.logic.tryDeleteBuilding(entityRef);
             });
+        }
+    }
+
+    /**
+     * Computes the color below the current tile
+     * @returns {object}
+     */
+    computeChannelBelowTile() {
+        const mousePosition = this.root.app.mousePosition;
+        if (!mousePosition) {
+            // Not on screen
+            return null;
+        }
+
+        const worldPos = this.root.camera.screenToWorld(mousePosition);
+        const tile = worldPos.toTileSpace();
+        const contents = this.root.map.getTileContent(tile, "regular");
+
+        if (contents && contents.components.ProgrammableBalancer) {
+            // We hovered a lower layer, show the sides there
+            return contents;
+        }
+
+        return null;
+    }
+
+    /**
+     * Draws a given chunk
+     * @param {import("../../core/draw_utils").DrawParameters} parameters
+     */
+    drawChunk(parameters) {
+        const entity = this.computeChannelBelowTile();
+        if (entity) {
+            this.drawMatchingAcceptorsAndEjectors(parameters, entity);
+        }
+    }
+
+    /**
+     * @param {DrawParameters} parameters
+     */
+    drawMatchingAcceptorsAndEjectors(parameters, entity) {
+        const acceptorComp = entity.components.ItemAcceptor;
+        const ejectorComp = entity.components.ItemEjector;
+        const staticComp = entity.components.StaticMapEntity;
+
+        const goodArrowSprite = Loader.getSprite("sprites/misc/slot_good_arrow.png");
+        const badArrowSprite = Loader.getSprite("sprites/misc/slot_bad_arrow.png");
+
+        // Just ignore the following code please ... thanks!
+
+        const offsetShift = 10;
+
+        let acceptorSlots = [];
+        let ejectorSlots = [];
+
+        if (ejectorComp) {
+            ejectorSlots = ejectorComp.slots.slice();
+        }
+
+        if (acceptorComp) {
+            acceptorSlots = acceptorComp.slots.slice();
+        }
+
+        for (let acceptorSlotIndex = 0; acceptorSlotIndex < acceptorSlots.length; ++acceptorSlotIndex) {
+            const slot = acceptorSlots[acceptorSlotIndex];
+
+            const acceptorSlotWsTile = staticComp.localTileToWorld(slot.pos);
+            const acceptorSlotWsPos = acceptorSlotWsTile.toWorldSpaceCenterOfTile();
+
+            // Go over all slots
+            for (
+                let acceptorDirectionIndex = 0;
+                acceptorDirectionIndex < slot.directions.length;
+                ++acceptorDirectionIndex
+            ) {
+                const direction = slot.directions[acceptorDirectionIndex];
+                const worldDirection = staticComp.localDirectionToWorld(direction);
+
+                // Figure out which tile ejects to this slot
+                const sourceTile = acceptorSlotWsTile.add(enumDirectionToVector[worldDirection]);
+
+                let isBlocked = false;
+                let isConnected = false;
+
+                // Find all entities which are on that tile
+                const sourceEntities = this.root.map.getLayersContentsMultipleXY(sourceTile.x, sourceTile.y);
+
+                // Check for every entity:
+                for (let i = 0; i < sourceEntities.length; ++i) {
+                    const sourceEntity = sourceEntities[i];
+                    const sourceEjector = sourceEntity.components.ItemEjector;
+                    const sourceBeltComp = sourceEntity.components.Belt;
+                    const sourceStaticComp = sourceEntity.components.StaticMapEntity;
+                    const ejectorAcceptLocalTile = sourceStaticComp.worldToLocalTile(acceptorSlotWsTile);
+
+                    // If this entity is on the same layer as the slot - if so, it can either be
+                    // connected, or it can not be connected and thus block the input
+                    if (sourceEjector && sourceEjector.anySlotEjectsToLocalTile(ejectorAcceptLocalTile)) {
+                        // This one is connected, all good
+                        isConnected = true;
+                    } else if (
+                        sourceBeltComp &&
+                        sourceStaticComp.localDirectionToWorld(sourceBeltComp.direction) ===
+                            enumInvertedDirections[worldDirection]
+                    ) {
+                        // Belt connected
+                        isConnected = true;
+                    } else {
+                        // This one is blocked
+                        isBlocked = true;
+                    }
+                }
+
+                const alpha = isConnected || isBlocked ? 1.0 : 0.3;
+                const sprite = isBlocked ? badArrowSprite : goodArrowSprite;
+
+                parameters.context.globalAlpha = alpha;
+                drawRotatedSprite({
+                    parameters,
+                    sprite,
+                    x: acceptorSlotWsPos.x,
+                    y: acceptorSlotWsPos.y,
+                    angle: Math.radians(enumDirectionToAngle[enumInvertedDirections[worldDirection]]),
+                    size: 13,
+                    offsetY: offsetShift + 13,
+                });
+                parameters.context.globalAlpha = 1;
+            }
+        }
+
+        // Go over all slots
+        for (let ejectorSlotIndex = 0; ejectorSlotIndex < ejectorSlots.length; ++ejectorSlotIndex) {
+            const slot = ejectorSlots[ejectorSlotIndex];
+
+            const ejectorSlotLocalTile = slot.pos.add(enumDirectionToVector[slot.direction]);
+            const ejectorSlotWsTile = staticComp.localTileToWorld(ejectorSlotLocalTile);
+
+            const ejectorSLotWsPos = ejectorSlotWsTile.toWorldSpaceCenterOfTile();
+            const ejectorSlotWsDirection = staticComp.localDirectionToWorld(slot.direction);
+
+            let isBlocked = false;
+            let isConnected = false;
+
+            // Find all entities which are on that tile
+            const destEntities = this.root.map.getLayersContentsMultipleXY(
+                ejectorSlotWsTile.x,
+                ejectorSlotWsTile.y
+            );
+
+            // Check for every entity:
+            for (let i = 0; i < destEntities.length; ++i) {
+                const destEntity = destEntities[i];
+                const destAcceptor = destEntity.components.ItemAcceptor;
+                const destStaticComp = destEntity.components.StaticMapEntity;
+                const destMiner = destEntity.components.Miner;
+
+                const destLocalTile = destStaticComp.worldToLocalTile(ejectorSlotWsTile);
+                const destLocalDir = destStaticComp.worldDirectionToLocal(ejectorSlotWsDirection);
+                if (destAcceptor && destAcceptor.findMatchingSlot(destLocalTile, destLocalDir)) {
+                    // This one is connected, all good
+                    isConnected = true;
+                } else if (destEntity.components.Belt && destLocalDir === enumDirection.top) {
+                    // Connected to a belt
+                    isConnected = true;
+                } else {
+                    // This one is blocked
+                    isBlocked = true;
+                }
+            }
+
+            const alpha = isConnected || isBlocked ? 1.0 : 0.3;
+            const sprite = isBlocked ? badArrowSprite : goodArrowSprite;
+
+            parameters.context.globalAlpha = alpha;
+            drawRotatedSprite({
+                parameters,
+                sprite,
+                x: ejectorSLotWsPos.x,
+                y: ejectorSLotWsPos.y,
+                angle: Math.radians(enumDirectionToAngle[ejectorSlotWsDirection]),
+                size: 13,
+                offsetY: offsetShift,
+            });
+            parameters.context.globalAlpha = 1;
         }
     }
 }

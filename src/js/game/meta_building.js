@@ -234,7 +234,6 @@ export class MetaBuilding {
         }
         if (entity.components.ProgrammableBalancer && progBalancer) {
             if (!entity.components.ProgrammableBalancer.word) {
-                console.log("aaaaaa");
                 entity.components.ProgrammableBalancer.word = progBalancer.word;
             }
         }
