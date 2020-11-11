@@ -150,11 +150,12 @@ export class ItemEjectorSystem extends GameSystemWithFilter {
             const sourceEntity = this.allEntities[i];
             const sourceEjectorComp = sourceEntity.components.ItemEjector;
             const slots = sourceEjectorComp.slots;
-            for (let j = 0; j < slots.length; ++j) {
+            for (let j = slots.length - 1; j >= 0; --j) {
                 const sourceSlot = slots[j];
                 const item = sourceSlot.item;
                 const destEntity = sourceSlot.cachedTargetEntity;
-                if (!item || !destEntity) {
+
+                if (!item) {
                     // No item available to be ejected
                     continue;
                 }
@@ -170,6 +171,10 @@ export class ItemEjectorSystem extends GameSystemWithFilter {
 
                 if (G_IS_DEV && globalConfig.debug.disableEjectorProcessing) {
                     sourceSlot.progress = 1.0;
+                }
+
+                if (!destEntity) {
+                    continue;
                 }
 
                 // Check if we are still in the process of ejecting, can't proceed then
@@ -312,9 +317,9 @@ export class ItemEjectorSystem extends GameSystemWithFilter {
             }
 
             const staticComp = entity.components.StaticMapEntity;
-
-            for (let i = 0; i < ejectorComp.slots.length; ++i) {
-                const slot = ejectorComp.slots[i];
+            const slots = ejectorComp.slots;
+            for (let i = 0; i < slots.length; ++i) {
+                const slot = slots[i];
                 const ejectedItem = slot.item;
 
                 if (!ejectedItem) {

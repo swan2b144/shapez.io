@@ -117,6 +117,36 @@ export class ItemEjectorComponent extends Component {
     }
 
     /**
+     * Returns the first free slot on this ejector or null if there is none
+     * @returns {number?}
+     */
+    getNextFreeSlotForTriple(slot, lastUsedSlot) {
+        let i = slot;
+        while (true) {
+            if (slot == this.slots.length - 1 && this.canEjectOnSlot(0)) {
+                if (!lastUsedSlot || lastUsedSlot != 0) {
+                    return 0;   
+                } else {
+                    return i + 1;
+                }
+            }
+            
+            if (this.canEjectOnSlot(i + 1)) {
+                if (!lastUsedSlot || lastUsedSlot != i + 1) {
+                    return i + 1;
+                } else {
+                    return 0;
+                }
+            }
+
+            i += 1;
+            if (i == this.slots.length) {
+                i = 0;
+            }
+        }
+    }
+
+    /**
      * Tries to eject a given item
      * @param {number} slotIndex
      * @param {BaseItem} item
