@@ -149,12 +149,12 @@ export class ItemEjectorSystem extends GameSystemWithFilter {
         for (let i = 0; i < this.allEntities.length; ++i) {
             const sourceEntity = this.allEntities[i];
             const sourceEjectorComp = sourceEntity.components.ItemEjector;
-
             const slots = sourceEjectorComp.slots;
             for (let j = 0; j < slots.length; ++j) {
                 const sourceSlot = slots[j];
                 const item = sourceSlot.item;
-                if (!item) {
+                const destEntity = sourceSlot.cachedTargetEntity;
+                if (!item || !destEntity) {
                     // No item available to be ejected
                     continue;
                 }
@@ -191,7 +191,6 @@ export class ItemEjectorSystem extends GameSystemWithFilter {
                 }
 
                 // Check if the target acceptor can actually accept this item
-                const destEntity = sourceSlot.cachedTargetEntity;
                 const destSlot = sourceSlot.cachedDestSlot;
                 if (destSlot) {
                     const targetAcceptorComp = destEntity.components.ItemAcceptor;

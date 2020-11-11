@@ -1058,34 +1058,39 @@ settings:
                 Shortens info boxes for buildings by only showing their ratios. Otherwise a description and image is shown.
 
         sandboxMod:
-            title: Opens Sandbox Mod
+            title: Sandbox Mod
             description: >-
                 Everything is configurable and if survival mode is opened, makes everything free (By Shrimp The Shrimp).
 
         survivalMod:
-            title: Opens Survival Mod
+            title: Survival Mod
             description: >-
                 Every build now has building cost and there is more hubs available (By Shrimp The Shrimp).
 
         visibleDisplayMod:
-            title: Opens Visible Display Mod
+            title: Visible Display Mod
             description: >-
                 Makes display more clear (By Shrimp The Shrimp).
 
         wiresMod:
-            title: Opens Wires Mod
+            title: Wires Mod
             description: >-
                 Adds new wire variant and adds new tunnel varians (By CEbbinghaus).
 
         wirelessDisplayMod:
-            title: Opens Wireless Display Mod
+            title: Wireless Display Mod
             description: >-
                 Adds wireless display to the game (By Shrimp The Shrimp).
 
         programmableBalancerMod:
-            title: Opens Programmable Balancer Mod
+            title: Programmable Balancer Mod
             description: >-
-                You can control balancers with this mod. (By Shrimp The Shrimp).        
+                You can control balancers with this mod. (By Shrimp The Shrimp).
+
+        compactFilterMod:
+            title: Compact Filter Mod
+            description: >-
+                Now there is 1x1 compact filter (By Shrimp The Shrimp).      
 
         disableCutDeleteWarnings:
             title: Disable Cut/Delete Warnings

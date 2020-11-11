@@ -178,10 +178,24 @@ export class GameSystemManager {
         add("itemProcessorOverlays", ItemProcessorOverlaysSystem);
 
         // ModZ
-        add("wirelessDisplay", WirelessDisplaySystem);
-        add("programmableBalancer", ProgrammableBalancerSystem);
+        this.addModZ();
 
         logger.log("📦 There are", this.systemUpdateOrder.length, "game systems");
+    }
+
+    addModZ() {
+        const add = (id, systemClass) => {
+            this.systems[id] = new systemClass(this.root);
+            this.systemUpdateOrder.push(id);
+        };
+
+        if (this.root.app.settings.getAllSettings().wirelessDisplayMod) {
+            add("wirelessDisplay", WirelessDisplaySystem);
+        }
+
+        if (this.root.app.settings.getAllSettings().programmableBalancerMod) {
+            add("programmableBalancer", ProgrammableBalancerSystem);
+        } 
     }
 
     /**

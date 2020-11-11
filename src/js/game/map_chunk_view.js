@@ -68,10 +68,21 @@ export class MapChunkView extends MapChunk {
         systems.staticMapEntities.drawChunk(parameters, this);
         systems.lever.drawChunk(parameters, this);
         systems.display.drawChunk(parameters, this);
-        systems.wirelessDisplay.drawChunk(parameters, this);
         systems.storage.drawChunk(parameters, this);
         systems.itemProcessorOverlays.drawChunk(parameters, this);
-        systems.programmableBalancer.drawChunk(parameters);
+
+        //ModZ
+        this.drawForegroundStaticLayerModZ(systems, parameters);
+    }
+
+    drawForegroundStaticLayerModZ(systems, parameters) {
+        if (this.root.app.settings.getAllSettings().wirelessDisplayMod) {
+            systems.wirelessDisplay.drawChunk(parameters, this);
+        }
+
+        if (this.root.app.settings.getAllSettings().programmableBalancerMod) {
+            systems.programmableBalancer.drawChunk(parameters, this);
+        }
     }
 
     /**

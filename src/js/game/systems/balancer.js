@@ -292,7 +292,7 @@ export class ProgrammableBalancerSystem extends GameSystemWithFilter {
      * Draws a given chunk
      * @param {import("../../core/draw_utils").DrawParameters} parameters
      */
-    drawChunk(parameters) {
+    drawChunk(parameters, chunk) {
         const entity = this.computeChannelBelowTile();
         if (entity) {
             this.drawMatchingAcceptorsAndEjectors(parameters, entity);

@@ -292,6 +292,7 @@ export const allApplicationSettings = [
     new BoolSetting("wiresMod", enumCategories.modBrowser, (app, value) => {}),
     new BoolSetting("wirelessDisplayMod", enumCategories.modBrowser, (app, value) => {}),
     new BoolSetting("programmableBalancerMod", enumCategories.modBrowser, (app, value) => {}),
+    new BoolSetting("compactFilterMod", enumCategories.modBrowser, (app, value) => {}),
 ];
 
 export function getApplicationSettingById(id) {
@@ -341,6 +342,7 @@ class SettingsStorage {
         this.wiresMod = false;
         this.wirelessDisplayMod = false;
         this.programmableBalancerMod = false;
+        this.compactFilterMod = false;
 
         /**
          * @type {Object.<string, number>}
