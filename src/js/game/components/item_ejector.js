@@ -121,29 +121,48 @@ export class ItemEjectorComponent extends Component {
      * @returns {number?}
      */
     getNextFreeSlotForTriple(slot, lastUsedSlot) {
-        let i = slot;
-        while (true) {
-            if (slot == this.slots.length - 1 && this.canEjectOnSlot(0)) {
-                if (!lastUsedSlot || lastUsedSlot != 0) {
-                    return 0;   
-                } else {
-                    return i + 1;
-                }
-            }
-            
-            if (this.canEjectOnSlot(i + 1)) {
-                if (!lastUsedSlot || lastUsedSlot != i + 1) {
-                    return i + 1;
-                } else {
-                    return 0;
-                }
-            }
-
-            i += 1;
-            if (i == this.slots.length) {
-                i = 0;
-            }
+        if (!this.canEjectOnSlot(0) && !this.canEjectOnSlot(1) && !this.canEjectOnSlot(2)) {
+            return null;
         }
+        if (this.canEjectOnSlot(0) && this.canEjectOnSlot(1) && this.canEjectOnSlot(2)) {
+            return this.getFirstFreeSlot();
+        }
+        switch (slot) {
+            case 0:
+                if (this.canEjectOnSlot(0) && lastUsedSlot != 0) {
+                    return 0;
+                } else if (this.canEjectOnSlot(1) && lastUsedSlot != 1) {
+                    return 1;
+                } else if (this.canEjectOnSlot(2) && lastUsedSlot != 2) {
+                    return 2;
+                } else {
+                    return null;
+                }
+                break;
+            case 1:
+                if (this.canEjectOnSlot(2) && lastUsedSlot != 2) {
+                    return 2;
+                } else if (this.canEjectOnSlot(0) && lastUsedSlot != 0) {
+                    return 0;
+                } else if (this.canEjectOnSlot(1) && lastUsedSlot != 1) {
+                    return 1;
+                } else {
+                    return null;
+                }
+            case 2:
+                if (this.canEjectOnSlot(0) && lastUsedSlot != 0) {
+                    return 0;
+                } else if (this.canEjectOnSlot(1) && lastUsedSlot != 1) {
+                    return 1;
+                } else if (this.canEjectOnSlot(2) && lastUsedSlot != 2) {
+                    return 2;
+                } else {
+                    return null;
+                }
+            default:
+                break;
+        }
+        return null;
     }
 
     /**

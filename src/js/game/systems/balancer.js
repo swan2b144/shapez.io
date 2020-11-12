@@ -45,24 +45,25 @@ export class ProgrammableBalancerSystem extends GameSystemWithFilter {
      */
     testSignal(word) {
         // If word isn't 4 letter it will return false
-        if (word.length != 4) {
+        const words = word.split("/");
+        if (words.length != 4) {
             return false;
         }
 
-        if (word == "1111" || word == "0000") {
+        if (word == "in/in/in/in" || word == "out/out/out/out") {
             return false;
         }
 
         this.sides = {
-            top: word.slice(0,1),
-            right: word.slice(1,2),
-            bottom: word.slice(2,3),
-            left: word.slice(3,4),
+            top: words[0],
+            right: words[1],
+            bottom: words[2],
+            left: words[3],
         };
 
         // Test for all sides and if there is a word diffrent than 0 or 1 return false
         for (const side in this.sides) {
-            if (this.sides[side] != 0 && this.sides[side] != 1) {
+            if (this.sides[side] != "in" && this.sides[side] != "out") {
                 return false;
             }
         }
@@ -162,12 +163,12 @@ export class ProgrammableBalancerSystem extends GameSystemWithFilter {
             const AcceptorSlots = [];
             const EjectorSlots = [];
             for (const side in this.sides) {
-                if (this.sides[side] == 1) {
+                if (this.sides[side] == "in") {
                     AcceptorSlots.push({
                         pos: new Vector(0, 0),
                         directions: [enumDirection[side]],
                     });
-                } else if (this.sides[side] == 0) { 
+                } else if (this.sides[side] == "out") { 
                     EjectorSlots.push({
                         pos: new Vector(0, 0),
                         direction: enumDirection[side],

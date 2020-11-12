@@ -49,6 +49,13 @@ export class MetaBalancerBuilding extends MetaBuilding {
         }
     }
 
+    getIsRotateable(variant) {
+        if (variant == enumBalancerVariants.programmableBalancer) {
+            return false;
+        } 
+        return true;
+    }
+
     /**
      * @param {number} rotation
      * @param {number} rotationVariant
@@ -237,8 +244,6 @@ export class MetaBalancerBuilding extends MetaBuilding {
                 break;
             }
             case enumBalancerVariants.programmableBalancer: {
-                entity.components.ItemAcceptor.setSlots([]);
-
                 entity.components.ItemEjector.setSlots([]);
 
                 if (!entity.components.ProgrammableBalancer) {

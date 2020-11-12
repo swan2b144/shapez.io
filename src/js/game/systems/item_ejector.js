@@ -152,6 +152,10 @@ export class ItemEjectorSystem extends GameSystemWithFilter {
             const slots = sourceEjectorComp.slots;
             for (let j = slots.length - 1; j >= 0; --j) {
                 const sourceSlot = slots[j];
+                if (!sourceSlot) {
+                    console.log(slots);
+                    console.log(j);
+                }
                 const item = sourceSlot.item;
                 const destEntity = sourceSlot.cachedTargetEntity;
 
