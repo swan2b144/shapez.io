@@ -25,6 +25,7 @@ import { ItemProducerComponent } from "./components/item_producer";
 import { WirelessDisplayComponent } from "./components/wireless_display";
 import { WirelessCodeComponent } from "./components/wireless_code";
 import { ProgrammableBalancerComponent } from "./components/balancer";
+import { InverseFilterComponent } from "./components/inverse_filter";
 
 /* typehints:end */
 
@@ -106,6 +107,9 @@ export class EntityComponentStorage {
 
         /** @type {ProgrammableBalancerComponent} */
         this.ProgrammableBalancer;
+
+        /** @type {InverseFilterComponent} */
+        this.InverseFilter;
 
         /* typehints:end */
     }

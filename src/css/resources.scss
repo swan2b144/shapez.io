@@ -41,6 +41,9 @@ $buildingsAndVariants: belt, balancer, underground_belt, underground_belt-tier2,
 
 // Filter and lever share tutorials
 [data-icon="building_tutorials/filter.png"],
+[data-icon="building_tutorials/filter-filter_inverse.png"],
+[data-icon="building_tutorials/filter-compact_filter.png"],
+[data-icon="building_tutorials/filter-compact_filter_inverse.png"],
 [data-icon="building_tutorials/lever.png"] {
     /* @load-async */
     background-image: uiResource("res/ui/building_tutorials/lever.png") !important;

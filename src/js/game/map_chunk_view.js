@@ -80,7 +80,7 @@ export class MapChunkView extends MapChunk {
             systems.wirelessDisplay.drawChunk(parameters, this);
         }
 
-        if (this.root.app.settings.getAllSettings().programmableBalancerMod) {
+        if (this.root.app.settings.getAllSettings().moreBalancerMod) {
             systems.programmableBalancer.drawChunk(parameters, this);
         }
     }

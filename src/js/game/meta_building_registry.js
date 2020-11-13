@@ -9,7 +9,7 @@ import { MetaConstantSignalBuilding } from "./buildings/constant_signal";
 import { enumCutterVariants, MetaCutterBuilding } from "./buildings/cutter";
 import { MetaDisplayBuilding } from "./buildings/display";
 import { enumWirelessDisplayVariants, MetaWirelessDisplayBuilding } from "./buildings/wireless_display";
-import { MetaFilterBuilding } from "./buildings/filter";
+import { enumFilterVariants, MetaFilterBuilding } from "./buildings/filter";
 import { MetaHubBuilding } from "./buildings/hub";
 import { MetaItemProducerBuilding } from "./buildings/item_producer";
 import { MetaLeverBuilding } from "./buildings/lever";
@@ -185,7 +185,12 @@ export function initMetaBuildingRegistry() {
     registerBuildingVariant(10000005, MetaWireBuilding, enumWireVariant.third, 3);
 
     // Programable Balancer
-    registerBuildingVariant(0, MetaBalancerBuilding, enumBalancerVariants.programmableBalancer);
+    registerBuildingVariant(-1, MetaBalancerBuilding, enumBalancerVariants.programmableBalancer);
+
+    // Compact Filter
+    registerBuildingVariant(-1, MetaFilterBuilding, enumFilterVariants.filterInverse);
+    registerBuildingVariant(-1, MetaFilterBuilding, enumFilterVariants.compactFilter);
+    registerBuildingVariant(-1, MetaFilterBuilding, enumFilterVariants.compactFilterInverse);
 
     // Propagate instances
     for (const key in gBuildingVariants) {

@@ -99,18 +99,21 @@ export class ItemProcessorSystem extends GameSystemWithFilter {
                         let slot = null;
                         if (requiredSlot !== null && requiredSlot !== undefined) {
                             // We have a slot override, check if that is free
-                            if (ejectorComp.canEjectOnSlot(requiredSlot)) {
+                            if (ejectorComp.canEjectOnSlot(requiredSlot) && requiredSlot !== ejectorComp.lastUsedSlot) {
                                 slot = requiredSlot;
+                                ejectorComp.lastUsedSlot = slot;
                             }
                         } else if (preferredSlot !== null && preferredSlot !== undefined) {
                             // We have a slot preference, try using it but otherwise use a free slot
-                            if (ejectorComp.canEjectOnSlot(preferredSlot)) {
+                            
+                            if (ejectorComp.canEjectOnSlot(preferredSlot) && preferredSlot !== ejectorComp.lastUsedSlot) {
                                 slot = preferredSlot;
+                                ejectorComp.lastUsedSlot = slot;
                             } else {
-                                if (entity.components.ItemEjector.slots[3]) {
-                                    slot = ejectorComp.getNextFreeSlotForTriple(preferredSlot, this.lastUsedSlot);
+                                if (entity.components.ItemEjector.slots[2]) {
+                                    slot = ejectorComp.getFreeSlotForTriple(preferredSlot, ejectorComp.lastUsedSlot);
                                     if (slot !== null) {
-                                        this.lastUsedSlot = slot;
+                                        ejectorComp.lastUsedSlot = slot;
                                     }
                                 } else {
                                     slot = ejectorComp.getFirstFreeSlot();

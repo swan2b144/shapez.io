@@ -26,7 +26,10 @@ export class FilterSystem extends GameSystemWithFilter {
             const ejectorComp = entity.components.ItemEjector;
 
             // Process payloads
-            const slotsAndLists = [filterComp.pendingItemsToLeaveThrough, filterComp.pendingItemsToReject];
+            let slotsAndLists = [filterComp.pendingItemsToLeaveThrough, filterComp.pendingItemsToReject];
+            if (entity.components.InverseFilter) {
+                slotsAndLists = [filterComp.pendingItemsToReject, filterComp.pendingItemsToLeaveThrough];
+            }
             for (let slotIndex = 0; slotIndex < slotsAndLists.length; ++slotIndex) {
                 const pendingItems = slotsAndLists[slotIndex];
 
@@ -52,7 +55,7 @@ export class FilterSystem extends GameSystemWithFilter {
      * @param {BaseItem} item
      */
     tryAcceptItem(entity, slot, item) {
-        const network = entity.components.WiredPins.slots[0].linkedNetwork;
+        let network = entity.components.WiredPins.slots[0].linkedNetwork;
         if (!network || !network.hasValue()) {
             // Filter is not connected
             return false;
@@ -68,7 +71,7 @@ export class FilterSystem extends GameSystemWithFilter {
             listToCheck = filterComp.pendingItemsToLeaveThrough;
         } else {
             listToCheck = filterComp.pendingItemsToReject;
-        }
+        } 
 
         if (listToCheck.length >= MAX_ITEMS_IN_QUEUE) {
             // Busy

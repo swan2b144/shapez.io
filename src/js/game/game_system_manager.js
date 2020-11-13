@@ -193,7 +193,7 @@ export class GameSystemManager {
             add("wirelessDisplay", WirelessDisplaySystem);
         }
 
-        if (this.root.app.settings.getAllSettings().programmableBalancerMod) {
+        if (this.root.app.settings.getAllSettings().moreBalancerMod) {
             add("programmableBalancer", ProgrammableBalancerSystem);
         } 
     }

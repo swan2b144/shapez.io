@@ -46,7 +46,7 @@ export function registerBuildingVariant(
     variant = "default" /* @TODO: Circular dependency, actually its defaultBuildingVariant */,
     rotationVariant = 0
 ) {
-    if (code == 0) {
+    if (code == -1) {
         code = buildingCode;
         buildingCode += 1;
     }

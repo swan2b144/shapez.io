@@ -46,6 +46,7 @@ export class ItemEjectorComponent extends Component {
 
         this.setSlots(slots);
         this.renderFloatingItems = renderFloatingItems;
+        this.lastUsedSlot = null;
     }
 
     /**
@@ -120,12 +121,21 @@ export class ItemEjectorComponent extends Component {
      * Returns the first free slot on this ejector or null if there is none
      * @returns {number?}
      */
-    getNextFreeSlotForTriple(slot, lastUsedSlot) {
+    getFreeSlotForTriple(slot, lastUsedSlot) {
         if (!this.canEjectOnSlot(0) && !this.canEjectOnSlot(1) && !this.canEjectOnSlot(2)) {
             return null;
         }
         if (this.canEjectOnSlot(0) && this.canEjectOnSlot(1) && this.canEjectOnSlot(2)) {
             return this.getFirstFreeSlot();
+        }
+        if (this.canEjectOnSlot(0) && !this.canEjectOnSlot(1) && !this.canEjectOnSlot(2)) {
+            return 0;
+        }
+        if (!this.canEjectOnSlot(0) && this.canEjectOnSlot(1) && !this.canEjectOnSlot(2)) {
+            return 1;
+        }
+        if (!this.canEjectOnSlot(0) && !this.canEjectOnSlot(1) && this.canEjectOnSlot(2)) {
+            return 2;
         }
         switch (slot) {
             case 0:

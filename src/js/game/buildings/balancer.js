@@ -18,6 +18,7 @@ export const enumBalancerVariants = {
     splitter: "splitter",
     splitterInverse: "splitter-inverse",
     programmableBalancer: "programmable-balancer",
+    autoBalancer: "auto-balancer",
 };
 
 const overlayMatrices = {
@@ -26,7 +27,8 @@ const overlayMatrices = {
     [enumBalancerVariants.mergerInverse]: generateMatrixRotations([0, 1, 0, 1, 1, 0, 0, 1, 0]),
     [enumBalancerVariants.splitter]: generateMatrixRotations([0, 1, 0, 0, 1, 1, 0, 1, 0]),
     [enumBalancerVariants.splitterInverse]: generateMatrixRotations([0, 1, 0, 1, 1, 0, 0, 1, 0]),
-    [enumBalancerVariants.programmableBalancer]: generateMatrixRotations([0, 1, 0, 0, 1, 1, 0, 1, 0]),
+    [enumBalancerVariants.programmableBalancer]: null,
+    [enumBalancerVariants.autoBalancer]: null,
 };
 
 export class MetaBalancerBuilding extends MetaBuilding {
@@ -43,6 +45,7 @@ export class MetaBalancerBuilding extends MetaBuilding {
             case enumBalancerVariants.splitter:
             case enumBalancerVariants.splitterInverse:
             case enumBalancerVariants.programmableBalancer:
+            case enumBalancerVariants.autoBalancer:
                 return new Vector(1, 1);
             default:
                 assertAlways(false, "Unknown balancer variant: " + variant);
@@ -84,6 +87,7 @@ export class MetaBalancerBuilding extends MetaBuilding {
             case enumBalancerVariants.splitter:
             case enumBalancerVariants.splitterInverse:
             case enumBalancerVariants.programmableBalancer:
+            case enumBalancerVariants.autoBalancer:
                 speedMultiplier = 1;
         }
 
@@ -100,20 +104,19 @@ export class MetaBalancerBuilding extends MetaBuilding {
      * @param {GameRoot} root
      */
     getAvailableVariants(root) {
-        this.programmableBalancerMod = root.app.settings.getAllSettings().programmableBalancerMod;
+        this.moreBalancerMod = root.app.settings.getAllSettings().moreBalancerMod;
 
         let available = [defaultBuildingVariant];
 
-        // Dont unlock compact balancers if there is programmable balancer already.
-        if (!this.programmableBalancerMod) {
-            if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_merger)) {
-                available.push(enumBalancerVariants.merger, enumBalancerVariants.mergerInverse);
-            }
-    
-            if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_splitter)) {
-                available.push(enumBalancerVariants.splitter, enumBalancerVariants.splitterInverse);
-            }
-        } else if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_merger)) {
+        if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_merger)) {
+            available.push(enumBalancerVariants.merger, enumBalancerVariants.mergerInverse);
+        }
+
+        if (root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_splitter)) {
+            available.push(enumBalancerVariants.splitter, enumBalancerVariants.splitterInverse);
+        }
+
+        if (this.moreBalancerMod && root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_merger)) {
             available.push(enumBalancerVariants.programmableBalancer);
         }
 
@@ -243,6 +246,7 @@ export class MetaBalancerBuilding extends MetaBuilding {
 
                 break;
             }
+            case enumBalancerVariants.autoBalancer:
             case enumBalancerVariants.programmableBalancer: {
                 entity.components.ItemEjector.setSlots([]);
 

@@ -263,7 +263,9 @@ dialogs:
 
     editBalancer:
         title: Program Sides
-        descShortKey: Select sides based on input/output</strong>
+        descShortKey:   (Top/Right/Bottom/Left)<br><br>
+                        Example, in/in/in/out<br><br>
+                        Select sides based on input/output</strong>
 
     editSignal:
         title: Set Signal
@@ -1082,12 +1084,12 @@ settings:
             description: >-
                 Adds wireless display to the game (By Shrimp The Shrimp).
 
-        programmableBalancerMod:
-            title: Programmable Balancer Mod
+        moreBalancerMod:
+            title: More Balancer Mod
             description: >-
-                You can control balancers with this mod. (By Shrimp The Shrimp).
+                Just adds more balancers. (By Shrimp The Shrimp & Sense_101).
 
-        compactFilterMod:
+        moreFiltersMod:
             title: Compact Filter Mod
             description: >-
                 Now there is 1x1 compact filter (By Shrimp The Shrimp).      
