@@ -273,9 +273,6 @@ export class AutoBalancerSystem extends GameSystemWithFilter {
             acceptorSlots = acceptorComp.slots.slice();
         }
 
-        console.log(ejectorComp);
-        console.log(acceptorComp);
-
         for (let acceptorSlotIndex = 0; acceptorSlotIndex < acceptorSlots.length; ++acceptorSlotIndex) {
             const slot = acceptorSlots[acceptorSlotIndex];
 
