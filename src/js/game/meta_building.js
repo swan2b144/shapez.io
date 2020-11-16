@@ -134,6 +134,17 @@ export class MetaBuilding {
      * @returns {AtlasSprite}
      */
     getPreviewSprite(rotationVariant = 0, variant = defaultBuildingVariant) {
+        const sprite = Loader.getSprite(
+            "sprites/buildings/" +
+                this.id +
+                (variant === defaultBuildingVariant ? "" : "-" + variant) +
+                ".png"
+        );
+        if (sprite.spriteName == "not-found") {
+            return Loader.getSprite(
+                "sprites/buildings/placeholder.png"
+            );
+        }
         return Loader.getSprite(
             "sprites/buildings/" +
                 this.id +
@@ -213,7 +224,7 @@ export class MetaBuilding {
      * @param {number} param0.rotationVariant Rotation variant
      * @param {string} param0.variant
      */
-    createEntity({ root, origin, rotation, originalRotation, rotationVariant, variant, wireless_code, progBalancer }) {
+    createEntity({ root, origin, rotation, originalRotation, rotationVariant, variant, DisplayComp, BalancerComp}) {
         const entity = new Entity(root);
         entity.layer = this.getLayer();
         entity.addComponent(
@@ -227,15 +238,11 @@ export class MetaBuilding {
         );
         this.setupEntityComponents(entity, root);
         this.updateVariants(entity, rotationVariant, variant);
-        if (entity.components.WirelessDisplay && wireless_code) {
-            if (!entity.components.WirelessCode) {
-                entity.components.WirelessCode = wireless_code;
-            }
+        if (entity.components.WirelessDisplay && DisplayComp && entity.components.WirelessDisplay.wireless_code) {
+            entity.components.WirelessDisplay.wireless_code = DisplayComp.wireless_code;
         }
-        if (entity.components.ProgrammableBalancer && progBalancer) {
-            if (!entity.components.ProgrammableBalancer.word) {
-                entity.components.ProgrammableBalancer.word = progBalancer.word;
-            }
+        if (entity.components.ProgrammableBalancer && BalancerComp && !entity.components.ProgrammableBalancer.word) {
+            entity.components.ProgrammableBalancer.word = BalancerComp.word;
         }
         return entity;
     }

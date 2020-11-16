@@ -23,8 +23,8 @@ import { ItemProducerComponent } from "./components/item_producer";
 // ModZ
 
 import { WirelessDisplayComponent } from "./components/wireless_display";
-import { WirelessCodeComponent } from "./components/wireless_code";
-import { ProgrammableBalancerComponent } from "./components/balancer";
+import { ProgrammableBalancerComponent } from "./components/programmable_balancer";
+import { AutoBalancerComponent } from "./components/auto_balancer";
 import { InverseFilterComponent } from "./components/inverse_filter";
 
 /* typehints:end */
@@ -102,11 +102,11 @@ export class EntityComponentStorage {
         /** @type {ItemProducerComponent} */
         this.ItemProducer;
 
-        /** @type {WirelessCodeComponent} */
-        this.WirelessCode;
-
         /** @type {ProgrammableBalancerComponent} */
         this.ProgrammableBalancer;
+
+        /** @type {AutoBalancerComponent} */
+        this.AutoBalancer;
 
         /** @type {InverseFilterComponent} */
         this.InverseFilter;

@@ -10,26 +10,17 @@ export class WirelessDisplayComponent extends Component {
 
     static getSchema() {
         return {
-            signal: types.nullable(typeItemSingleton),
+            wireless_code: types.string,
         };
     }
 
     /**
-     * Copy the current state to another component
-     * @param {WirelessDisplayComponent} otherComponent
-     */
-    copyAdditionalStateTo(otherComponent) {
-        otherComponent.signal = this.signal;
-    }
-
-    /**
      *
-     * @param {object} param0
-     * @param {BaseItem=} param0.signal The signal to store
+     * @param {string} wireless_code 
      */
-    constructor({ signal = null }) {
+    constructor(wireless_code = "") {
         super();
-        this.signal = signal;
+        this.wireless_code = wireless_code;
     }
 }
 

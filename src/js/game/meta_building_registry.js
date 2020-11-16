@@ -184,8 +184,9 @@ export function initMetaBuildingRegistry() {
     registerBuildingVariant(10000004, MetaWireBuilding, enumWireVariant.third, 2);
     registerBuildingVariant(10000005, MetaWireBuilding, enumWireVariant.third, 3);
 
-    // Programable Balancer
+    // More Balancer
     registerBuildingVariant(-1, MetaBalancerBuilding, enumBalancerVariants.programmableBalancer);
+    registerBuildingVariant(-1, MetaBalancerBuilding, enumBalancerVariants.autoBalancer);
 
     // Compact Filter
     registerBuildingVariant(-1, MetaFilterBuilding, enumFilterVariants.filterInverse);

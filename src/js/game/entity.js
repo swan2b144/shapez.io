@@ -96,8 +96,8 @@ export class Entity extends BasicSerializableObject {
             rotation: staticComp.rotation,
             rotationVariant: buildingData.rotationVariant,
             variant: buildingData.variant,
-            wireless_code: this.components.WirelessCode,
-            progBalancer: this.components.ProgrammableBalancer,
+            DisplayComp: this.components.WirelessDisplay,
+            BalancerComp: this.components.ProgrammableBalancer,
         });
 
         for (const key in this.components) {

@@ -82,6 +82,7 @@ export class MapChunkView extends MapChunk {
 
         if (this.root.app.settings.getAllSettings().moreBalancerMod) {
             systems.programmableBalancer.drawChunk(parameters, this);
+            systems.autoBalancer.drawChunk(parameters, this);
         }
     }
 

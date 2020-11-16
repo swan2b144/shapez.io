@@ -27,7 +27,9 @@ import { ItemProducerSystem } from "./systems/item_producer";
 
 // ModZ
 import { WirelessDisplaySystem } from "./systems/wireless_display";
-import { ProgrammableBalancerSystem } from "./systems/balancer";
+import { ProgrammableBalancerSystem } from "./systems/programmable_balancer";
+import { AutoBalancerSystem } from "./systems/auto_balancer";
+import { AutoBalancerComponent } from "./components/auto_balancer";
 
 const logger = createLogger("game_system_manager");
 
@@ -111,6 +113,9 @@ export class GameSystemManager {
 
             /** @type {ProgrammableBalancerSystem} */
             programmableBalancer: null,
+        
+            /** @type {AutoBalancerComponent} */
+            autoBalancer: null,
 
             /* typehints:end */
         };
@@ -195,7 +200,8 @@ export class GameSystemManager {
 
         if (this.root.app.settings.getAllSettings().moreBalancerMod) {
             add("programmableBalancer", ProgrammableBalancerSystem);
-        } 
+            add("autoBalancer", AutoBalancerSystem);
+        }
     }
 
     /**

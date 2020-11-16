@@ -122,7 +122,7 @@ export class ItemProcessorSystem extends GameSystemWithFilter {
                         } else {
                             // We can eject on any slot
                             slot = ejectorComp.getFirstFreeSlot();
-                        }
+                        }      
 
                         if (slot !== null) {
                             // Alright, we can actually eject

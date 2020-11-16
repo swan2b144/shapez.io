@@ -55,7 +55,7 @@ export class MetaWireBuilding extends MetaBuilding {
         let available = [defaultBuildingVariant];
         available.push(wireVariants.second);
 
-        if (root.app.settings.getAllSettings().wiresMod) {
+        if (root.app.settings.getAllSettings().moreWiresMod) {
             available.push(wireVariants.third);
         }
 

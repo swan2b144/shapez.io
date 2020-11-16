@@ -1,7 +1,5 @@
 import { types } from "../../savegame/serialization";
 import { Component } from "../component";
-import { BaseItem } from "../base_item";
-import { typeItemSingleton } from "../item_resolver";
 
 export class ProgrammableBalancerComponent extends Component {
     static getId() {
@@ -17,7 +15,7 @@ export class ProgrammableBalancerComponent extends Component {
     /**
      * @param {string} word
      */
-    constructor(word = null) {
+    constructor(word = "out/out/out/out") {
         super();
         this.word = word;
     }

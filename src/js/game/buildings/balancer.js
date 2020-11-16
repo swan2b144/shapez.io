@@ -9,7 +9,8 @@ import { enumHubGoalRewards } from "../tutorial_goals";
 import { T } from "../../translations";
 import { formatItemsPerSecond, generateMatrixRotations } from "../../core/utils";
 import { BeltUnderlaysComponent } from "../components/belt_underlays";
-import { ProgrammableBalancerComponent } from "../components/balancer";
+import { ProgrammableBalancerComponent } from "../components/programmable_balancer";
+import { AutoBalancerComponent } from "../components/auto_balancer";
 
 /** @enum {string} */
 export const enumBalancerVariants = {
@@ -117,7 +118,7 @@ export class MetaBalancerBuilding extends MetaBuilding {
         }
 
         if (this.moreBalancerMod && root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_merger)) {
-            available.push(enumBalancerVariants.programmableBalancer);
+            available.push(enumBalancerVariants.programmableBalancer, enumBalancerVariants.autoBalancer);
         }
 
         return available;
@@ -246,12 +247,13 @@ export class MetaBalancerBuilding extends MetaBuilding {
 
                 break;
             }
-            case enumBalancerVariants.autoBalancer:
             case enumBalancerVariants.programmableBalancer: {
                 entity.components.ItemEjector.setSlots([]);
 
-                if (!entity.components.ProgrammableBalancer) {
+                if (!entity.components.ProgrammableBalancer && variant == enumBalancerVariants.programmableBalancer) {
                     entity.addComponent(new ProgrammableBalancerComponent());
+                } else if (!entity.components.AutoBalancer && variant == enumBalancerVariants.autoBalancer) {
+                    entity.addComponent(new AutoBalancerComponent());
                 }
 
                 entity.components.ItemAcceptor.setSlots([{ 
@@ -265,6 +267,16 @@ export class MetaBalancerBuilding extends MetaBuilding {
                 },
                 ]);
 
+                break;
+            }
+            case enumBalancerVariants.autoBalancer: {
+                entity.components.ItemEjector.setSlots([]);
+
+                if (!entity.components.AutoBalancer && variant == enumBalancerVariants.autoBalancer) {
+                    entity.addComponent(new AutoBalancerComponent());
+                }
+
+                entity.components.ItemAcceptor.setSlots([]);
                 break;
             }
             default:

@@ -65,7 +65,7 @@ export class MetaWireTunnelBuilding extends MetaBuilding {
     getAvailableVariants(root) {
         let available = [defaultBuildingVariant];
 
-        if (root.app.settings.getAllSettings().wiresMod) {
+        if (root.app.settings.getAllSettings().moreWiresMod) {
             available.push(enumWireTunnelVariants.Elbow);
             available.push(enumWireTunnelVariants.Straight);
             available.push(enumWireTunnelVariants.DoubleElbow);

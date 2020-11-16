@@ -590,6 +590,10 @@ buildings:
             name: Programmable Balancer
             description: Select which side will be input which will be output (1 means input 0 means output) - You can only use 1 or 0.
 
+        auto-balancer:
+            name: Automatic Balancer
+            description: This machine controls inputs and outputs based on placed entity.
+
     cutter:
         default:
             name: &cutter Cutter
@@ -1074,7 +1078,7 @@ settings:
             description: >-
                 Makes display more clear (By Shrimp The Shrimp).
 
-        wiresMod:
+        moreWiresMod:
             title: Wires Mod
             description: >-
                 Adds new wire variant and adds new tunnel varians (By CEbbinghaus).

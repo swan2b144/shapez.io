@@ -22,8 +22,8 @@ import { ItemProducerComponent } from "./components/item_producer";
 
 // ModZ
 import { WirelessDisplayComponent } from "./components/wireless_display";
-import { WirelessCodeComponent } from "./components/wireless_code";
-import { ProgrammableBalancerComponent } from "./components/balancer";
+import { ProgrammableBalancerComponent } from "./components/programmable_balancer";
+import { AutoBalancerComponent } from "./components/auto_balancer";
 import { InverseFilterComponent } from "./components/inverse_filter";
 
 export function initComponentRegistry() {
@@ -49,9 +49,10 @@ export function initComponentRegistry() {
     gComponentRegistry.register(ItemProducerComponent);
 
     // ModZ
-    gComponentRegistry.register(WirelessCodeComponent);
+    
     gComponentRegistry.register(WirelessDisplayComponent);
     gComponentRegistry.register(ProgrammableBalancerComponent);
+    gComponentRegistry.register(AutoBalancerComponent);
     gComponentRegistry.register(InverseFilterComponent);
 
     // IMPORTANT ^^^^^ UPDATE ENTITY COMPONENT STORAGE AFTERWARDS

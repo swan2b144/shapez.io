@@ -9,6 +9,7 @@ import { ExplainedResult } from "../core/explained_result";
 import { THEMES, applyGameTheme } from "../game/theme";
 import { T } from "../translations";
 import { LANGUAGES } from "../languages";
+import { enumBalancerVariants } from "../game/buildings/balancer";
 
 const logger = createLogger("application_settings");
 
@@ -289,7 +290,7 @@ export const allApplicationSettings = [
     new BoolSetting("sandboxMod", enumCategories.modBrowser, (app, value) => {}),
     new BoolSetting("survivalMod", enumCategories.modBrowser, (app, value) => {}),
     new BoolSetting("visibleDisplayMod", enumCategories.modBrowser, (app, value) => {}),
-    new BoolSetting("wiresMod", enumCategories.modBrowser, (app, value) => {}),
+    new BoolSetting("moreWiresMod", enumCategories.modBrowser, (app, value) => {}),
     new BoolSetting("wirelessDisplayMod", enumCategories.modBrowser, (app, value) => {}),
     new BoolSetting("moreBalancerMod", enumCategories.modBrowser, (app, value) => {}),
     new BoolSetting("moreFiltersMod", enumCategories.modBrowser, (app, value) => {}),
@@ -298,6 +299,8 @@ export const allApplicationSettings = [
 export function getApplicationSettingById(id) {
     return allApplicationSettings.find(setting => setting.id === id);
 }
+
+const enumModSettings = [];
 
 class SettingsStorage {
     constructor() {
@@ -336,10 +339,11 @@ class SettingsStorage {
         this.mapResourcesScale = 0.5;
 
         // ModZ
+
         this.sandboxMod = false;
         this.survivalMod = false;
         this.visibleDisplayMod = false;
-        this.wiresMod = false;
+        this.moreWiresMod = false;
         this.wirelessDisplayMod = false;
         this.moreBalancerMod = false;
         this.moreFiltersMod = false;
@@ -348,6 +352,18 @@ class SettingsStorage {
          * @type {Object.<string, number>}
          */
         this.keybindingOverrides = {};
+
+        // ModZ
+
+        enumModSettings.push(
+            "sandboxMod",
+            "survivalMod",
+            "visibleDisplayMod",
+            "moreWiresMod",
+            "wirelessDisplayMod",
+            "moreBalancerMod",
+            "moreFiltersMod",
+        );
     }
 }
 
@@ -553,7 +569,7 @@ export class ApplicationSettings extends ReadWriteProxy {
     }
 
     getCurrentVersion() {
-        return 30;
+        return 30 + enumModSettings.length;
     }
 
     /** @param {{settings: SettingsStorage, version: number}} data */
@@ -699,6 +715,18 @@ export class ApplicationSettings extends ReadWriteProxy {
 
             data.version = 30;
         }
+
+        // ModZ
+        
+        for (const modNum in enumModSettings) {
+            const dataVersion = 31 + parseInt(modNum);
+            if (data.version < dataVersion) {
+                const setting = enumModSettings[modNum];
+                data.settings[setting] = false;
+                data.version = dataVersion;
+            }
+        }
+
         return ExplainedResult.good();
     }
 }
