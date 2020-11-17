@@ -11,6 +11,8 @@ import { formatItemsPerSecond, generateMatrixRotations } from "../../core/utils"
 import { BeltUnderlaysComponent } from "../components/belt_underlays";
 import { ProgrammableBalancerComponent } from "../components/programmable_balancer";
 import { AutoBalancerComponent } from "../components/auto_balancer";
+import { LaneSwapperComponent } from "../components/lane_swapper";
+import { globalConfig } from "../../core/config";
 
 /** @enum {string} */
 export const enumBalancerVariants = {
@@ -20,6 +22,7 @@ export const enumBalancerVariants = {
     splitterInverse: "splitter-inverse",
     programmableBalancer: "programmable-balancer",
     autoBalancer: "auto-balancer",
+    laneSwapper: "lane-swapper",
 };
 
 const overlayMatrices = {
@@ -30,6 +33,7 @@ const overlayMatrices = {
     [enumBalancerVariants.splitterInverse]: generateMatrixRotations([0, 1, 0, 1, 1, 0, 0, 1, 0]),
     [enumBalancerVariants.programmableBalancer]: null,
     [enumBalancerVariants.autoBalancer]: null,
+    [enumBalancerVariants.laneSwapper]: null,
 };
 
 export class MetaBalancerBuilding extends MetaBuilding {
@@ -40,6 +44,7 @@ export class MetaBalancerBuilding extends MetaBuilding {
     getDimensions(variant) {
         switch (variant) {
             case defaultBuildingVariant:
+            case enumBalancerVariants.laneSwapper:
                 return new Vector(2, 1);
             case enumBalancerVariants.merger:
             case enumBalancerVariants.mergerInverse:
@@ -118,7 +123,7 @@ export class MetaBalancerBuilding extends MetaBuilding {
         }
 
         if (this.moreBalancerMod && root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_merger)) {
-            available.push(enumBalancerVariants.programmableBalancer, enumBalancerVariants.autoBalancer);
+            available.push(enumBalancerVariants.programmableBalancer, enumBalancerVariants.autoBalancer, enumBalancerVariants.laneSwapper);
         }
 
         return available;
@@ -267,6 +272,13 @@ export class MetaBalancerBuilding extends MetaBuilding {
                 },
                 ]);
 
+                entity.components.BeltUnderlays.underlays = [
+                    { pos: new Vector(0, 0), direction: enumDirection.top },
+                    { pos: new Vector(0, 0), direction: enumDirection.right },
+                    { pos: new Vector(0, 0), direction: enumDirection.bottom },
+                    { pos: new Vector(0, 0), direction: enumDirection.left },
+                ];
+
                 break;
             }
             case enumBalancerVariants.autoBalancer: {
@@ -277,6 +289,50 @@ export class MetaBalancerBuilding extends MetaBuilding {
                 }
 
                 entity.components.ItemAcceptor.setSlots([]);
+
+                entity.components.BeltUnderlays.underlays = [
+                    { pos: new Vector(0, 0), direction: enumDirection.top },
+                    { pos: new Vector(0, 0), direction: enumDirection.right },
+                    { pos: new Vector(0, 0), direction: enumDirection.bottom },
+                    { pos: new Vector(0, 0), direction: enumDirection.left },
+                ];
+
+                break;
+            }
+            case enumBalancerVariants.laneSwapper: {
+                if (!entity.components.LaneSwapper && variant == enumBalancerVariants.laneSwapper) {
+                    entity.addComponent(new LaneSwapperComponent());
+                }
+
+                entity.components.ItemAcceptor.setSlots([
+                    {
+                        pos: new Vector(0, 0),
+                        directions: [enumDirection.bottom],
+                    },
+                    {
+                        pos: new Vector(1, 0),
+                        directions: [enumDirection.bottom],
+                    },
+                ]);
+
+                entity.components.ItemEjector.setSlots([
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.top,
+                    },
+                    {
+                        pos: new Vector(1, 0),
+                        direction: enumDirection.top,
+                    },
+                ]);
+
+                entity.components.BeltUnderlays.underlays = [
+                    { pos: new Vector(0, 0), direction: enumDirection.top },
+                    { pos: new Vector(0, 0), direction: enumDirection.bottom },
+                    { pos: new Vector(1, 0), direction: enumDirection.top },
+                    { pos: new Vector(1, 0), direction: enumDirection.bottom },
+                ];
+
                 break;
             }
             default:

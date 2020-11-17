@@ -16,6 +16,8 @@ import { Loader } from "../../core/loader";
 import { drawRotatedSprite } from "../../core/draw_utils";
 import { DrawParameters } from "../../core/draw_parameters";
 
+let balancerWord = "";
+
 export class ProgrammableBalancerSystem extends GameSystemWithFilter {
     constructor(root) {
         super(root, [ProgrammableBalancerComponent]);
@@ -50,7 +52,7 @@ export class ProgrammableBalancerSystem extends GameSystemWithFilter {
             return false;
         }
 
-        this.sides = {
+        const sides = {
             top: words[0],
             right: words[1],
             bottom: words[2],
@@ -58,13 +60,13 @@ export class ProgrammableBalancerSystem extends GameSystemWithFilter {
         };
 
         // Test for all sides and if there is a word diffrent than 0 or 1 return false
-        for (const side in this.sides) {
-            if (this.sides[side] != "in" && this.sides[side] != "out") {
+        for (const side in sides) {
+            if (sides[side] != "in" && sides[side] != "out") {
                 return false;
             }
         }
 
-        this.word = word;
+        balancerWord = word;
 
         // If it passes all tests return true
         return true;
@@ -158,13 +160,20 @@ export class ProgrammableBalancerSystem extends GameSystemWithFilter {
             this.testSignal(entity.components.ProgrammableBalancer.word);
             const AcceptorSlots = [];
             const EjectorSlots = [];
-            for (const side in this.sides) {
-                if (this.sides[side] == "in") {
+            const words = entity.components.ProgrammableBalancer.word.split("/");
+            const sides = {
+                top: words[0],
+                right: words[1],
+                bottom: words[2],
+                left: words[3],
+            };
+            for (const side in sides) {
+                if (sides[side] == "in") {
                     AcceptorSlots.push({
                         pos: new Vector(0, 0),
                         directions: [enumDirection[side]],
                     });
-                } else if (this.sides[side] == "out") { 
+                } else if (sides[side] == "out") { 
                     EjectorSlots.push({
                         pos: new Vector(0, 0),
                         direction: enumDirection[side],
@@ -211,6 +220,8 @@ export class ProgrammableBalancerSystem extends GameSystemWithFilter {
 
             // When confirmed, set the signal
             const closeHandler = () => {
+                entity.components.ProgrammableBalancer.word = balancerWord;
+
                 if (!this.root || !this.root.entityMgr) {
                     // Game got stopped
                     return;
@@ -231,8 +242,6 @@ export class ProgrammableBalancerSystem extends GameSystemWithFilter {
                 if (signalValueInput.getValue()) {
                     this.fixComponents(entity);
                 }
-
-                entity.components.ProgrammableBalancer.word = this.word;
             };
 
             dialog.buttonSignals.ok.add(closeHandler);

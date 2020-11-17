@@ -1,4 +1,5 @@
 import { BaseItem } from "../base_item";
+import { enumBalancerVariants } from "../buildings/balancer";
 import { enumColorMixingResults, enumColors } from "../colors";
 import {
     enumItemProcessorRequirements,
@@ -97,32 +98,41 @@ export class ItemProcessorSystem extends GameSystemWithFilter {
                         assert(ejectorComp, "To eject items, the building needs to have an ejector");
 
                         let slot = null;
-                        if (requiredSlot !== null && requiredSlot !== undefined) {
-                            // We have a slot override, check if that is free
-                            if (ejectorComp.canEjectOnSlot(requiredSlot) && requiredSlot !== ejectorComp.lastUsedSlot) {
-                                slot = requiredSlot;
-                                ejectorComp.lastUsedSlot = slot;
-                            }
-                        } else if (preferredSlot !== null && preferredSlot !== undefined) {
-                            // We have a slot preference, try using it but otherwise use a free slot
-                            
-                            if (ejectorComp.canEjectOnSlot(preferredSlot) && preferredSlot !== ejectorComp.lastUsedSlot) {
-                                slot = preferredSlot;
-                                ejectorComp.lastUsedSlot = slot;
-                            } else {
-                                if (entity.components.ItemEjector.slots[2]) {
-                                    slot = ejectorComp.getFreeSlotForTriple(preferredSlot, ejectorComp.lastUsedSlot);
-                                    if (slot !== null) {
-                                        ejectorComp.lastUsedSlot = slot;
-                                    }
-                                } else {
-                                    slot = ejectorComp.getFirstFreeSlot();
+
+                        if (!entity.components.LaneSwapper) {
+                            if (requiredSlot !== null && requiredSlot !== undefined) {
+                                // We have a slot override, check if that is free
+                                if (ejectorComp.canEjectOnSlot(requiredSlot) && requiredSlot !== ejectorComp.lastUsedSlot) {
+                                    slot = requiredSlot;
+                                    ejectorComp.lastUsedSlot = slot;
                                 }
+                            } else if (preferredSlot !== null && preferredSlot !== undefined) {
+                                // We have a slot preference, try using it but otherwise use a free slot
+                                
+                                if (ejectorComp.canEjectOnSlot(preferredSlot) && preferredSlot !== ejectorComp.lastUsedSlot) {
+                                    slot = preferredSlot;
+                                    ejectorComp.lastUsedSlot = slot;
+                                } else {
+                                    if (entity.components.ItemEjector.slots[2]) {
+                                        slot = ejectorComp.getFreeSlotForTriple(preferredSlot, ejectorComp.lastUsedSlot);
+                                        if (slot !== null) {
+                                            ejectorComp.lastUsedSlot = slot;
+                                        }
+                                    } else {
+                                        slot = ejectorComp.getFirstFreeSlot();
+                                    }
+                                }
+                            } else {
+                                // We can eject on any slot
+                                slot = ejectorComp.getFirstFreeSlot();
                             }
-                        } else {
-                            // We can eject on any slot
-                            slot = ejectorComp.getFirstFreeSlot();
-                        }      
+                        } else if (entity.components.LaneSwapper) {
+                            if (preferredSlot == 0 && ejectorComp.canEjectOnSlot(1)) {
+                                slot = 1;
+                            } else if (preferredSlot == 1 && ejectorComp.canEjectOnSlot(0)) {
+                                slot = 0;
+                            }
+                        }
 
                         if (slot !== null) {
                             // Alright, we can actually eject
@@ -292,6 +302,12 @@ export class ItemProcessorSystem extends GameSystemWithFilter {
             itemsBySlot,
             outItems,
         });
+
+        if (entity.components.LaneSwapper) {
+            for (let i = 0; i < outItems.length; ++i) {
+                outItems[i].preferredSlot = items[i].sourceSlot;
+            }
+        }
 
         // Track produced items
         for (let i = 0; i < outItems.length; ++i) {

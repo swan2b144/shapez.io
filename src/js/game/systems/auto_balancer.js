@@ -24,13 +24,6 @@ export class AutoBalancerSystem extends GameSystemWithFilter {
     }
 
     update() {
-        this.recomputeCacheFull();
-    }
-
-        /**
-     * Recomputes the whole cache after the game has loaded
-     */
-    recomputeCacheFull() {
         for (let i = 0; i < this.allEntities.length; ++i) {
             const entity = this.allEntities[i];
             this.recomputeBalancer(entity);

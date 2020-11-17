@@ -187,6 +187,7 @@ export function initMetaBuildingRegistry() {
     // More Balancer
     registerBuildingVariant(-1, MetaBalancerBuilding, enumBalancerVariants.programmableBalancer);
     registerBuildingVariant(-1, MetaBalancerBuilding, enumBalancerVariants.autoBalancer);
+    registerBuildingVariant(-1, MetaBalancerBuilding, enumBalancerVariants.laneSwapper);
 
     // Compact Filter
     registerBuildingVariant(-1, MetaFilterBuilding, enumFilterVariants.filterInverse);

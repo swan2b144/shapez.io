@@ -25,6 +25,7 @@ import { WirelessDisplayComponent } from "./components/wireless_display";
 import { ProgrammableBalancerComponent } from "./components/programmable_balancer";
 import { AutoBalancerComponent } from "./components/auto_balancer";
 import { InverseFilterComponent } from "./components/inverse_filter";
+import { LaneSwapperComponent } from "./components/lane_swapper";
 
 export function initComponentRegistry() {
     gComponentRegistry.register(StaticMapEntityComponent);
@@ -54,6 +55,7 @@ export function initComponentRegistry() {
     gComponentRegistry.register(ProgrammableBalancerComponent);
     gComponentRegistry.register(AutoBalancerComponent);
     gComponentRegistry.register(InverseFilterComponent);
+    gComponentRegistry.register(LaneSwapperComponent);
 
     // IMPORTANT ^^^^^ UPDATE ENTITY COMPONENT STORAGE AFTERWARDS
 

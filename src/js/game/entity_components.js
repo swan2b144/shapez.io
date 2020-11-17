@@ -26,6 +26,7 @@ import { WirelessDisplayComponent } from "./components/wireless_display";
 import { ProgrammableBalancerComponent } from "./components/programmable_balancer";
 import { AutoBalancerComponent } from "./components/auto_balancer";
 import { InverseFilterComponent } from "./components/inverse_filter";
+import { LaneSwapperComponent } from "./components/lane_swapper";
 
 /* typehints:end */
 
@@ -88,9 +89,6 @@ export class EntityComponentStorage {
         /** @type {DisplayComponent} */
         this.Display;
 
-        /** @type {WirelessDisplayComponent} */
-        this.WirelessDisplay;
-
         /** @type {BeltReaderComponent} */
         this.BeltReader;
 
@@ -98,6 +96,9 @@ export class EntityComponentStorage {
         this.Filter;
 
         // ModZ
+
+        /** @type {WirelessDisplayComponent} */
+        this.WirelessDisplay;
 
         /** @type {ItemProducerComponent} */
         this.ItemProducer;
@@ -110,6 +111,9 @@ export class EntityComponentStorage {
 
         /** @type {InverseFilterComponent} */
         this.InverseFilter;
+
+        /** @type {LaneSwapperComponent} */
+        this.LaneSwapper;
 
         /* typehints:end */
     }

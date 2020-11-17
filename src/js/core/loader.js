@@ -36,18 +36,19 @@ class LoaderImpl {
      * @returns {BaseSprite}
      */
     getSpriteInternal(key) {
-        const sprite = this.sprites.get(key);
+        let sprite = this.sprites.get(key);
         if (!sprite) {
             if (!missingSpriteIds[key]) {
                 // Only show error once
                 missingSpriteIds[key] = true;
                 logger.error("Sprite '" + key + "' not found!");
             }
-            return this.spriteNotFoundSprite;
+            sprite = this.getSprite("sprites/buildings/placeholder.png");
+            //return this.spriteNotFoundSprite;
         }
         return sprite;
     }
-
+    
     /**
      * Returns an atlas sprite from the cache
      * @param {string} key

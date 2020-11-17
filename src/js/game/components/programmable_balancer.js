@@ -15,7 +15,7 @@ export class ProgrammableBalancerComponent extends Component {
     /**
      * @param {string} word
      */
-    constructor(word = "out/out/out/out") {
+    constructor(word = "out/in/out/out") {
         super();
         this.word = word;
     }
