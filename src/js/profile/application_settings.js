@@ -10,6 +10,7 @@ import { THEMES, applyGameTheme } from "../game/theme";
 import { T } from "../translations";
 import { LANGUAGES } from "../languages";
 import { enumBalancerVariants } from "../game/buildings/balancer";
+import { globalConfig } from "../core/config";
 
 const logger = createLogger("application_settings");
 
@@ -285,16 +286,23 @@ export const allApplicationSettings = [
     new BoolSetting("disableTileGrid", enumCategories.performance, (app, value) => {}),
     new BoolSetting("lowQualityTextures", enumCategories.performance, (app, value) => {}),
     new BoolSetting("simplifiedBelts", enumCategories.performance, (app, value) => {}),
-
-    // ModZ
-    new BoolSetting("sandboxMod", enumCategories.modBrowser, (app, value) => {}),
-    new BoolSetting("survivalMod", enumCategories.modBrowser, (app, value) => {}),
-    new BoolSetting("visibleDisplayMod", enumCategories.modBrowser, (app, value) => {}),
-    new BoolSetting("moreWiresMod", enumCategories.modBrowser, (app, value) => {}),
-    new BoolSetting("wirelessDisplayMod", enumCategories.modBrowser, (app, value) => {}),
-    new BoolSetting("moreBalancerMod", enumCategories.modBrowser, (app, value) => {}),
-    new BoolSetting("moreFiltersMod", enumCategories.modBrowser, (app, value) => {}),
 ];
+
+for (let k in globalConfig.mods) {
+    if (k.startsWith('_')) continue;
+        const mod = globalConfig.mods[k];
+        const setting = new BoolSetting(mod, enumCategories.modBrowser, (app, value) => {
+            globalConfig.mods[k] = value;
+        });
+        setting.validate = () => true;
+        if (!T.settings.labels[mod]) {
+            T.settings.labels[mod] = {
+                title : mod.replace(/(?!^)([A-Z])/g, " $1"),
+                description: mod.replace(/(?!^)([A-Z])/g, " $1"),
+            }
+        }
+    allApplicationSettings.push(setting);
+}
 
 export function getApplicationSettingById(id) {
     return allApplicationSettings.find(setting => setting.id === id);
@@ -338,32 +346,10 @@ class SettingsStorage {
         this.zoomToCursor = true;
         this.mapResourcesScale = 0.5;
 
-        // ModZ
-
-        this.sandboxMod = false;
-        this.survivalMod = false;
-        this.visibleDisplayMod = false;
-        this.moreWiresMod = false;
-        this.wirelessDisplayMod = false;
-        this.moreBalancerMod = false;
-        this.moreFiltersMod = false;
-
         /**
          * @type {Object.<string, number>}
          */
         this.keybindingOverrides = {};
-
-        // ModZ
-
-        enumModSettings.push(
-            "sandboxMod",
-            "survivalMod",
-            "visibleDisplayMod",
-            "moreWiresMod",
-            "wirelessDisplayMod",
-            "moreBalancerMod",
-            "moreFiltersMod",
-        );
     }
 }
 
@@ -404,7 +390,9 @@ export class ApplicationSettings extends ReadWriteProxy {
      * @param {string} key
      */
     getSetting(key) {
-        assert(this.getAllSettings().hasOwnProperty(key), "Setting not known: " + key);
+        if (!key.startsWith('mod_')) {
+            //assert(this.getAllSettings().hasOwnProperty(key), "Setting not known: " + key);
+        }
         return this.getAllSettings()[key];
     }
 
@@ -569,7 +557,7 @@ export class ApplicationSettings extends ReadWriteProxy {
     }
 
     getCurrentVersion() {
-        return 30 + enumModSettings.length;
+        return 30;
     }
 
     /** @param {{settings: SettingsStorage, version: number}} data */
@@ -714,17 +702,6 @@ export class ApplicationSettings extends ReadWriteProxy {
             data.settings.offerHints = true;
 
             data.version = 30;
-        }
-
-        // ModZ
-        
-        for (const modNum in enumModSettings) {
-            const dataVersion = 31 + parseInt(modNum);
-            if (data.version < dataVersion) {
-                const setting = enumModSettings[modNum];
-                data.settings[setting] = false;
-                data.version = dataVersion;
-            }
         }
 
         return ExplainedResult.good();

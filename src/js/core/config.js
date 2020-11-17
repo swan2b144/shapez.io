@@ -98,6 +98,15 @@ export const globalConfig = {
 
     rendering: {},
     debug: require("./config.local").default,
+    mods : [
+        "sandboxMod",
+        "survivalMod",
+        "visibleDisplayMod",
+        "moreWiresMod",
+        "wirelessDisplayMod",
+        "moreBalancerMod",
+        "moreFiltersMod",
+    ],
 
     // Secret vars
     info: {
