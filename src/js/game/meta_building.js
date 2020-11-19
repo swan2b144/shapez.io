@@ -172,12 +172,7 @@ export class MetaBuilding {
                     ".png"
             );
         }
-        return Loader.getSprite(
-            "sprites/blueprints/" +
-                this.id +
-                (variant === defaultBuildingVariant ? "" : "-" + variant) +
-                ".png"
-        );
+        return sprite;
     }
 
     /**
@@ -223,8 +218,10 @@ export class MetaBuilding {
      * @param {number} param0.originalRotation Original Rotation
      * @param {number} param0.rotationVariant Rotation variant
      * @param {string} param0.variant
+     * @param {object=} param0.DisplayComp
+     * @param {object=} param0.BalancerComp
      */
-    createEntity({ root, origin, rotation, originalRotation, rotationVariant, variant, DisplayComp, BalancerComp}) {
+    createEntity({ root, origin, rotation, originalRotation, rotationVariant, variant, DisplayComp = null, BalancerComp = null}) {
         const entity = new Entity(root);
         entity.layer = this.getLayer();
         entity.addComponent(
@@ -241,7 +238,7 @@ export class MetaBuilding {
         if (entity.components.WirelessDisplay && DisplayComp && entity.components.WirelessDisplay.wireless_code) {
             entity.components.WirelessDisplay.wireless_code = DisplayComp.wireless_code;
         }
-        if (entity.components.ProgrammableBalancer && BalancerComp && !entity.components.ProgrammableBalancer.word) {
+        if (entity.components.ProgrammableBalancer && BalancerComp) {
             entity.components.ProgrammableBalancer.word = BalancerComp.word;
         }
         return entity;

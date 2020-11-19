@@ -21,9 +21,73 @@ import { ItemAcceptorComponent } from "../components/item_acceptor";
 export class AutoBalancerSystem extends GameSystemWithFilter {
     constructor(root) {
         super(root, [AutoBalancerComponent]);
+        this.root.signals.entityManuallyPlaced.add(this.recomputeAllEjectorArray, this);
+        this.root.signals.entityDestroyed.add(this.recomputeAllEjectorArray, this);
     }
 
     update() {
+        this.recomputeCacheFull();
+    }
+
+    recomputeAllEjectorArray() {
+        for (let i = 0; i < this.allEntities.length; ++i) {
+            if (this.allEntities[i].components.AutoBalancer) {
+                const entity = this.allEntities[i];
+                const autoBalancerComp = entity.components.AutoBalancer;
+                autoBalancerComp.balancerEjectorArray = [];
+            }
+        }
+        for (let i = 0; i < this.allEntities.length; ++i) {
+            if (this.allEntities[i].components.AutoBalancer) {
+                this.recomputeBalancerEjectorArray(this.allEntities[i]);
+            }
+        }
+    }
+
+    /**
+     * Fixes all arrays
+     * @param {Entity} entity 
+     */
+    recomputeBalancerEjectorArray(entity) {
+        const PossibleSlots = entity.components.ItemEjector;
+        const staticComp = entity.components.StaticMapEntity;
+        const autoBalancerComp = entity.components.AutoBalancer;
+        const allBalancers = [];
+
+        for (let slotIndex = 0; slotIndex < PossibleSlots.slots.length; ++slotIndex) {
+            const ejectorSlot = PossibleSlots.slots[slotIndex];
+
+            const ejectSlotWsTile = staticComp.localTileToWorld(ejectorSlot.pos);
+            const ejectSlotWsDirection = staticComp.localDirectionToWorld(ejectorSlot.direction);
+            const ejectSlotWsDirectionVector = enumDirectionToVector[ejectSlotWsDirection];
+            const ejectSlotTargetWsTile = ejectSlotWsTile.add(ejectSlotWsDirectionVector);
+
+            const targetEntities = this.root.map.getLayersContentsMultipleXY(
+                ejectSlotTargetWsTile.x,
+                ejectSlotTargetWsTile.y,
+            );
+
+            for (let i = 0; i < targetEntities.length; ++i) {
+                const targetEntity = targetEntities[i];
+
+                if (targetEntity.components.AutoBalancer && !allBalancers.includes(targetEntity)) {
+                    allBalancers.push(targetEntity);
+                }
+
+                if (!targetEntity.components.AutoBalancer && !autoBalancerComp.balancerEjectorArray.includes(ejectorSlot)) {
+                    autoBalancerComp.balancerEjectorArray.push(ejectorSlot);
+                }
+            }
+        }
+
+        for (let i = 0; i < allBalancers.length; ++i) {
+            const nextTargetEntity = allBalancers[i];
+            nextTargetEntity.components.AutoBalancer.balancerEjectorArray = entity.components.AutoBalancer.balancerEjectorArray;
+            this.recomputeBalancerEjectorArray(nextTargetEntity);
+        }
+    }
+
+    recomputeCacheFull() {
         for (let i = 0; i < this.allEntities.length; ++i) {
             const entity = this.allEntities[i];
             this.recomputeBalancer(entity);
@@ -109,7 +173,6 @@ export class AutoBalancerSystem extends GameSystemWithFilter {
                 {
                     pos: new Vector(0, 0),
                     direction: enumDirection.top,
-                    cachedBeltPath: null,
                 },
                 {
                     pos: new Vector(0, 0),
@@ -148,18 +211,20 @@ export class AutoBalancerSystem extends GameSystemWithFilter {
             // Since there can be cross layer dependencies, check on all layers
             const targetEntities = this.root.map.getLayersContentsMultipleXY(
                 ejectSlotTargetWsTile.x,
-                ejectSlotTargetWsTile.y
+                ejectSlotTargetWsTile.y,
             );
 
             for (let i = 0; i < targetEntities.length; ++i) {
                 const targetEntity = targetEntities[i];
-
+                
                 const targetStaticComp = targetEntity.components.StaticMapEntity;
                 const targetBeltComp = targetEntity.components.Belt;
+                const targetBalancerComp = targetEntity.components.AutoBalancer;
 
                 // Check for belts (special case)
                 if (targetBeltComp) {
                     const beltAcceptingDirection = targetStaticComp.localDirectionToWorld(enumDirection.top);
+                    targetBeltComp.assignedPath.onPathChanged();
                     if (ejectSlotWsDirection === beltAcceptingDirection) {
                         ejectorSlot.cachedTargetEntity = targetEntity;
                         ejectorSlot.cachedBeltPath = targetBeltComp.assignedPath;
@@ -189,7 +254,7 @@ export class AutoBalancerSystem extends GameSystemWithFilter {
                 ejectorSlot.cachedDestSlot = matchingSlot;
                 break;
             }
-            
+
             if (ejectorSlot.cachedBeltPath || ejectorSlot.cachedTargetEntity || ejectorSlot.cachedDestSlot) {
                 EjectorSlots.push(ejectorSlot);
             } else {
@@ -389,4 +454,3 @@ export class AutoBalancerSystem extends GameSystemWithFilter {
         }
     }
 }
-

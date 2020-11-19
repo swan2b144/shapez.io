@@ -4,6 +4,7 @@ import { findNiceIntegerValue } from "../core/utils";
 import { Vector } from "../core/vector";
 import { Entity } from "./entity";
 import { GameRoot } from "./root";
+import { Loader } from "../core/loader";
 
 export class Blueprint {
     /**
@@ -88,7 +89,7 @@ export class Blueprint {
                 parameters.context.globalAlpha = 1;
             }
 
-            staticComp.drawSpriteOnBoundsClipped(parameters, staticComp.getBlueprintSprite(), 0, newPos);
+            staticComp.drawBlueprintSprite(parameters, staticComp.getSprite(), 0, newPos);
         }
         parameters.context.globalAlpha = 1;
     }

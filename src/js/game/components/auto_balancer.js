@@ -11,5 +11,6 @@ export class AutoBalancerComponent extends Component {
 
     constructor() {
         super();
+        this.balancerEjectorArray = [];
     }
 }
