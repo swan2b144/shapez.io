@@ -193,7 +193,7 @@ export class MetaBalancerBuilding extends MetaBuilding {
                     { pos: new Vector(0, 0), direction: enumDirection.top },
                     { pos: new Vector(1, 0), direction: enumDirection.top },
                 ];
-
+                
                 break;
             }
             case enumBalancerVariants.merger:

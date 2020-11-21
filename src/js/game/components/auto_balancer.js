@@ -1,3 +1,4 @@
+import { types } from "../../savegame/serialization";
 import { Component } from "../component";
 
 export class AutoBalancerComponent extends Component {
@@ -11,6 +12,6 @@ export class AutoBalancerComponent extends Component {
 
     constructor() {
         super();
-        this.balancerEjectorArray = [];
+        this.balancerEjectorArray = {};
     }
 }
