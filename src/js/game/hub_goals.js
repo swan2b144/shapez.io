@@ -357,13 +357,13 @@ export class HubGoals extends BasicSerializableObject {
     generateRandomColorSet(rng, allowUncolored = false) {
         const colorWheel = [
             enumColors.red,
-           /* enumColors.yellow,*/
+            enumColors.yellow,
             enumColors.green,
-           /* enumColors.cyan, 
+            enumColors.cyan, 
             enumColors.blue,
-            enumColors.purple,*/
+            enumColors.purple,
             enumColors.red,
-           /* enumColors.yellow,
+            enumColors.yellow,
         ];
 
         const universalColors = [enumColors.white];
