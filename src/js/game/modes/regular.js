@@ -275,7 +275,7 @@ export function generateLevelDefinitions(limitedVersion = false) {
 
         // 8
         {
-            shape: "RbRb----", // painter t2
+            shape: "RgRg----", // painter t2
             required: 480,
             reward: enumHubGoalRewards.reward_mixer,
         },
