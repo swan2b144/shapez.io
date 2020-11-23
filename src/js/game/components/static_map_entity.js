@@ -242,60 +242,6 @@ export class StaticMapEntityComponent extends Component {
         );
     }
 
-        /**
-     * Draws a sprite over the whole space of the entity
-     * @param {DrawParameters} parameters
-     * @param {AtlasSprite} sprite
-     * @param {number=} extrudePixels How many pixels to extrude the sprite
-     * @param {Vector=} overridePosition Whether to drwa the entity at a different location
-     */
-    drawBlueprintSprite(parameters, sprite, extrudePixels = 0, overridePosition = null) {
-        if (!sprite) {
-            sprite = Loader.getSprite("sprites/buildings/placeholder.png");
-        }
-
-        const size = this.getTileSize();
-        let worldX = this.origin.x * globalConfig.tileSize;
-        let worldY = this.origin.y * globalConfig.tileSize;
-
-        const newCanvas = new DrawParameters({
-            context: parameters.context, 
-            visibleRect: new Rectangle(0, 0, globalConfig.tileSize, globalConfig.tileSize), 
-            desiredAtlasScale: parameters.desiredAtlasScale, 
-            zoomLevel: parameters.zoomLevel,
-            root: parameters.root
-        });
-
-        if (!this.shouldBeDrawn(newCanvas) && !overridePosition) {
-            return;
-        }
-
-        if (overridePosition) {
-            worldX = overridePosition.x * globalConfig.tileSize;
-            worldY = overridePosition.y * globalConfig.tileSize;
-        }
-
-        const rotationCenterX = worldX + globalConfig.halfTileSize;
-        const rotationCenterY = worldY + globalConfig.halfTileSize;
-
-        newCanvas.context.translate(rotationCenterX, rotationCenterY);
-        newCanvas.context.rotate(Math.radians(this.rotation));
-        sprite.drawCached(
-            newCanvas,
-            -globalConfig.halfTileSize - extrudePixels * size.x,
-            -globalConfig.halfTileSize - extrudePixels * size.y,
-            globalConfig.tileSize * size.x + 2 * extrudePixels * size.x,
-            globalConfig.tileSize * size.y + 2 * extrudePixels * size.y,
-            false // no clipping possible here
-        );
-        newCanvas.context.rotate(-Math.radians(this.rotation));
-        newCanvas.context.translate(-rotationCenterX, -rotationCenterY);
-
-        //newCanvas.context.globalCompositeOperation = "destination-atop";
-        newCanvas.context.fillRect(worldX, worldY, globalConfig.tileSize, globalConfig.tileSize);
-        newCanvas.context.globalCompositeOperation = "source-over";
-    }
-
     /**
      * Draws a sprite over the whole space of the entity
      * @param {DrawParameters} parameters

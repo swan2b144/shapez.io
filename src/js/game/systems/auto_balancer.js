@@ -1,9 +1,4 @@
 import { GameSystemWithFilter } from "../game_system_with_filter";
-import { THIRDPARTY_URLS } from "../../core/config";
-import { DialogWithForm } from "../../core/modal_dialog_elements";
-import { FormElementInput } from "../../core/modal_dialog_forms";
-import { fillInLinkIntoTranslation } from "../../core/utils";
-import { T } from "../../translations";
 import { Entity } from "../entity";
 import { AutoBalancerComponent } from "../components/auto_balancer";
 import { 
@@ -21,165 +16,14 @@ import { ItemAcceptorComponent } from "../components/item_acceptor";
 export class AutoBalancerSystem extends GameSystemWithFilter {
     constructor(root) {
         super(root, [AutoBalancerComponent]);
-        this.root.signals.entityManuallyPlaced.add(this.recomputeAllEjectorArray, this);
-        this.root.signals.entityDestroyed.add(this.recomputeAllEjectorArray, this);
     }
 
     update() {
         this.recomputeCacheFull();
     }
 
-    recomputeAllEjectorArray() {
-        for (let i = 0; i < this.allEntities.length; ++i) {
-            const entity = this.allEntities[i];
-            const autoBalancerComp = entity.components.AutoBalancer;
-            autoBalancerComp.balancerEjectorArray = {};
-        }
-        for (let i = 0; i < this.allEntities.length; ++i) {
-            this.allBalancers = [];
-            //this.allBalancers.push(this.allEntities[i]);
-            this.foundAllNextBalancers(this.allEntities[i]);
-            //this.allEntities[i].components.AutoBalancer.balancerEjectorArray = this.allBalancers;
-        }
-    }
-
-    /**
-     * Fixes all arrays
-     * @param {Entity} entity 
-     */
-    recomputeBalancerEjectorArray(entity) {
-        const PossibleSlots = entity.components.ItemEjector;
-        const staticComp = entity.components.StaticMapEntity;
-        const autoBalancerComp = entity.components.AutoBalancer;
-        const allBalancers = [];
-
-        for (let slotIndex = 0; slotIndex < PossibleSlots.slots.length; ++slotIndex) {
-            const ejectorSlot = PossibleSlots.slots[slotIndex];
-
-            const ejectSlotWsTile = staticComp.localTileToWorld(ejectorSlot.pos);
-            const ejectSlotWsDirection = staticComp.localDirectionToWorld(ejectorSlot.direction);
-            const ejectSlotWsDirectionVector = enumDirectionToVector[ejectSlotWsDirection];
-            const ejectSlotTargetWsTile = ejectSlotWsTile.add(ejectSlotWsDirectionVector);
-
-            const targetEntities = this.root.map.getLayersContentsMultipleXY(
-                ejectSlotTargetWsTile.x,
-                ejectSlotTargetWsTile.y,
-            );
-
-            for (let i = 0; i < targetEntities.length; ++i) {
-                const targetEntity = targetEntities[i];
-
-                if (targetEntity.components.AutoBalancer && !allBalancers.includes(targetEntity)) {
-                    allBalancers.push(targetEntity);
-                }
-
-                if (!targetEntity.components.AutoBalancer && !autoBalancerComp.balancerEjectorArray[ejectorSlot]) {
-                    //autoBalancerComp.balancerEjectorArray[ejectorSlot.direction] = {realPosition, ejectorSlot.};
-                }
-            }
-        }
-
-        for (let i = 0; i < allBalancers.length; ++i) {
-            const nextTargetEntity = allBalancers[i];
-            nextTargetEntity.components.AutoBalancer.balancerEjectorArray = entity.components.AutoBalancer.balancerEjectorArray;
-            this.recomputeBalancerEjectorArray(nextTargetEntity);
-        }
-
-        //console.log(entity.components.AutoBalancer.balancerEjectorArray);
-    }
-
-    /**
-     * Founds Balancers
-     * @param {Entity} entity 
-     */
-    foundAllNextBalancers(entity) {
-        console.log(this.allEntities[0].components.AutoBalancer.balancerEjectorArray);
-        this.foundAllNextBalancersByEntity(entity);
-
-        for (let i = this.allBalancers.length - 1; i >= 0; --i) {
-            const entity = this.allBalancers[i];
-            const nextEntities = entity.components.AutoBalancer.balancerEjectorArray;
-
-            if (nextEntities.length === 4) {
-                this.allBalancers.splice(i, 1);
-            }
-        }
-    }
-
-    /**
-     * Found All Next Balancer By Entity
-     * @param {Entity} entity 
-     */
-    foundAllNextBalancersByEntity(entity) {
-        const PossibleSlots = {
-            slots: [
-                {
-                    pos: new Vector(0, 0),
-                    direction: enumDirection.top,
-                },
-                {
-                    pos: new Vector(0, 0),
-                    direction: enumDirection.right,
-                },
-                {
-                    pos: new Vector(0, 0),
-                    direction: enumDirection.bottom,
-                },
-                {
-                    pos: new Vector(0, 0),
-                    direction: enumDirection.left,
-                }
-            ]
-        };
-
-        const staticComp = entity.components.StaticMapEntity;
-        const allTargetEntities = [];
-
-        for (let slotIndex = 0; slotIndex < PossibleSlots.slots.length; ++slotIndex) {
-            const slot = PossibleSlots.slots[slotIndex];
-
-            const ejectSlotWsTile = staticComp.localTileToWorld(slot.pos);
-            const ejectSlotWsDirection = staticComp.localDirectionToWorld(slot.direction);
-            const ejectSlotWsDirectionVector = enumDirectionToVector[ejectSlotWsDirection];
-            const ejectSlotTargetWsTile = ejectSlotWsTile.add(ejectSlotWsDirectionVector);
-
-            const targetEntities = this.root.map.getLayersContentsMultipleXY(
-                ejectSlotTargetWsTile.x,
-                ejectSlotTargetWsTile.y,
-            );
-
-            for (let i = 0; i < targetEntities.length; ++i) {
-                const targetEntity = targetEntities[i];
-                const targetBalancerComp = targetEntity.components.AutoBalancer;
-                
-                if (targetBalancerComp) {
-                    allTargetEntities.push(targetEntities);
-                }
-            }
-        }
-
-        if (!this.allBalancers.includes(entity)) {
-            this.allBalancers.push(entity);
-            entity.components.AutoBalancer.balancerEjectorArray = allTargetEntities;
-        }
-
-        for (let i = 0; i < allTargetEntities.length; ++i) {
-            const targetEntities = allTargetEntities[i];
-            for (let i = 0; i < targetEntities.length; ++i) {
-                const targetEntity = targetEntities[i];
-                const targetBalancerComp = targetEntity.components.AutoBalancer;
-                
-                if (targetBalancerComp && !this.allBalancers.includes(targetEntity)) {
-                    this.allBalancers.push(targetEntity);
-                    targetEntity.components.AutoBalancer.balancerEjectorArray = allTargetEntities;
-                    this.foundAllNextBalancersByEntity(targetEntity);
-                }
-            }
-        }
-    }
-
     recomputeCacheFull() {
-        for (let i = 0; i < this.allEntities.length; ++i) {
+        for (let i = this.allEntities.length - 1; i >= 0; --i) {
             const entity = this.allEntities[i];
             this.recomputeBalancer(entity);
             this.recomputeSingleEntityCache(entity);
