@@ -194,6 +194,9 @@ export function initMetaBuildingRegistry() {
     registerBuildingVariant(-1, MetaFilterBuilding, enumFilterVariants.compactFilter);
     registerBuildingVariant(-1, MetaFilterBuilding, enumFilterVariants.compactFilterInverse);
 
+    // Compact Display
+    registerBuildingVariant(-1, MetaWirelessDisplayBuilding, enumWirelessDisplayVariants.quad_sender);
+
     // Propagate instances
     for (const key in gBuildingVariants) {
         gBuildingVariants[key].metaInstance = gMetaBuildingRegistry.findByClass(

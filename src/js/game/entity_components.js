@@ -27,6 +27,7 @@ import { ProgrammableBalancerComponent } from "./components/programmable_balance
 import { AutoBalancerComponent } from "./components/auto_balancer";
 import { InverseFilterComponent } from "./components/inverse_filter";
 import { LaneSwapperComponent } from "./components/lane_swapper";
+import { QuadSenderComponent } from "./components/quad_sender";
 
 /* typehints:end */
 
@@ -99,6 +100,9 @@ export class EntityComponentStorage {
 
         /** @type {WirelessDisplayComponent} */
         this.WirelessDisplay;
+
+        /** @type {QuadSenderComponent} */
+        this.QuadSender;
 
         /** @type {ItemProducerComponent} */
         this.ItemProducer;

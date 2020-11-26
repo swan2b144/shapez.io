@@ -221,7 +221,7 @@ export class MetaBuilding {
      * @param {object=} param0.DisplayComp
      * @param {object=} param0.BalancerComp
      */
-    createEntity({ root, origin, rotation, originalRotation, rotationVariant, variant, DisplayComp = null, BalancerComp = null}) {
+    createEntity({ root, origin, rotation, originalRotation, rotationVariant, variant, DisplayComp, BalancerComp}) {
         const entity = new Entity(root);
         entity.layer = this.getLayer();
         entity.addComponent(
@@ -235,7 +235,7 @@ export class MetaBuilding {
         );
         this.setupEntityComponents(entity, root);
         this.updateVariants(entity, rotationVariant, variant);
-        if (entity.components.WirelessDisplay && DisplayComp && entity.components.WirelessDisplay.wireless_code) {
+        if (entity.components.WirelessDisplay && DisplayComp) {
             entity.components.WirelessDisplay.wireless_code = DisplayComp.wireless_code;
         }
         if (entity.components.ProgrammableBalancer && BalancerComp) {

@@ -84,11 +84,16 @@ export class DisplaySystem extends GameSystemWithFilter {
                         globalConfig.tileSize
                     );
                 } else if (value.getItemType() === "shape") {
+                    const visibleDisplayMod = parameters.root.app.settings.getAllSettings().visibleDisplayMod;
+                    let radius = 30;
+                    if (visibleDisplayMod) {
+                        radius += 11;
+                    }
                     value.drawItemCenteredClipped(
                         (origin.x + 0.5) * globalConfig.tileSize,
                         (origin.y + 0.5) * globalConfig.tileSize,
                         parameters,
-                        30
+                        radius
                     );
                 }
             }

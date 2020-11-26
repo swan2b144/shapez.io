@@ -6,16 +6,13 @@ import { GameRoot } from "../root";
 import { WirelessDisplayComponent } from "../components/wireless_display";
 import { enumHubGoalRewards } from "../tutorial_goals";
 import { formatItemsPerSecond, generateMatrixRotations } from "../../core/utils";
+import { QuadSenderComponent } from "../components/quad_sender";
 
 
 /** @enum {string} */
 export const enumWirelessDisplayVariants = {
     remote_control: "remote_control",
-};
-
-const overlayMatrices = {
-    [defaultBuildingVariant]: null,
-    [enumWirelessDisplayVariants.remote_control]: generateMatrixRotations([0, 1, 0, 0, 1, 1, 0, 1, 0]),
+    quad_sender: "quad_sender",
 };
 
 export class MetaWirelessDisplayBuilding extends MetaBuilding {
@@ -35,7 +32,7 @@ export class MetaWirelessDisplayBuilding extends MetaBuilding {
     }
 
     getAvailableVariants() {
-        return [defaultBuildingVariant, enumWirelessDisplayVariants.remote_control];
+        return [defaultBuildingVariant, enumWirelessDisplayVariants.remote_control, enumWirelessDisplayVariants.quad_sender];
     }
 
     getDimensions() {
@@ -46,12 +43,8 @@ export class MetaWirelessDisplayBuilding extends MetaBuilding {
         return true;
     }
 
-    /**
-     * Creates the entity at the given location
-     * @param {Entity} entity
-     */
     setupEntityComponents(entity) {
-        entity.addComponent(new WirelessDisplayComponent({}));
+        entity.addComponent(new WirelessDisplayComponent());
     }
 
     /**
@@ -61,18 +54,53 @@ export class MetaWirelessDisplayBuilding extends MetaBuilding {
      * @param {string} variant
      */
     updateVariants(entity, rotationVariant, variant) {
-        if (variant == enumWirelessDisplayVariants.remote_control && !entity.components.WiredPins) {
-            entity.addComponent(
-                new WiredPinsComponent({
-                    slots: [
-                        {
-                            pos: new Vector(0, 0),
-                            direction: enumDirection.bottom,
-                            type: enumPinSlotType.logicalAcceptor,
-                        },
-                    ],
-                }),
-            );
+        switch (variant) {
+            case defaultBuildingVariant:
+                break;
+            case enumWirelessDisplayVariants.remote_control:
+                if (!entity.components.WiredPins) {
+                    entity.addComponent(new WiredPinsComponent({ slots: [] }));
+                }
+                entity.components.WiredPins.setSlots([
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.bottom,
+                        type: enumPinSlotType.logicalAcceptor,
+                    },
+                ]);
+                break;
+            case enumWirelessDisplayVariants.quad_sender:
+                if (!entity.components.WiredPins) {
+                    entity.addComponent(new WiredPinsComponent({ slots: [] }));
+                }
+                entity.components.WiredPins.setSlots([
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.top,
+                        type: enumPinSlotType.logicalAcceptor,
+                    },
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.right,
+                        type: enumPinSlotType.logicalAcceptor,
+                    },
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.bottom,
+                        type: enumPinSlotType.logicalAcceptor,
+                    },
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.left,
+                        type: enumPinSlotType.logicalAcceptor,
+                    },
+                ]);
+                if (!entity.components.QuadSender) {
+                    entity.addComponent(new QuadSenderComponent());
+                }
+                break;
+            default:
+                break;
         }
     }
 }

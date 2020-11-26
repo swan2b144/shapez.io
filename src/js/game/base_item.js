@@ -77,9 +77,9 @@ export class BaseItem extends BasicSerializableObject {
      * @param {number=} diameter
      */
     drawItemCenteredClipped(x, y, parameters, diameter = globalConfig.defaultItemDiameter) {
-        if (parameters.visibleRect.containsCircle(x, y, diameter / 2)) {
-            this.drawItemCenteredImpl(x, y, parameters, diameter);
-        }
+        //if (parameters.visibleRect.containsCircle(x, y, diameter / 2)) {
+        this.drawItemCenteredImpl(x, y, parameters, diameter);
+        //}
     }
 
     /**

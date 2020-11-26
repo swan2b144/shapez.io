@@ -23,5 +23,3 @@ export class WirelessDisplayComponent extends Component {
         this.wireless_code = wireless_code;
     }
 }
-
-

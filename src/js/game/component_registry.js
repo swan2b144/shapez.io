@@ -22,6 +22,7 @@ import { ItemProducerComponent } from "./components/item_producer";
 
 // ModZ
 import { WirelessDisplayComponent } from "./components/wireless_display";
+import { QuadSenderComponent } from "./components/quad_sender";
 import { ProgrammableBalancerComponent } from "./components/programmable_balancer";
 import { AutoBalancerComponent } from "./components/auto_balancer";
 import { InverseFilterComponent } from "./components/inverse_filter";
@@ -52,6 +53,7 @@ export function initComponentRegistry() {
     // ModZ
     
     gComponentRegistry.register(WirelessDisplayComponent);
+    gComponentRegistry.register(QuadSenderComponent);
     gComponentRegistry.register(ProgrammableBalancerComponent);
     gComponentRegistry.register(AutoBalancerComponent);
     gComponentRegistry.register(InverseFilterComponent);
