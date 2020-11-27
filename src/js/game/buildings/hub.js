@@ -26,7 +26,7 @@ export class MetaHubBuilding extends MetaBuilding {
     }
 
     getBlueprintSprite() {
-        return null;
+        return Loader.getSprite("sprites/blueprints/hub.png");
     }
 
     getSprite() {
