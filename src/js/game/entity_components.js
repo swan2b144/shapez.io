@@ -22,12 +22,14 @@ import { ItemProducerComponent } from "./components/item_producer";
 
 // ModZ
 
+import { WirelessCodeComponent } from "./components/wireless_code";
 import { WirelessDisplayComponent } from "./components/wireless_display";
 import { ProgrammableBalancerComponent } from "./components/programmable_balancer";
 import { AutoBalancerComponent } from "./components/auto_balancer";
 import { InverseFilterComponent } from "./components/inverse_filter";
-import { LaneSwapperComponent } from "./components/lane_swapper";
+import { BeltSwapperComponent } from "./components/belt_swapper";
 import { QuadSenderComponent } from "./components/quad_sender";
+import { WirelessSignalComponent } from "./components/wireless_signal";
 
 /* typehints:end */
 
@@ -98,11 +100,17 @@ export class EntityComponentStorage {
 
         // ModZ
 
+        /** @type {WirelessCodeComponent} */
+        this.WirelessCode;
+
         /** @type {WirelessDisplayComponent} */
         this.WirelessDisplay;
 
         /** @type {QuadSenderComponent} */
         this.QuadSender;
+
+        /** @type {WirelessSignalComponent} */
+        this.WirelessSignal;
 
         /** @type {ItemProducerComponent} */
         this.ItemProducer;
@@ -116,8 +124,8 @@ export class EntityComponentStorage {
         /** @type {InverseFilterComponent} */
         this.InverseFilter;
 
-        /** @type {LaneSwapperComponent} */
-        this.LaneSwapper;
+        /** @type {BeltSwapperComponent} */
+        this.BeltSwapper;
 
         /* typehints:end */
     }

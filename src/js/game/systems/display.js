@@ -99,4 +99,43 @@ export class DisplaySystem extends GameSystemWithFilter {
             }
         }
     }
+
+    /**
+     * Draws overlay of a given chunk
+     * @param {import("../../core/draw_utils").DrawParameters} parameters
+     * @param {MapChunkView} chunk
+     */
+    drawChunkOverlay(parameters, chunk) {
+        const contents = chunk.containedEntitiesByLayer.regular;
+        for (let i = 0; i < contents.length; ++i) {
+            const entity = contents[i];
+            if (!entity || !entity.components.Display) {
+                continue;
+            }
+
+            const pinsComp = entity.components.WiredPins;
+            const network = pinsComp.slots[0].linkedNetwork;
+
+            if (!network || !network.hasValue()) {
+                continue;
+            }
+
+            const value = this.getDisplayItem(network.currentValue);
+
+            if (!value) {
+                continue;
+            }
+
+            const origin = entity.components.StaticMapEntity.origin;
+            if (value instanceof ColorItem) {
+                parameters.context.fillStyle = value.color;
+                parameters.context.fillRect(
+                    origin.x * globalConfig.tileSize,
+                    origin.y * globalConfig.tileSize,
+                    globalConfig.tileSize,
+                    globalConfig.tileSize
+                );
+            }
+        }
+    }
 }

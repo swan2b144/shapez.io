@@ -30,6 +30,8 @@ import { WirelessDisplaySystem } from "./systems/wireless_display";
 import { ProgrammableBalancerSystem } from "./systems/programmable_balancer";
 import { AutoBalancerSystem } from "./systems/auto_balancer";
 import { AutoBalancerComponent } from "./components/auto_balancer";
+import { WirelessSignalComponent } from "./components/wireless_signal";
+import { WirelessSignalSystem } from "./systems/wireless_signal";
 
 const logger = createLogger("game_system_manager");
 
@@ -183,6 +185,7 @@ export class GameSystemManager {
         add("itemProcessorOverlays", ItemProcessorOverlaysSystem);
 
         // ModZ
+        
         this.addModZ();
 
         logger.log("📦 There are", this.systemUpdateOrder.length, "game systems");
@@ -196,6 +199,7 @@ export class GameSystemManager {
 
         if (this.root.app.settings.getAllSettings().wirelessDisplayMod) {
             add("wirelessDisplay", WirelessDisplaySystem);
+            add("wirelessSignal", WirelessSignalSystem);
         }
 
         if (this.root.app.settings.getAllSettings().moreBalancerMod) {

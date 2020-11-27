@@ -99,7 +99,7 @@ export class ItemProcessorSystem extends GameSystemWithFilter {
 
                         let slot = null;
 
-                        if (!entity.components.LaneSwapper) {
+                        if (!entity.components.BeltSwapper) {
                             if (requiredSlot !== null && requiredSlot !== undefined) {
                                 // We have a slot override, check if that is free
                                 if (ejectorComp.canEjectOnSlot(requiredSlot) && requiredSlot !== ejectorComp.lastUsedSlot) {
@@ -126,7 +126,7 @@ export class ItemProcessorSystem extends GameSystemWithFilter {
                                 // We can eject on any slot
                                 slot = ejectorComp.getFirstFreeSlot();
                             }
-                        } else if (entity.components.LaneSwapper) {
+                        } else if (entity.components.BeltSwapper) {
                             if (preferredSlot == 0 && ejectorComp.canEjectOnSlot(1)) {
                                 slot = 1;
                             } else if (preferredSlot == 1 && ejectorComp.canEjectOnSlot(0)) {
@@ -303,7 +303,7 @@ export class ItemProcessorSystem extends GameSystemWithFilter {
             outItems,
         });
 
-        if (entity.components.LaneSwapper) {
+        if (entity.components.BeltSwapper) {
             for (let i = 0; i < outItems.length; ++i) {
                 outItems[i].preferredSlot = items[i].sourceSlot;
             }

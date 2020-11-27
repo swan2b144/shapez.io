@@ -263,9 +263,16 @@ dialogs:
 
     editBalancer:
         title: Program Sides
-        descShortKey:   (Top/Right/Bottom/Left)<br><br>
-                        Example, in/in/in/out<br><br>
-                        Select sides based on input/output</strong>
+        descShortKey: (Top/Right/Bottom/Left)<br><br>
+                      Example, in/in/in/out<br><br>
+                      Select sides based on input/output</strong>
+
+    editChannelForWS:
+        title: Set Channel
+        descItems: >-
+            Enter <strong>channel name</strong>
+        descShortKey: (input/output)<br><br>
+                      Example, name1/name2<br><br>
 
     editSignal:
         title: Set Signal
@@ -594,6 +601,10 @@ buildings:
             name: Automatic Balancer
             description: This machine controls inputs and outputs based on placed entity.
 
+        belt_swapper:
+            name: Automatic Balancer
+            description: This machine controls inputs and outputs based on placed entity.
+
     cutter:
         default:
             name: &cutter Cutter
@@ -720,13 +731,19 @@ buildings:
             name: &display Display
             description: Connect a signal to show it on the display - It can be a shape, color or boolean.
 
-    wireless_display:
+    wireless_buildings:
         default:
-            name: &wireless_display Wireless Display
+            name: &wireless_buildings Wireless Display
             description: Connect to a channel and if channel connects, it receives the signal coming from Remote Control - Signal can be a shape, color or boolean.
         remote_control:
             name: Remote Control
             description: Connect to a channel and if channel connects, it emits signal to Wireless Control - Signal can be a shape, color or boolean.
+        quad_sender:
+            name: Remote Control (Quad)
+            description: Connect to a channel and if channel connects, it emits signal to Wireless Control with 4 different screens - Signal can be a shape, color or boolean.
+        wireless_signal:
+            name: Wireless Signal
+            description: Connect input and output to a channel and if channel connects, they will transfer signals between them.
 
     reader:
         default:
@@ -1083,10 +1100,10 @@ settings:
             description: >-
                 Adds new wire variant and adds new tunnel varians (By CEbbinghaus).
 
-        wirelessDisplayMod:
-            title: Wireless Display Mod
+        wirelessBuildingsMod:
+            title: Wireless Mod
             description: >-
-                Adds wireless display to the game (By Shrimp The Shrimp).
+                Adds wireless buildings to the game (By Shrimp The Shrimp).
 
         moreBalancerMod:
             title: More Balancer Mod
@@ -1214,7 +1231,7 @@ keybindings:
         hub: *hub
         wire_tunnel: *wire_tunnel
         display: *display
-        wireless_display: *wireless_display
+        wireless_buildings: *wireless_buildings
         reader: *reader
         virtual_processor: *virtual_processor
         transistor: *transistor

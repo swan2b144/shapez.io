@@ -21,12 +21,15 @@ import { FilterComponent } from "./components/filter";
 import { ItemProducerComponent } from "./components/item_producer";
 
 // ModZ
+
+import { WirelessCodeComponent } from "./components/wireless_code";
 import { WirelessDisplayComponent } from "./components/wireless_display";
 import { QuadSenderComponent } from "./components/quad_sender";
+import { WirelessSignalComponent } from "./components/wireless_signal";
 import { ProgrammableBalancerComponent } from "./components/programmable_balancer";
 import { AutoBalancerComponent } from "./components/auto_balancer";
 import { InverseFilterComponent } from "./components/inverse_filter";
-import { LaneSwapperComponent } from "./components/lane_swapper";
+import { BeltSwapperComponent } from "./components/belt_swapper";
 
 export function initComponentRegistry() {
     gComponentRegistry.register(StaticMapEntityComponent);
@@ -52,12 +55,14 @@ export function initComponentRegistry() {
 
     // ModZ
     
+    gComponentRegistry.register(WirelessCodeComponent);
     gComponentRegistry.register(WirelessDisplayComponent);
     gComponentRegistry.register(QuadSenderComponent);
+    gComponentRegistry.register(WirelessSignalComponent);
     gComponentRegistry.register(ProgrammableBalancerComponent);
     gComponentRegistry.register(AutoBalancerComponent);
     gComponentRegistry.register(InverseFilterComponent);
-    gComponentRegistry.register(LaneSwapperComponent);
+    gComponentRegistry.register(BeltSwapperComponent);
 
     // IMPORTANT ^^^^^ UPDATE ENTITY COMPONENT STORAGE AFTERWARDS
 

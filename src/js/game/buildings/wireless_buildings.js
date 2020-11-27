@@ -7,17 +7,20 @@ import { WirelessDisplayComponent } from "../components/wireless_display";
 import { enumHubGoalRewards } from "../tutorial_goals";
 import { formatItemsPerSecond, generateMatrixRotations } from "../../core/utils";
 import { QuadSenderComponent } from "../components/quad_sender";
+import { WirelessSignalComponent } from "../components/wireless_signal";
+import { WirelessCodeComponent } from "../components/wireless_code";
 
 
 /** @enum {string} */
-export const enumWirelessDisplayVariants = {
+export const enumWirelessBuildingsVariants = {
     remote_control: "remote_control",
     quad_sender: "quad_sender",
+    wireless_signal: "wireless_signal",
 };
 
-export class MetaWirelessDisplayBuilding extends MetaBuilding {
+export class MetaWirelessBuildingsBuilding extends MetaBuilding {
     constructor() {
-        super("wireless_display");
+        super("wireless_buildings");
     }
 
     getSilhouetteColor() {
@@ -32,7 +35,7 @@ export class MetaWirelessDisplayBuilding extends MetaBuilding {
     }
 
     getAvailableVariants() {
-        return [defaultBuildingVariant, enumWirelessDisplayVariants.remote_control, enumWirelessDisplayVariants.quad_sender];
+        return [defaultBuildingVariant, enumWirelessBuildingsVariants.remote_control, enumWirelessBuildingsVariants.quad_sender, enumWirelessBuildingsVariants.wireless_signal];
     }
 
     getDimensions() {
@@ -44,7 +47,7 @@ export class MetaWirelessDisplayBuilding extends MetaBuilding {
     }
 
     setupEntityComponents(entity) {
-        entity.addComponent(new WirelessDisplayComponent());
+        entity.addComponent(new WirelessCodeComponent());
     }
 
     /**
@@ -56,10 +59,16 @@ export class MetaWirelessDisplayBuilding extends MetaBuilding {
     updateVariants(entity, rotationVariant, variant) {
         switch (variant) {
             case defaultBuildingVariant:
+                if (!entity.components.WirelessDisplay) {
+                    entity.addComponent(new WirelessDisplayComponent());
+                }
                 break;
-            case enumWirelessDisplayVariants.remote_control:
+            case enumWirelessBuildingsVariants.remote_control:
                 if (!entity.components.WiredPins) {
                     entity.addComponent(new WiredPinsComponent({ slots: [] }));
+                }
+                if (!entity.components.WirelessDisplay) {
+                    entity.addComponent(new WirelessDisplayComponent());
                 }
                 entity.components.WiredPins.setSlots([
                     {
@@ -69,9 +78,15 @@ export class MetaWirelessDisplayBuilding extends MetaBuilding {
                     },
                 ]);
                 break;
-            case enumWirelessDisplayVariants.quad_sender:
+            case enumWirelessBuildingsVariants.quad_sender:
                 if (!entity.components.WiredPins) {
                     entity.addComponent(new WiredPinsComponent({ slots: [] }));
+                }
+                if (!entity.components.QuadSender) {
+                    entity.addComponent(new QuadSenderComponent());
+                }
+                if (!entity.components.WirelessDisplay) {
+                    entity.addComponent(new WirelessDisplayComponent());
                 }
                 entity.components.WiredPins.setSlots([
                     {
@@ -95,9 +110,26 @@ export class MetaWirelessDisplayBuilding extends MetaBuilding {
                         type: enumPinSlotType.logicalAcceptor,
                     },
                 ]);
-                if (!entity.components.QuadSender) {
-                    entity.addComponent(new QuadSenderComponent());
+                break;
+            case enumWirelessBuildingsVariants.wireless_signal:
+                if (!entity.components.WiredPins) {
+                    entity.addComponent(new WiredPinsComponent({ slots: [] }));
                 }
+                if (!entity.components.WirelessSignal) {
+                    entity.addComponent(new WirelessSignalComponent());
+                }
+                entity.components.WiredPins.setSlots([
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.top,
+                        type: enumPinSlotType.logicalEjector,
+                    },
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.bottom,
+                        type: enumPinSlotType.logicalAcceptor,
+                    }
+                ]);
                 break;
             default:
                 break;

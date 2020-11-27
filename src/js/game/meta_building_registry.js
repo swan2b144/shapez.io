@@ -8,7 +8,7 @@ import { MetaComparatorBuilding } from "./buildings/comparator";
 import { MetaConstantSignalBuilding } from "./buildings/constant_signal";
 import { enumCutterVariants, MetaCutterBuilding } from "./buildings/cutter";
 import { MetaDisplayBuilding } from "./buildings/display";
-import { enumWirelessDisplayVariants, MetaWirelessDisplayBuilding } from "./buildings/wireless_display";
+import { enumWirelessBuildingsVariants, MetaWirelessBuildingsBuilding } from "./buildings/wireless_buildings";
 import { enumFilterVariants, MetaFilterBuilding } from "./buildings/filter";
 import { MetaHubBuilding } from "./buildings/hub";
 import { MetaItemProducerBuilding } from "./buildings/item_producer";
@@ -54,7 +54,7 @@ export function initMetaBuildingRegistry() {
     gMetaBuildingRegistry.register(MetaFilterBuilding);
     gMetaBuildingRegistry.register(MetaWireTunnelBuilding);
     gMetaBuildingRegistry.register(MetaDisplayBuilding);
-    gMetaBuildingRegistry.register(MetaWirelessDisplayBuilding);
+    gMetaBuildingRegistry.register(MetaWirelessBuildingsBuilding);
     gMetaBuildingRegistry.register(MetaVirtualProcessorBuilding);
     gMetaBuildingRegistry.register(MetaReaderBuilding);
     gMetaBuildingRegistry.register(MetaTransistorBuilding);
@@ -170,8 +170,8 @@ export function initMetaBuildingRegistry() {
     /* ModZ */
 
     // Wireless Display
-    registerBuildingVariant(62, MetaWirelessDisplayBuilding);
-    registerBuildingVariant(63, MetaWirelessDisplayBuilding, enumWirelessDisplayVariants.remote_control);
+    registerBuildingVariant(62, MetaWirelessBuildingsBuilding);
+    registerBuildingVariant(63, MetaWirelessBuildingsBuilding, enumWirelessBuildingsVariants.remote_control);
 
     // Wire Tunnel
     registerBuildingVariant(10000006, MetaWireTunnelBuilding, enumWireTunnelVariants.Elbow);
@@ -187,7 +187,7 @@ export function initMetaBuildingRegistry() {
     // More Balancer
     registerBuildingVariant(-1, MetaBalancerBuilding, enumBalancerVariants.programmableBalancer);
     registerBuildingVariant(-1, MetaBalancerBuilding, enumBalancerVariants.autoBalancer);
-    registerBuildingVariant(-1, MetaBalancerBuilding, enumBalancerVariants.laneSwapper);
+    registerBuildingVariant(-1, MetaBalancerBuilding, enumBalancerVariants.beltSwapper);
 
     // Compact Filter
     registerBuildingVariant(-1, MetaFilterBuilding, enumFilterVariants.filterInverse);
@@ -195,7 +195,8 @@ export function initMetaBuildingRegistry() {
     registerBuildingVariant(-1, MetaFilterBuilding, enumFilterVariants.compactFilterInverse);
 
     // Compact Display
-    registerBuildingVariant(-1, MetaWirelessDisplayBuilding, enumWirelessDisplayVariants.quad_sender);
+    registerBuildingVariant(-1, MetaWirelessBuildingsBuilding, enumWirelessBuildingsVariants.quad_sender);
+    registerBuildingVariant(-1, MetaWirelessBuildingsBuilding, enumWirelessBuildingsVariants.wireless_signal);
 
     // Propagate instances
     for (const key in gBuildingVariants) {
@@ -255,10 +256,6 @@ export function initBuildingCodesAfterResourcesLoaded() {
         variant.blueprintSprite = variant.metaInstance.getBlueprintSprite(
             variant.rotationVariant,
             variant.variant
-        );
-        variant.silhouetteColor = variant.metaInstance.getSilhouetteColor(
-            variant.variant,
-            variant.rotationVariant
         );
     }
 

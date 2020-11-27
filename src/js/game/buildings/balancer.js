@@ -11,8 +11,7 @@ import { formatItemsPerSecond, generateMatrixRotations } from "../../core/utils"
 import { BeltUnderlaysComponent } from "../components/belt_underlays";
 import { ProgrammableBalancerComponent } from "../components/programmable_balancer";
 import { AutoBalancerComponent } from "../components/auto_balancer";
-import { LaneSwapperComponent } from "../components/lane_swapper";
-import { globalConfig } from "../../core/config";
+import { BeltSwapperComponent } from "../components/belt_swapper";
 
 /** @enum {string} */
 export const enumBalancerVariants = {
@@ -22,7 +21,7 @@ export const enumBalancerVariants = {
     splitterInverse: "splitter-inverse",
     programmableBalancer: "programmable-balancer",
     autoBalancer: "auto-balancer",
-    laneSwapper: "lane-swapper",
+    beltSwapper: "belt-swapper",
 };
 
 const overlayMatrices = {
@@ -33,7 +32,7 @@ const overlayMatrices = {
     [enumBalancerVariants.splitterInverse]: generateMatrixRotations([0, 1, 0, 1, 1, 0, 0, 1, 0]),
     [enumBalancerVariants.programmableBalancer]: null,
     [enumBalancerVariants.autoBalancer]: null,
-    [enumBalancerVariants.laneSwapper]: null,
+    [enumBalancerVariants.beltSwapper]: null,
 };
 
 export class MetaBalancerBuilding extends MetaBuilding {
@@ -44,7 +43,7 @@ export class MetaBalancerBuilding extends MetaBuilding {
     getDimensions(variant) {
         switch (variant) {
             case defaultBuildingVariant:
-            case enumBalancerVariants.laneSwapper:
+            case enumBalancerVariants.beltSwapper:
                 return new Vector(2, 1);
             case enumBalancerVariants.merger:
             case enumBalancerVariants.mergerInverse:
@@ -123,7 +122,7 @@ export class MetaBalancerBuilding extends MetaBuilding {
         }
 
         if (this.moreBalancerMod && root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_merger)) {
-            available.push(enumBalancerVariants.programmableBalancer, enumBalancerVariants.autoBalancer, enumBalancerVariants.laneSwapper);
+            available.push(enumBalancerVariants.programmableBalancer, enumBalancerVariants.autoBalancer, enumBalancerVariants.beltSwapper);
         }
 
         return available;
@@ -299,9 +298,9 @@ export class MetaBalancerBuilding extends MetaBuilding {
 
                 break;
             }
-            case enumBalancerVariants.laneSwapper: {
-                if (!entity.components.LaneSwapper && variant == enumBalancerVariants.laneSwapper) {
-                    entity.addComponent(new LaneSwapperComponent());
+            case enumBalancerVariants.beltSwapper: {
+                if (!entity.components.BeltSwapper && variant == enumBalancerVariants.beltSwapper) {
+                    entity.addComponent(new BeltSwapperComponent());
                 }
 
                 entity.components.ItemAcceptor.setSlots([

@@ -1,7 +1,7 @@
 import { MetaBeltBuilding } from "../../buildings/belt";
 import { MetaCutterBuilding } from "../../buildings/cutter";
 import { MetaDisplayBuilding } from "../../buildings/display";
-import { MetaWirelessDisplayBuilding } from "../../buildings/wireless_display";
+import { MetaWirelessBuildingsBuilding } from "../../buildings/wireless_buildings";
 import { MetaFilterBuilding } from "../../buildings/filter";
 import { MetaLeverBuilding } from "../../buildings/lever";
 import { MetaMinerBuilding } from "../../buildings/miner";
@@ -45,7 +45,7 @@ export class HUDBuildingsToolbar extends HUDBaseToolbar {
                 MetaLeverBuilding,
                 MetaFilterBuilding,
                 MetaDisplayBuilding,
-                ...(wirelessDisplayMod ? [MetaWirelessDisplayBuilding] : []),
+                ...(wirelessDisplayMod ? [MetaWirelessBuildingsBuilding] : []),
             ],
             visibilityCondition: () =>
                 !this.root.camera.getIsMapOverlayActive() && this.root.currentLayer === "regular",

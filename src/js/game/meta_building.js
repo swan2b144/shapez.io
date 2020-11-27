@@ -235,8 +235,8 @@ export class MetaBuilding {
         );
         this.setupEntityComponents(entity, root);
         this.updateVariants(entity, rotationVariant, variant);
-        if (entity.components.WirelessDisplay && DisplayComp) {
-            entity.components.WirelessDisplay.wireless_code = DisplayComp.wireless_code;
+        if (entity.components.WirelessCode && DisplayComp) {
+            entity.components.WirelessCode.wireless_code = DisplayComp.wireless_code;
         }
         if (entity.components.ProgrammableBalancer && BalancerComp) {
             entity.components.ProgrammableBalancer.word = BalancerComp.word;

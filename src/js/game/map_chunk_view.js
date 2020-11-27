@@ -72,6 +72,7 @@ export class MapChunkView extends MapChunk {
         systems.itemProcessorOverlays.drawChunk(parameters, this);
 
         //ModZ
+
         this.drawForegroundStaticLayerModZ(systems, parameters);
     }
 
@@ -117,6 +118,7 @@ export class MapChunkView extends MapChunk {
             originalH: overlaySize,
         });
 
+        this.root.systemMgr.systems.display.drawChunkOverlay(parameters, this);
         parameters.context.imageSmoothingEnabled = true;
         const resourcesScale = this.root.app.settings.getAllSettings().mapResourcesScale;
 
@@ -308,5 +310,10 @@ export class MapChunkView extends MapChunk {
         systems.wire.drawChunk(parameters, this);
         systems.staticMapEntities.drawWiresChunk(parameters, this);
         systems.wiredPins.drawChunk(parameters, this);
+
+        if (this.root.app.settings.getAllSettings().wirelessDisplayMod) {
+            systems.wirelessSignal.drawWiresChunk(parameters, this);
+            systems.wirelessDisplay.drawWiresChunk(parameters, this);
+        }
     }
 }

@@ -188,7 +188,7 @@ export class WiredPinsSystem extends GameSystemWithFilter {
                     staticComp.rotation + enumDirectionToAngle[slot.direction]
                 );
 
-                if (staticComp.getMetaBuilding().getRenderPins()) {
+                if (staticComp.getMetaBuilding().getRenderPins() && (!entity.components.WirelessSignal && !entity.components.QuadSender)) {
                     this.sprite = this.pinSprites[slot.type];
                     this.visibleDisplayMod = this.root.app.settings.getAllSettings().visibleDisplayMod;
                     if (staticComp.getMetaBuilding().id == "display" && this.visibleDisplayMod) {

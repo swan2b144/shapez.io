@@ -103,7 +103,7 @@ export const globalConfig = {
         "survivalMod",
         "visibleDisplayMod",
         "moreWiresMod",
-        "wirelessDisplayMod",
+        "wirelessBuildingsMod",
         "moreBalancerMod",
         "moreFiltersMod",
     ],

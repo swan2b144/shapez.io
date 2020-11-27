@@ -1,8 +1,8 @@
 import { Component } from "../component";
 
-export class LaneSwapperComponent extends Component {
+export class BeltSwapperComponent extends Component {
     static getId() {
-        return "LaneSwapper";
+        return "BeltSwapper";
     }
 
     static getSchema() {
