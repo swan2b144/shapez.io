@@ -26,12 +26,12 @@ import { FilterSystem } from "./systems/filter";
 import { ItemProducerSystem } from "./systems/item_producer";
 
 // ModZ
+
 import { WirelessDisplaySystem } from "./systems/wireless_display";
 import { ProgrammableBalancerSystem } from "./systems/programmable_balancer";
 import { AutoBalancerSystem } from "./systems/auto_balancer";
-import { AutoBalancerComponent } from "./components/auto_balancer";
-import { WirelessSignalComponent } from "./components/wireless_signal";
 import { WirelessSignalSystem } from "./systems/wireless_signal";
+import { DynamicRemoteSignalSystem } from "./systems/dynamic_remote_signal";
 
 const logger = createLogger("game_system_manager");
 
@@ -116,8 +116,14 @@ export class GameSystemManager {
             /** @type {ProgrammableBalancerSystem} */
             programmableBalancer: null,
         
-            /** @type {AutoBalancerComponent} */
+            /** @type {AutoBalancerSystem} */
             autoBalancer: null,
+
+            /** @type {WirelessSignalSystem} */
+            wirelessSignal: null,
+
+            /** @type {DynamicRemoteSignalSystem} */
+            dynamicRemoteSignal: null,
 
             /* typehints:end */
         };
@@ -197,9 +203,10 @@ export class GameSystemManager {
             this.systemUpdateOrder.push(id);
         };
 
-        if (this.root.app.settings.getAllSettings().wirelessDisplayMod) {
+        if (this.root.app.settings.getAllSettings().wirelessBuildingsMod) {
             add("wirelessDisplay", WirelessDisplaySystem);
             add("wirelessSignal", WirelessSignalSystem);
+            add("dynamicRemoteSignal", DynamicRemoteSignalSystem);
         }
 
         if (this.root.app.settings.getAllSettings().moreBalancerMod) {

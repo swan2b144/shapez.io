@@ -43,7 +43,6 @@ class LoaderImpl {
                 missingSpriteIds[key] = true;
                 logger.error("Sprite '" + key + "' not found!");
             }
-            console.log(key);
             sprite = this.sprites.get("sprites/buildings/placeholder.png");
             //return this.spriteNotFoundSprite;
         }

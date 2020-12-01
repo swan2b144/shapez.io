@@ -13,10 +13,11 @@ import { MetaFilterBuilding } from "../../buildings/filter";
 import { MetaDisplayBuilding } from "../../buildings/display";
 import { MetaWirelessBuildingsBuilding } from "../../buildings/wireless_buildings";
 import { MetaStorageBuilding } from "../../buildings/storage";
+import { MetaSignalTransportBuilding } from "../../buildings/signal_transport";
 
 export class HUDWiresToolbar extends HUDBaseToolbar {
     constructor(root) {
-        const wirelessDisplayMod = root.app.settings.getAllSettings().wirelessDisplayMod;
+        const wirelessBuildingsMod = root.app.settings.getAllSettings().wirelessBuildingsMod;
         super(root, {
             primaryBuildings: [
                 MetaWireBuilding,
@@ -34,7 +35,8 @@ export class HUDWiresToolbar extends HUDBaseToolbar {
                 MetaLeverBuilding,
                 MetaFilterBuilding,
                 MetaDisplayBuilding,
-                ...(wirelessDisplayMod ? [MetaWirelessBuildingsBuilding] : []),
+                ...(wirelessBuildingsMod ? [MetaWirelessBuildingsBuilding] : []),
+                ...(wirelessBuildingsMod ? [MetaSignalTransportBuilding] : []),
             ],
             visibilityCondition: () =>
                 !this.root.camera.getIsMapOverlayActive() && this.root.currentLayer === "wires",

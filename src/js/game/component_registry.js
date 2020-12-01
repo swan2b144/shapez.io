@@ -30,6 +30,7 @@ import { ProgrammableBalancerComponent } from "./components/programmable_balance
 import { AutoBalancerComponent } from "./components/auto_balancer";
 import { InverseFilterComponent } from "./components/inverse_filter";
 import { BeltSwapperComponent } from "./components/belt_swapper";
+import { DynamicRemoteSignalComponent } from "./components/dynamic_remote_signal";
 
 export function initComponentRegistry() {
     gComponentRegistry.register(StaticMapEntityComponent);
@@ -63,6 +64,7 @@ export function initComponentRegistry() {
     gComponentRegistry.register(AutoBalancerComponent);
     gComponentRegistry.register(InverseFilterComponent);
     gComponentRegistry.register(BeltSwapperComponent);
+    gComponentRegistry.register(DynamicRemoteSignalComponent);
 
     // IMPORTANT ^^^^^ UPDATE ENTITY COMPONENT STORAGE AFTERWARDS
 

@@ -77,13 +77,13 @@ export class MapChunkView extends MapChunk {
     }
 
     drawForegroundStaticLayerModZ(systems, parameters) {
-        if (this.root.app.settings.getAllSettings().wirelessDisplayMod) {
-            systems.wirelessDisplay.drawChunk(parameters, this);
-        }
-
         if (this.root.app.settings.getAllSettings().moreBalancerMod) {
             systems.programmableBalancer.drawChunk(parameters, this);
             systems.autoBalancer.drawChunk(parameters, this);
+        }
+
+        if (this.root.app.settings.getAllSettings().wirelessBuildingsMod) {
+            systems.wirelessDisplay.drawRegularChunk(parameters, this);
         }
     }
 
@@ -311,7 +311,7 @@ export class MapChunkView extends MapChunk {
         systems.staticMapEntities.drawWiresChunk(parameters, this);
         systems.wiredPins.drawChunk(parameters, this);
 
-        if (this.root.app.settings.getAllSettings().wirelessDisplayMod) {
+        if (this.root.app.settings.getAllSettings().wirelessBuildingsMod) {
             systems.wirelessSignal.drawWiresChunk(parameters, this);
             systems.wirelessDisplay.drawWiresChunk(parameters, this);
         }

@@ -16,6 +16,7 @@ import { Entity } from "../entity";
 import { THEME} from "../theme";
 import { WirelessSignalComponent } from "../components/wireless_signal";
 import { enumDirectionToAngle, Vector } from "../../core/vector";
+import { drawRotatedSprite } from "../../core/draw_utils";
 
 /** @type {Object<ItemType, number>} */
 const enumTypeToSize = {
@@ -38,6 +39,10 @@ export class WirelessSignalSystem extends GameSystemWithFilter {
         for (let i = 0; i < this.allEntities.length; i++) {
             const entity = this.allEntities[i];
 
+            if (!entity.components.WirelessCode) {
+                continue;
+            }
+            
             const wirelessCode = entity.components.WirelessCode.wireless_code;
             const parts = wirelessCode.split('/');
 
@@ -213,34 +218,80 @@ export class WirelessSignalSystem extends GameSystemWithFilter {
     }
 
     /**
+     * Computes the color below the current tile
+     * @returns {string}
+     */
+    computeChannelBelowTile() {
+        const mousePosition = this.root.app.mousePosition;
+        if (!mousePosition) {
+            // Not on screen
+            return null;
+        }
+
+        const worldPos = this.root.camera.screenToWorld(mousePosition);
+        const tile = worldPos.toTileSpace();
+        const contents = this.root.map.getTileContent(tile, "wires");
+
+        if (contents && contents.components.WirelessCode) {
+            return contents.components.WirelessCode.wireless_code;
+        }
+
+        return null;
+    }
+
+    /**
+     * Draws Text Storked
+     * @param {string} text
+     * @param {number} y
+     * @param {number} x
+     * @param {number=} width
+     */
+    drawStroked(ctx, text, x, y, width = undefined) {
+        ctx.font = '15px Sans-serif';
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 1;
+        ctx.miterLimit=2
+        ctx.strokeText(text, x, y, width);
+        ctx.fillStyle = 'white';
+        ctx.fillText(text, x, y, width);
+    }
+
+    /**
      * Draws a given chunk
      * @param {import("../../core/draw_utils").DrawParameters} parameters
      * @param {MapChunkView} chunk
      */
     drawWiresChunk(parameters, chunk) {
-        const contents = chunk.containedEntitiesByLayer.regular;
+        const contents = chunk.containedEntitiesByLayer.wires;
         for (let i = 0; i < contents.length; ++i) {
             const entity = contents[i];
             if (entity.components.WirelessSignal) {
                 const wirelessSignalWire = Loader.getSprite("sprites/buildings/wireless_buildings-wireless_signal(wire).png");
-                const staticEntity = entity.components.StaticMapEntity
-                const origin = staticEntity.origin;
-                const tileSize = globalConfig.tileSize
-                wirelessSignalWire.drawCachedCentered(parameters, origin.x * tileSize + tileSize / 2, origin.y * tileSize + tileSize / 2, tileSize);
-
                 const staticComp = entity.components.StaticMapEntity
+                const origin = staticComp.origin;
+                const tileSize = globalConfig.tileSize;
                 const slot = entity.components.WiredPins.slots[0];
                 const tile = staticComp.localTileToWorld(slot.pos);
+                const worldPos = tile.toWorldSpaceCenterOfTile();
+                const effectiveRotation = Math.radians(
+                    staticComp.rotation + enumDirectionToAngle[slot.direction]
+                );
+
+                drawRotatedSprite({
+                    parameters,
+                    sprite: wirelessSignalWire,
+                    x: origin.x * tileSize + tileSize / 2,
+                    y: origin.y * tileSize + tileSize / 2,
+                    angle: effectiveRotation,
+                    size: tileSize,
+                    offsetX: 0,
+                    offsetY: 0,
+                });
 
                 if (!chunk.tileSpaceRectangle.containsPoint(tile.x, tile.y)) {
                     // Doesn't belong to this chunk
                     continue;
                 }
-                const worldPos = tile.toWorldSpaceCenterOfTile();
-
-                const effectiveRotation = Math.radians(
-                    staticComp.rotation + enumDirectionToAngle[slot.direction]
-                );
 
                 // Draw contained item to visualize whats emitted
                 const value = slot.value;
@@ -253,6 +304,20 @@ export class WirelessSignalSystem extends GameSystemWithFilter {
                         parameters,
                         enumTypeToSize[value.getItemType()]
                     );
+                }
+
+                const below = this.computeChannelBelowTile();
+                if (below) {
+                    // We have something below our tile
+                    const mousePosition = this.root.app.mousePosition;
+                    const worldPos = this.root.camera.screenToWorld(mousePosition);
+                    const tile = worldPos.toTileSpace().toWorldSpace();
+                    
+                    this.drawStroked(parameters.context, below.toString(), worldPos.x + 5, worldPos.y + 5)
+                    parameters.context.strokeStyle = THEME.map.colorBlindPickerTile;
+                    parameters.context.beginPath();
+                    parameters.context.rect(tile.x, tile.y, globalConfig.tileSize, globalConfig.tileSize);
+                    parameters.context.stroke();
                 }
             }
         }

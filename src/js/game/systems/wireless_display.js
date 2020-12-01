@@ -335,11 +335,53 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
     }
 
     /**
+     * Draws corner items on wire layer
+     */
+    drawCorners(entity, parameters, chunk) {
+        const origin = entity.components.StaticMapEntity.origin;
+        const pinsComp = entity.components.WiredPins;
+        const staticComp = entity.components.StaticMapEntity;
+        const slots = pinsComp.slots;
+
+        for (let i = 0; i < slots.length; ++i) {
+            const slot = slots[i];
+            const tile = staticComp.localTileToWorld(slot.pos);
+            const network = slot.linkedNetwork;
+
+            if (!network) {
+                continue;
+            }
+
+            if (!chunk.tileSpaceRectangle.containsPoint(tile.x, tile.y)) {
+                // Doesn't belong to this chunk
+                continue;
+            }
+            const worldPos = tile.toWorldSpaceCenterOfTile();
+
+            const effectiveRotation = Math.radians(
+                enumDirectionToAngle[slot.direction] - 90
+            );
+
+            // Draw contained item to visualize whats emitted
+            const value = network.currentValue;
+            if (value) {
+                const offset = new Vector(10.65, -10.5).rotated(effectiveRotation);
+                value.drawItemCenteredClipped(
+                    worldPos.x + offset.x,
+                    worldPos.y + offset.y,
+                    parameters,
+                    enumTypeToSize[value.getItemType()]
+                );
+            }
+        }
+    }
+
+    /**
      * Draws a given chunk
      * @param {import("../../core/draw_utils").DrawParameters} parameters
      * @param {MapChunkView} chunk
      */
-    drawChunk(parameters, chunk) {
+    drawRegularChunk(parameters, chunk) {
         const contents = chunk.containedEntitiesByLayer.regular;
         for (let i = 0; i < contents.length; ++i) {
             const entity = contents[i];
@@ -365,48 +407,6 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
     }
 
     /**
-     * Draws corner items on wire layer
-     */
-    drawCorners(entity, parameters, chunk) {
-        const origin = entity.components.StaticMapEntity.origin;
-        const pinsComp = entity.components.WiredPins;
-        const staticComp = entity.components.StaticMapEntity;
-        const slots = pinsComp.slots;
-
-        for (let i = 0; i < slots.length; ++i) {
-            const slot = slots[i];
-            const tile = staticComp.localTileToWorld(slot.pos);
-            const network = slot.linkedNetwork;
-
-            if (!network) {
-                continue;
-            }
-
-            if (!chunk.tileSpaceRectangle.containsPoint(tile.x, tile.y)) {
-                // Doesn't belong to this chunk
-                continue;
-            }
-            const worldPos = tile.toWorldSpaceCenterOfTile();
-
-            const effectiveRotation = Math.radians(
-                staticComp.rotation + enumDirectionToAngle[slot.direction]
-            );
-
-            // Draw contained item to visualize whats emitted
-            const value = network.currentValue;
-            if (value) {
-                const offset = new Vector(10.65, -10.5).rotated(effectiveRotation);
-                value.drawItemCenteredClipped(
-                    worldPos.x + offset.x,
-                    worldPos.y + offset.y,
-                    parameters,
-                    enumTypeToSize[value.getItemType()]
-                );
-            }
-        }
-    }
-
-    /**
      * Draws a given chunk
      * @param {import("../../core/draw_utils").DrawParameters} parameters
      * @param {MapChunkView} chunk
@@ -415,6 +415,11 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
         const contents = chunk.containedEntitiesByLayer.regular;
         for (let i = 0; i < contents.length; ++i) {
             const entity = contents[i];
+            if (entity.components.WirelessCode) {
+                if (!entity.components.WiredPins) {
+                    this.drawBasedOnSender(entity, parameters);
+                }
+            }
             if (entity.components.QuadSender) {
                 const quadSenderWire = Loader.getSprite("sprites/buildings/wireless_buildings-quad_sender(wire).png");
                 const staticEntity = entity.components.StaticMapEntity

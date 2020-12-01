@@ -1,8 +1,8 @@
 import { Component } from "../component";
 
-export class WirelessSignalComponent extends Component {
+export class DynamicRemoteSignalComponent extends Component {
     static getId() {
-        return "WirelessSignal";
+        return "DynamicRemoteSignal";
     }
 
     static getSchema() {

@@ -23,7 +23,7 @@ export class HUDBuildingsToolbar extends HUDBaseToolbar {
     constructor(root) {
         const survivalMod = root.app.settings.getAllSettings().survivalMod;
         const sandboxMod = root.app.settings.getAllSettings().sandboxMod;
-        const wirelessDisplayMod = root.app.settings.getAllSettings().wirelessDisplayMod;
+        const wirelessBuildingsMod = root.app.settings.getAllSettings().wirelessBuildingsMod;
         super(root, {
             primaryBuildings: [
                 MetaBeltBuilding,
@@ -45,7 +45,7 @@ export class HUDBuildingsToolbar extends HUDBaseToolbar {
                 MetaLeverBuilding,
                 MetaFilterBuilding,
                 MetaDisplayBuilding,
-                ...(wirelessDisplayMod ? [MetaWirelessBuildingsBuilding] : []),
+                ...(wirelessBuildingsMod ? [MetaWirelessBuildingsBuilding] : []),
             ],
             visibilityCondition: () =>
                 !this.root.camera.getIsMapOverlayActive() && this.root.currentLayer === "regular",

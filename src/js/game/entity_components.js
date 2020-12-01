@@ -30,6 +30,7 @@ import { InverseFilterComponent } from "./components/inverse_filter";
 import { BeltSwapperComponent } from "./components/belt_swapper";
 import { QuadSenderComponent } from "./components/quad_sender";
 import { WirelessSignalComponent } from "./components/wireless_signal";
+import { DynamicRemoteSignalComponent } from "./components/dynamic_remote_signal";
 
 /* typehints:end */
 
@@ -126,6 +127,9 @@ export class EntityComponentStorage {
 
         /** @type {BeltSwapperComponent} */
         this.BeltSwapper;
+
+        /** @type {DynamicRemoteSignalComponent} */
+        this.DynamicRemoteSignal;
 
         /* typehints:end */
     }

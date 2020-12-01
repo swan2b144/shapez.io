@@ -164,6 +164,10 @@ export class WiredPinsSystem extends GameSystemWithFilter {
                 continue;
             }
 
+            if (entity.components.WirelessSignal || entity.components.QuadSender) {
+                continue;
+            }
+
             const staticComp = entity.components.StaticMapEntity;
             const slots = pinsComp.slots;
 
@@ -188,7 +192,7 @@ export class WiredPinsSystem extends GameSystemWithFilter {
                     staticComp.rotation + enumDirectionToAngle[slot.direction]
                 );
 
-                if (staticComp.getMetaBuilding().getRenderPins() && (!entity.components.WirelessSignal && !entity.components.QuadSender)) {
+                if (staticComp.getMetaBuilding().getRenderPins()) {
                     this.sprite = this.pinSprites[slot.type];
                     this.visibleDisplayMod = this.root.app.settings.getAllSettings().visibleDisplayMod;
                     if (staticComp.getMetaBuilding().id == "display" && this.visibleDisplayMod) {

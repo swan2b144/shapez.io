@@ -67,6 +67,7 @@ export const KEYMAPPINGS = {
         filter: { keyCode: key("O") },
         display: { keyCode: key("P") },
         wireless_buildings: { keyCode: key("K") },
+        signal_transport: { keyCode: key("B") },
 
         // Wires toolbar
         wire: { keyCode: key("1") },

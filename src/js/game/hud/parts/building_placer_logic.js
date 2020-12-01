@@ -778,10 +778,6 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
      * @param {Vector} pos
      */
     onMouseMove(pos) {
-        if (!this.root.camera.getIsMapOverlayActive() && this.lastDragTile && this.currentlyDragging && this.isDirectionLockActive && this.survivalMod) {
-            this.computeAutoWay();
-        }
-
         if (this.root.camera.getIsMapOverlayActive()) {
             return;
         }

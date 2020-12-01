@@ -8,7 +8,6 @@ import { MetaComparatorBuilding } from "./buildings/comparator";
 import { MetaConstantSignalBuilding } from "./buildings/constant_signal";
 import { enumCutterVariants, MetaCutterBuilding } from "./buildings/cutter";
 import { MetaDisplayBuilding } from "./buildings/display";
-import { enumWirelessBuildingsVariants, MetaWirelessBuildingsBuilding } from "./buildings/wireless_buildings";
 import { enumFilterVariants, MetaFilterBuilding } from "./buildings/filter";
 import { MetaHubBuilding } from "./buildings/hub";
 import { MetaItemProducerBuilding } from "./buildings/item_producer";
@@ -32,6 +31,11 @@ import { enumWireVariant } from "./components/wire";
 import { KEYMAPPINGS } from "./key_action_mapper";
 import { defaultBuildingVariant } from "./meta_building";
 
+// ModZ
+
+import { enumWirelessBuildingsVariants, MetaWirelessBuildingsBuilding } from "./buildings/wireless_buildings";
+import { enumSignalTransportVariants, MetaSignalTransportBuilding } from "./buildings/signal_transport";
+
 const logger = createLogger("building_registry");
 
 export function initMetaBuildingRegistry() {
@@ -54,13 +58,17 @@ export function initMetaBuildingRegistry() {
     gMetaBuildingRegistry.register(MetaFilterBuilding);
     gMetaBuildingRegistry.register(MetaWireTunnelBuilding);
     gMetaBuildingRegistry.register(MetaDisplayBuilding);
-    gMetaBuildingRegistry.register(MetaWirelessBuildingsBuilding);
     gMetaBuildingRegistry.register(MetaVirtualProcessorBuilding);
     gMetaBuildingRegistry.register(MetaReaderBuilding);
     gMetaBuildingRegistry.register(MetaTransistorBuilding);
     gMetaBuildingRegistry.register(MetaAnalyzerBuilding);
     gMetaBuildingRegistry.register(MetaComparatorBuilding);
     gMetaBuildingRegistry.register(MetaItemProducerBuilding);
+
+    // Modz
+
+    gMetaBuildingRegistry.register(MetaWirelessBuildingsBuilding);
+    gMetaBuildingRegistry.register(MetaSignalTransportBuilding);
 
     // Belt
     registerBuildingVariant(1, MetaBeltBuilding, defaultBuildingVariant, 0);
@@ -178,7 +186,7 @@ export function initMetaBuildingRegistry() {
     registerBuildingVariant(10000007, MetaWireTunnelBuilding, enumWireTunnelVariants.Straight);
     registerBuildingVariant(10000008, MetaWireTunnelBuilding, enumWireTunnelVariants.DoubleElbow);
 
-	//Wire
+	// Wire
     registerBuildingVariant(10000002, MetaWireBuilding, enumWireVariant.third, 0);
     registerBuildingVariant(10000003, MetaWireBuilding, enumWireVariant.third, 1);
     registerBuildingVariant(10000004, MetaWireBuilding, enumWireVariant.third, 2);
@@ -194,9 +202,11 @@ export function initMetaBuildingRegistry() {
     registerBuildingVariant(-1, MetaFilterBuilding, enumFilterVariants.compactFilter);
     registerBuildingVariant(-1, MetaFilterBuilding, enumFilterVariants.compactFilterInverse);
 
-    // Compact Display
+    // More Wireless Buildings
     registerBuildingVariant(-1, MetaWirelessBuildingsBuilding, enumWirelessBuildingsVariants.quad_sender);
-    registerBuildingVariant(-1, MetaWirelessBuildingsBuilding, enumWirelessBuildingsVariants.wireless_signal);
+    registerBuildingVariant(-1, MetaSignalTransportBuilding);
+    registerBuildingVariant(-1, MetaSignalTransportBuilding, enumSignalTransportVariants.dynamic_remote_signal);
+    registerBuildingVariant(-1, MetaSignalTransportBuilding, enumSignalTransportVariants.dynamic_remote_signal_reversed);
 
     // Propagate instances
     for (const key in gBuildingVariants) {
