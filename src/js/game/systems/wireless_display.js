@@ -196,16 +196,15 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
      * @param {string} text
      * @param {number} y
      * @param {number} x
-     * @param {number=} width
      */
-    drawStroked(ctx, text, x, y, width = undefined) {
+    drawStroked(ctx, text, x, y) {
         ctx.font = '15px Sans-serif';
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 1;
-        ctx.miterLimit=2
-        ctx.strokeText(text, x, y, width);
+        ctx.miterLimit = 2;
+        ctx.strokeText(text, x, y);
         ctx.fillStyle = 'white';
-        ctx.fillText(text, x, y, width);
+        ctx.fillText(text, x, y);
     }
 
     /**
@@ -338,7 +337,6 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
      * Draws corner items on wire layer
      */
     drawCorners(entity, parameters, chunk) {
-        const origin = entity.components.StaticMapEntity.origin;
         const pinsComp = entity.components.WiredPins;
         const staticComp = entity.components.StaticMapEntity;
         const slots = pinsComp.slots;
@@ -436,7 +434,38 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
                 const worldPos = this.root.camera.screenToWorld(mousePosition);
                 const tile = worldPos.toTileSpace().toWorldSpace();
                 
-                this.drawStroked(parameters.context, below.toString(), worldPos.x + 5, worldPos.y + 5)
+                this.drawStroked(parameters.context, below.toString(), worldPos.x + 5, worldPos.y + 5);
+                parameters.context.strokeStyle = THEME.map.colorBlindPickerTile;
+                parameters.context.beginPath();
+                parameters.context.rect(tile.x, tile.y, globalConfig.tileSize, globalConfig.tileSize);
+                parameters.context.stroke();
+            }
+        }
+    }
+
+    /**
+     * Draws overlay of a given chunk
+     * @param {import("../../core/draw_utils").DrawParameters} parameters
+     * @param {MapChunkView} chunk
+     */
+    drawChunkOverlay(parameters, chunk) {
+        const contents = chunk.containedEntitiesByLayer.regular;
+        for (let i = 0; i < contents.length; ++i) {
+            const entity = contents[i];
+            if (entity.components.WirelessCode) {
+                if (!entity.components.WiredPins) {
+                    this.drawBasedOnSender(entity, parameters);
+                }
+            }
+
+            const below = this.computeChannelBelowTile();
+            if (below) {
+                // We have something below our tile
+                const mousePosition = this.root.app.mousePosition;
+                const worldPos = this.root.camera.screenToWorld(mousePosition);
+                const tile = worldPos.toTileSpace().toWorldSpace();
+                
+                this.drawStroked(parameters.context, below.toString(), worldPos.x + 5, worldPos.y + 5);
                 parameters.context.strokeStyle = THEME.map.colorBlindPickerTile;
                 parameters.context.beginPath();
                 parameters.context.rect(tile.x, tile.y, globalConfig.tileSize, globalConfig.tileSize);

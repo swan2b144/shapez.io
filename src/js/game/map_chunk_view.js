@@ -119,6 +119,7 @@ export class MapChunkView extends MapChunk {
         });
 
         this.root.systemMgr.systems.display.drawChunkOverlay(parameters, this);
+        this.root.systemMgr.systems.wirelessDisplay.drawChunkOverlay(parameters, this);
         parameters.context.imageSmoothingEnabled = true;
         const resourcesScale = this.root.app.settings.getAllSettings().mapResourcesScale;
 
