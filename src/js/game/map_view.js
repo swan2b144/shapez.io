@@ -173,6 +173,14 @@ export class MapView extends BaseMap {
     }
 
     /**
+     * Draws the signal foreground
+     * @param {DrawParameters} parameters
+     */
+    drawSignalForegroundLayer(parameters) {
+        this.drawVisibleChunks(parameters, MapChunkView.prototype.drawSignalForegroundLayer);
+    }
+
+    /**
      * Draws the map overlay
      * @param {DrawParameters} parameters
      */

@@ -50,6 +50,10 @@ import { HUDStandaloneAdvantages } from "./parts/standalone_advantages";
 import { HUDCatMemes } from "./parts/cat_memes";
 import { HUDTutorialVideoOffer } from "./parts/tutorial_video_offer";
 
+// ModZ
+import { HUDSignalOverlay } from "./parts/signal_overlay";
+import { HUDSignalToolbar } from "./parts/signal_toolbar";
+
 export class GameHUD {
     /**
      * @param {GameRoot} root
@@ -62,6 +66,7 @@ export class GameHUD {
      * Initializes the hud parts
      */
     initialize() {
+        // @ts-ignore
         this.sandboxMod = this.root.app.settings.getAllSettings().sandboxMod;
         this.signals = {
             buildingSelectedForPlacement: /** @type {TypedSignal<[MetaBuilding|null]>} */ (new Signal()),
@@ -90,6 +95,9 @@ export class GameHUD {
             wireInfo: new HUDWireInfo(this.root),
             leverToggle: new HUDLeverToggle(this.root),
 
+            // ModZ
+            signalToolbar: new HUDSignalToolbar(this.root),
+
             // Must always exist
             pinnedShapes: new HUDPinnedShapes(this.root),
             notifications: new HUDNotifications(this.root),
@@ -104,6 +112,9 @@ export class GameHUD {
 
             minerHighlight: new HUDMinerHighlight(this.root),
             tutorialVideoOffer: new HUDTutorialVideoOffer(this.root),
+
+            // ModZ
+            signalOverlay: new HUDSignalOverlay(this.root),
 
             // Typing hints
             /* typehints:start */

@@ -439,10 +439,16 @@ export class GameCore {
 
             // Green wires overlay
             root.hud.parts.wiresOverlay.draw(params);
+            root.hud.parts.signalOverlay.draw(params);
 
             if (this.root.currentLayer === "wires") {
                 // Static map entities
                 root.map.drawWiresForegroundLayer(params);
+            }
+
+            if (this.root.currentLayer === "signal") {
+                // Static map entities
+                root.map.drawSignalForegroundLayer(params);
             }
         }
 

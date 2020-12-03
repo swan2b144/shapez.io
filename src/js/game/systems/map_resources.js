@@ -36,45 +36,94 @@ export class MapResourcesSystem extends GameSystem {
 
         parameters.context.globalAlpha = 0.5;
 
-        if (this.root.app.settings.getAllSettings().lowQualityMapResources) {
-            // LOW QUALITY: Draw patch items only
-            for (let i = 0; i < chunk.patches.length; ++i) {
-                const patch = chunk.patches[i];
-                const destX = chunk.x * globalConfig.mapChunkWorldSize + patch.pos.x * globalConfig.tileSize;
-                const destY = chunk.y * globalConfig.mapChunkWorldSize + patch.pos.y * globalConfig.tileSize;
-                const diameter = Math.min(80, 40 / parameters.zoomLevel);
-
-                patch.item.drawItemCenteredClipped(destX, destY, parameters, diameter);
-            }
-        } else {
-            // HIGH QUALITY: Draw all items
-            const layer = chunk.lowerLayer;
-            const layerEntities = chunk.contents;
-            for (let x = 0; x < globalConfig.mapChunkSize; ++x) {
-                const row = layer[x];
-                const rowEntities = layerEntities[x];
-                const worldX = (chunk.tileX + x) * globalConfig.tileSize;
-                for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
-                    const lowerItem = row[y];
-
-                    const entity = rowEntities[y];
-                    if (entity) {
-                        // Don't draw if there is an entity above
-                        continue;
+        if (this.root.currentLayer === "regular" || this.root.currentLayer == "wires") {
+            if (this.root.app.settings.getAllSettings().lowQualityMapResources) {
+                // LOW QUALITY: Draw patch items only
+                for (let i = 0; i < chunk.patches.length; ++i) {
+                    const patch = chunk.patches[i];
+                    const destX = chunk.x * globalConfig.mapChunkWorldSize + patch.pos.x * globalConfig.tileSize;
+                    const destY = chunk.y * globalConfig.mapChunkWorldSize + patch.pos.y * globalConfig.tileSize;
+                    const diameter = Math.min(80, 40 / parameters.zoomLevel);
+    
+                    patch.item.drawItemCenteredClipped(destX, destY, parameters, diameter);
+                }
+            } else {
+                // HIGH QUALITY: Draw all items
+                const layer = chunk.lowerLayer;
+                const layerEntities = chunk.contents;
+                for (let x = 0; x < globalConfig.mapChunkSize; ++x) {
+                    const row = layer[x];
+                    const rowEntities = layerEntities[x];
+                    const worldX = (chunk.tileX + x) * globalConfig.tileSize;
+                    for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
+                        const lowerItem = row[y];
+    
+                        const entity = rowEntities[y];
+                        if (entity) {
+                            // Don't draw if there is an entity above
+                            continue;
+                        }
+    
+                        if (lowerItem) {
+                            const worldY = (chunk.tileY + y) * globalConfig.tileSize;
+    
+                            const destX = worldX + globalConfig.halfTileSize;
+                            const destY = worldY + globalConfig.halfTileSize;
+    
+                            lowerItem.drawItemCenteredClipped(
+                                destX,
+                                destY,
+                                parameters,
+                                globalConfig.defaultItemDiameter
+                            );
+                        }
                     }
-
-                    if (lowerItem) {
-                        const worldY = (chunk.tileY + y) * globalConfig.tileSize;
-
-                        const destX = worldX + globalConfig.halfTileSize;
-                        const destY = worldY + globalConfig.halfTileSize;
-
-                        lowerItem.drawItemCenteredClipped(
-                            destX,
-                            destY,
-                            parameters,
-                            globalConfig.defaultItemDiameter
-                        );
+                }
+            }
+        } else if (this.root.currentLayer === "signal") {
+            if (this.root.app.settings.getAllSettings().lowQualityMapResources) {
+                // LOW QUALITY: Draw patch items only
+                for (let i = 0; i < chunk.patches.length; ++i) {
+                    const patch = chunk.patches[i];
+                    const destX = chunk.x * globalConfig.mapChunkWorldSize + patch.pos.x * globalConfig.tileSize;
+                    const destY = chunk.y * globalConfig.mapChunkWorldSize + patch.pos.y * globalConfig.tileSize;
+                    const diameter = Math.min(80, 40 / parameters.zoomLevel);
+    
+                    patch.item.drawItemCenteredClipped(destX, destY, parameters, diameter);
+                }
+            } else {
+                // HIGH QUALITY: Draw all items
+                const layer = chunk.lowerLayer;
+                const layerEntities = chunk.contents;
+                for (let x = 0; x < globalConfig.mapChunkSize; ++x) {
+                    const row = layer[x];
+                    const rowEntities = layerEntities[x];
+                    const worldX = (chunk.tileX + x) * globalConfig.tileSize;
+                    for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
+                        const lowerItem = row[y];
+    
+                        const entity = rowEntities[y];
+                        if (entity) {
+                            // Don't draw if there is an entity above
+                            continue;
+                        }
+    
+                        if (lowerItem) {
+                            if (lowerItem.getAsCopyableKey() !== "blue") {
+                                continue;
+                            }
+                            const worldY = (chunk.tileY + y) * globalConfig.tileSize;
+    
+                            const destX = worldX + globalConfig.halfTileSize;
+                            const destY = worldY + globalConfig.halfTileSize;
+    
+                            lowerItem.drawItemCenteredClipped(
+                                destX,
+                                destY,
+                                parameters,
+                                globalConfig.defaultItemDiameter
+                            );
+                        }
                     }
                 }
             }

@@ -190,7 +190,7 @@ declare interface TypedSignal<T extends Array<any>> {
     removeAll();
 }
 
-declare type Layer = "regular" | "wires";
+declare type Layer = "regular" | "wires" | "signal";
 declare type ItemType = "shape" | "color" | "boolean";
 
 declare module "worker-loader?inline=true&fallback=false!*" {

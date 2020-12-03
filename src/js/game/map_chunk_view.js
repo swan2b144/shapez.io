@@ -77,11 +77,13 @@ export class MapChunkView extends MapChunk {
     }
 
     drawForegroundStaticLayerModZ(systems, parameters) {
+        // @ts-ignore
         if (this.root.app.settings.getAllSettings().moreBalancerMod) {
             systems.programmableBalancer.drawChunk(parameters, this);
             systems.autoBalancer.drawChunk(parameters, this);
         }
 
+        // @ts-ignore
         if (this.root.app.settings.getAllSettings().wirelessBuildingsMod) {
             systems.wirelessDisplay.drawRegularChunk(parameters, this);
         }
@@ -312,9 +314,21 @@ export class MapChunkView extends MapChunk {
         systems.staticMapEntities.drawWiresChunk(parameters, this);
         systems.wiredPins.drawChunk(parameters, this);
 
+        // @ts-ignore
         if (this.root.app.settings.getAllSettings().wirelessBuildingsMod) {
             systems.wirelessSignal.drawWiresChunk(parameters, this);
             systems.wirelessDisplay.drawWiresChunk(parameters, this);
         }
+    }
+
+    /**
+     * Draws the signal layer
+     * @param {DrawParameters} parameters
+     */
+    drawSignalForegroundLayer(parameters) {
+        const systems = this.root.systemMgr.systems;
+        systems.wire.drawChunk(parameters, this);
+        systems.staticMapEntities.drawWiresChunk(parameters, this);
+        systems.wiredPins.drawChunk(parameters, this);
     }
 }

@@ -13,7 +13,7 @@ import { FormElementInput, FormElementItemChooser } from "../../core/modal_dialo
 import { fillInLinkIntoTranslation } from "../../core/utils";
 import { T } from "../../translations";
 import { Entity } from "../entity";
-import { THEME} from "../theme";
+import { THEME } from "../theme";
 import { drawRotatedSprite } from "../../core/draw_utils";
 import { enumDirectionToAngle, Vector } from "../../core/vector";
 
@@ -69,7 +69,10 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
 
             const signalValueInput = new FormElementInput({
                 id: "channelValue",
-                label: fillInLinkIntoTranslation(T.dialogs.editChannel.descShortKey, THIRDPARTY_URLS.shapeViewer),
+                label: fillInLinkIntoTranslation(
+                    T.dialogs.editChannel.descShortKey,
+                    THIRDPARTY_URLS.shapeViewer
+                ),
                 placeholder: "",
                 defaultValue: "",
                 validator: val => val,
@@ -198,12 +201,12 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
      * @param {number} x
      */
     drawStroked(ctx, text, x, y) {
-        ctx.font = '15px Sans-serif';
-        ctx.strokeStyle = 'black';
+        ctx.font = "15px Sans-serif";
+        ctx.strokeStyle = "black";
         ctx.lineWidth = 1;
         ctx.miterLimit = 2;
         ctx.strokeText(text, x, y);
-        ctx.fillStyle = 'white';
+        ctx.fillStyle = "white";
         ctx.fillText(text, x, y);
     }
 
@@ -228,13 +231,13 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
                 if (!network) {
                     return;
                 }
-    
+
                 const value = this.getDisplayItem(network.currentValue);
-    
+
                 if (!value) {
                     return;
                 }
-    
+
                 if (value.getItemType()) {
                     if (value.getItemType() === "color") {
                         this.displaySprites[/** @type {ColorItem} */ (value).color].drawCachedCentered(
@@ -244,9 +247,9 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
                             globalConfig.tileSize
                         );
                     } else if (value.getItemType() === "shape") {
-                        const visibleDisplayMod = parameters.root.app.settings.getAllSettings().visibleDisplayMod;
                         let radius = 30;
-                        if (visibleDisplayMod) {
+                        // @ts-ignore
+                        if (parameters.root.app.settings.getAllSettings().visibleDisplayMod) {
                             radius += 11;
                         }
                         value.drawItemCenteredClipped(
@@ -263,7 +266,7 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
                     const network = pinsComp.slots[slot].linkedNetwork;
 
                     if (!network) {
-                        possibleItems.push('dead');
+                        possibleItems.push("dead");
                         continue;
                     }
 
@@ -276,8 +279,13 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
 
                 if (possibleItems.length > 0) {
                     const D_context = parameters.context;
-                    D_context.fillStyle = 'black';
-                    D_context.fillRect((origin.x + 0.5) * globalConfig.tileSize - 16, (origin.y + 0.5) * globalConfig.tileSize - 15.5, 32.25, 32.25);
+                    D_context.fillStyle = "black";
+                    D_context.fillRect(
+                        (origin.x + 0.5) * globalConfig.tileSize - 16,
+                        (origin.y + 0.5) * globalConfig.tileSize - 15.5,
+                        32.25,
+                        32.25
+                    );
                 }
 
                 for (let index = 0; index < possibleItems.length; ++index) {
@@ -309,7 +317,7 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
                                 break;
                         }
 
-                        if (typeof value == 'string') {
+                        if (typeof value == "string") {
                             continue;
                         } else if (value.getItemType() === "color") {
                             this.displaySprites[/** @type {ColorItem} */ (value).color].drawCachedCentered(
@@ -320,12 +328,7 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
                             );
                         } else if (value.getItemType() === "shape") {
                             let radius = 20;
-                            value.drawItemCenteredClipped(
-                                currentX,
-                                currentY,
-                                parameters,
-                                radius
-                            );
+                            value.drawItemCenteredClipped(currentX, currentY, parameters, radius);
                         }
                     }
                 }
@@ -356,9 +359,7 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
             }
             const worldPos = tile.toWorldSpaceCenterOfTile();
 
-            const effectiveRotation = Math.radians(
-                enumDirectionToAngle[slot.direction] - 90
-            );
+            const effectiveRotation = Math.radians(enumDirectionToAngle[slot.direction] - 90);
 
             // Draw contained item to visualize whats emitted
             const value = network.currentValue;
@@ -394,8 +395,8 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
                 const mousePosition = this.root.app.mousePosition;
                 const worldPos = this.root.camera.screenToWorld(mousePosition);
                 const tile = worldPos.toTileSpace().toWorldSpace();
-                
-                this.drawStroked(parameters.context, below.toString(), worldPos.x + 5, worldPos.y + 5)
+
+                this.drawStroked(parameters.context, below.toString(), worldPos.x + 5, worldPos.y + 5);
                 parameters.context.strokeStyle = THEME.map.colorBlindPickerTile;
                 parameters.context.beginPath();
                 parameters.context.rect(tile.x, tile.y, globalConfig.tileSize, globalConfig.tileSize);
@@ -419,11 +420,18 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
                 }
             }
             if (entity.components.QuadSender) {
-                const quadSenderWire = Loader.getSprite("sprites/buildings/wireless_buildings-quad_sender(wire).png");
-                const staticEntity = entity.components.StaticMapEntity
+                const quadSenderWire = Loader.getSprite(
+                    "sprites/buildings/wireless_buildings-quad_sender(wire).png"
+                );
+                const staticEntity = entity.components.StaticMapEntity;
                 const origin = staticEntity.origin;
-                const tileSize = globalConfig.tileSize
-                quadSenderWire.drawCachedCentered(parameters, origin.x * tileSize + tileSize / 2, origin.y * tileSize + tileSize / 2, tileSize);
+                const tileSize = globalConfig.tileSize;
+                quadSenderWire.drawCachedCentered(
+                    parameters,
+                    origin.x * tileSize + tileSize / 2,
+                    origin.y * tileSize + tileSize / 2,
+                    tileSize
+                );
 
                 this.drawCorners(entity, parameters, chunk);
             }
@@ -433,7 +441,7 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
                 const mousePosition = this.root.app.mousePosition;
                 const worldPos = this.root.camera.screenToWorld(mousePosition);
                 const tile = worldPos.toTileSpace().toWorldSpace();
-                
+
                 this.drawStroked(parameters.context, below.toString(), worldPos.x + 5, worldPos.y + 5);
                 parameters.context.strokeStyle = THEME.map.colorBlindPickerTile;
                 parameters.context.beginPath();
@@ -464,7 +472,7 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
                 const mousePosition = this.root.app.mousePosition;
                 const worldPos = this.root.camera.screenToWorld(mousePosition);
                 const tile = worldPos.toTileSpace().toWorldSpace();
-                
+
                 this.drawStroked(parameters.context, below.toString(), worldPos.x + 5, worldPos.y + 5);
                 parameters.context.strokeStyle = THEME.map.colorBlindPickerTile;
                 parameters.context.beginPath();
@@ -474,4 +482,3 @@ export class WirelessDisplaySystem extends GameSystemWithFilter {
         }
     }
 }
-
