@@ -359,7 +359,7 @@ export class HubGoals extends BasicSerializableObject {
             enumColors.red,
             enumColors.yellow,
             enumColors.green,
-            enumColors.cyan,
+            enumColors.cyan, 
             enumColors.blue,
             enumColors.purple,
             enumColors.red,
