@@ -427,7 +427,7 @@ export class MapChunk {
      * @param {Entity=} contents
      * @param {Layer} layer
      */
-    setLayerContentFromWorldCords(tileX, tileY, contents, layer) {
+    setLayerContentFromWorldCords(tileX, tileY, layer, contents) {
         const localX = tileX - this.tileX;
         const localY = tileY - this.tileY;
         assert(localX >= 0, "Local X is < 0");
