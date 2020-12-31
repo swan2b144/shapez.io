@@ -19,5 +19,14 @@ export class BaseFluidComponent extends BasicSerializableObject{
         return {};
     }
 
+    getItemType(){
+        abstract;
+        return "water";
+    }
+
+    getAsCopyableKey() {
+        abstract;
+        return "";
+    }
 
 }
