@@ -4,7 +4,7 @@ import { BasicSerializableObject } from "../savegame/serialization";
 
 export const fluidTypes =["water"];
 
-export class BaseFluidComponent extends BasicSerializableObject{
+export class BaseFluid extends BasicSerializableObject{
 
     constructor(){
         super();
