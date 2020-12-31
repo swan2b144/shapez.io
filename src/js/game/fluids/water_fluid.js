@@ -15,8 +15,16 @@ export class WaterFluid extends BaseFluid{
 
     }
 
-    
+    constructor(definition) {
+        super();
 
+        /**
+         * This property must not be modified on runtime, you have to clone the class in order to change the definition
+         */
+        this.definition = definition;
+    }
+
+    
 
 
 }

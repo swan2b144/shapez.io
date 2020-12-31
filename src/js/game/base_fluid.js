@@ -24,9 +24,5 @@ export class BaseFluid extends BasicSerializableObject{
         return "water";
     }
 
-    getAsCopyableKey() {
-        abstract;
-        return "";
-    }
-
+    
 }
