@@ -2,16 +2,14 @@ import { globalConfig } from "../core/config";
 import { DrawParameters } from "../core/draw_parameters";
 import { BasicSerializableObject } from "../savegame/serialization";
 
-export const fluidTypes =["water"];
+export const fluidTypes = ["water"];
 
-export class BaseFluid extends BasicSerializableObject{
-
-    constructor(){
+export class BaseFluid extends BasicSerializableObject {
+    constructor() {
         super();
     }
 
-    static getId()
-    {
+    static getId() {
         return "base_fluid";
     }
 
@@ -19,10 +17,8 @@ export class BaseFluid extends BasicSerializableObject{
         return {};
     }
 
-    getItemType(){
+    getItemType() {
         abstract;
         return "water";
     }
-
-    
 }
