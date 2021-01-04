@@ -22,6 +22,10 @@ export class BaseFluid extends BasicSerializableObject {
         return "water";
     }
 
+    drawFullSizeOnCanvas(context, size) {
+        abstract;
+    }
+
     drawFluidCenteredClipped(x, y, parameters, diameter = globalConfig.defaultFluidDiameter) {
         if (parameters.visibleRect.containsCircle(x, y, diameter / 2)) {
             this.drawFluidCenteredImpl(x, y, parameters, diameter);
