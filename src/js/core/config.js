@@ -60,6 +60,8 @@ export const globalConfig = {
 
     defaultItemDiameter: 20,
 
+    defualtFluidDiameter: 20,
+
     itemSpacingOnBelts: 0.63,
 
     wiresSpeedItemsPerSecond: 6,
