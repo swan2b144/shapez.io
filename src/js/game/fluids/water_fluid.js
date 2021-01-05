@@ -13,6 +13,10 @@ export class WaterFluid extends BaseFluid {
         return types.string;
     }
 
+    static getViscosity() {
+        return 1.0;
+    }
+
     constructor(definition) {
         super();
 
@@ -20,19 +24,5 @@ export class WaterFluid extends BaseFluid {
          * This property must not be modified on runtime, you have to clone the class in order to change the definition
          */
         this.definition = definition;
-    }
-
-    drawFullSizeOnCanvas(context, size) {
-        if (!this.cachedSprite) {
-            this.cachedSprite = Loader.getSprite("sprites/fluids/water.png");
-        }
-    }
-
-    drawFluidCenteredClipped(x, y, parameters, diameter = globalConfig.defaultItemDiameter) {
-        const realDiameter = diameter * 0.6;
-        if (!this.cachedSprite) {
-            this.cachedSprite = Loader.getSprite("sprites/fluids/water.png");
-        }
-        this.cachedSprite.drawCachedCentered(parameters, x, y, realDiameter);
     }
 }

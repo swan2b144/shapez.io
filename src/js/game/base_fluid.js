@@ -17,22 +17,17 @@ export class BaseFluid extends BasicSerializableObject {
         return {};
     }
 
-    getItemType() {
+    static getItemType() {
         abstract;
         return "water";
     }
 
-    drawFullSizeOnCanvas(context, size) {
+    getViscosity() {
         abstract;
+        return 1.0;
     }
 
-    drawFluidCenteredClipped(x, y, parameters, diameter = globalConfig.defaultFluidDiameter) {
-        if (parameters.visibleRect.containsCircle(x, y, diameter / 2)) {
-            this.drawFluidCenteredImpl(x, y, parameters, diameter);
-        }
-    }
-
-    drawFluidCenteredImpl(x, y, parameters, diameter = globalConfig.defaultFluidDiameter) {
+    drawFullSizeOnCanvas(context, size) {
         abstract;
     }
 }
