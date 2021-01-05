@@ -1,1 +1,0 @@
-Sprites that renders in terrain generation and storage will appear in this folder. This file will be deleted when I populate this folder.
