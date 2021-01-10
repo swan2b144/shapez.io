@@ -122,6 +122,54 @@ export class FormElementInput extends FormElement {
     }
 }
 
+export class FormCommandInput extends FormElement {
+    constructor({ id, label = null, placeholder, defaultValue = "", validator = null }) {
+        super(id, label);
+        this.placeholder = placeholder;
+        this.defaultValue = defaultValue;
+        this.validator = validator;
+
+        this.element = null;
+    }
+
+    getHtml() {
+        return `
+            <div class="formElement input">
+                ${this.label ? `<label>${this.label}</label>` : ""}
+                <textarea
+                    id="textarea"
+                    type="text"
+                    spellcheck="false"
+                    class="input-text"
+                    placeholder="${this.placeholder.replace(/["\\]+/gi, "")}"
+                    data-formId="${this.id}">${this.defaultValue.replace(/["\\]+/gi, "")}</textarea>
+            </div>
+        `;
+    }
+
+    bindEvents(parent, clickTrackers) {
+        this.element = this.getFormElement(parent);
+        this.element.addEventListener("input", event => this.updateErrorState());
+        this.updateErrorState();
+    }
+
+    updateErrorState() {
+        this.element.classList.toggle("errored", !this.isValid());
+    }
+
+    isValid() {
+        return !this.validator || this.validator(this.element.value);
+    }
+
+    getValue() {
+        return this.element.value;
+    }
+
+    focus() {
+        this.element.focus();
+    }
+}
+
 export class FormElementCheckbox extends FormElement {
     constructor({ id, label, defaultValue = true }) {
         super(id, label);

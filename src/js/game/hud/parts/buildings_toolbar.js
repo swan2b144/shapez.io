@@ -16,6 +16,7 @@ import { HUDBaseToolbar } from "./base_toolbar";
 import { MetaStorageBuilding } from "../../buildings/storage";
 import { MetaItemProducerBuilding } from "../../buildings/item_producer";
 import { queryParamOptions } from "../../../core/query_parameters";
+import { MetaCommandControllerBuilding } from "../../buildings/command_controller";
 
 export class HUDBuildingsToolbar extends HUDBaseToolbar {
     constructor(root) {
@@ -39,6 +40,7 @@ export class HUDBuildingsToolbar extends HUDBaseToolbar {
                 MetaLeverBuilding,
                 MetaFilterBuilding,
                 MetaDisplayBuilding,
+                MetaCommandControllerBuilding,
             ],
             visibilityCondition: () =>
                 !this.root.camera.getIsMapOverlayActive() && this.root.currentLayer === "regular",

@@ -106,7 +106,7 @@ export class HUDWaypoints extends BaseHUDPart {
                 label: null,
                 center: { x: 0, y: 0 },
                 zoomLevel: 3,
-                layer: gMetaBuildingRegistry.findByClass(MetaHubBuilding).getLayer(),
+                layer: gMetaBuildingRegistry.findByClass(MetaHubBuilding).getLayer(this.root),
             },
         ];
 

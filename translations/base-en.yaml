@@ -730,6 +730,11 @@ buildings:
             name: Item Producer
             description: Available in sandbox mode only, outputs the given signal from the wires layer on the regular layer.
 
+    command_controller:
+        default:
+            name: &command_controller Command Controller
+            description: Command block but shapez.io :).
+
 storyRewards:
     # Those are the rewards gained from completing the store
     reward_cutter_and_trash:
@@ -1156,6 +1161,7 @@ keybindings:
         transistor: *transistor
         analyzer: *analyzer
         comparator: *comparator
+        command_controller: *command_controller
         item_producer: Item Producer (Sandbox)
         # ---
 

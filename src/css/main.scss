@@ -54,10 +54,11 @@
 @import "ingame_hud/sandbox_controller";
 @import "ingame_hud/standalone_advantages";
 @import "ingame_hud/cat_memes";
+@import "ingame_hud/command_editor";
 
 // prettier-ignore
-$elements: 
-// Base    
+$elements:
+// Base
 ingame_Canvas,
 ingame_VignetteOverlay,
 

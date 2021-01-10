@@ -75,6 +75,7 @@ export const KEYMAPPINGS = {
         analyzer: { keyCode: key("6") },
         comparator: { keyCode: key("7") },
         transistor: { keyCode: key("8") },
+        command_controller: { keyCode: key("/") },
     },
 
     placement: {

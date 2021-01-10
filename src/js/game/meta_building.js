@@ -29,7 +29,7 @@ export class MetaBuilding {
      * Returns the edit layer of the building
      * @returns {Layer}
      */
-    getLayer() {
+    getLayer(root) {
         return "regular";
     }
 
@@ -201,7 +201,7 @@ export class MetaBuilding {
      */
     createEntity({ root, origin, rotation, originalRotation, rotationVariant, variant }) {
         const entity = new Entity(root);
-        entity.layer = this.getLayer();
+        entity.layer = this.getLayer(root);
         entity.addComponent(
             new StaticMapEntityComponent({
                 origin: new Vector(origin.x, origin.y),

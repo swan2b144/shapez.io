@@ -139,7 +139,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
     onEditModeChanged(layer) {
         const metaBuilding = this.currentMetaBuilding.get();
         if (metaBuilding) {
-            if (metaBuilding.getLayer() !== layer) {
+            if (metaBuilding.getLayer(this.root) !== layer) {
                 // This layer doesn't fit the edit mode anymore
                 this.currentMetaBuilding.set(null);
             }
@@ -413,7 +413,7 @@ export class HUDBuildingPlacerLogic extends BaseHUDPart {
             tile,
             rotation: this.currentBaseRotation,
             variant: this.currentVariant.get(),
-            layer: metaBuilding.getLayer(),
+            layer: metaBuilding.getLayer(this.root),
         });
 
         const entity = this.root.logic.tryPlaceBuilding({
