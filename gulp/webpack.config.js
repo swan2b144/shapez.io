@@ -5,7 +5,6 @@ const webpack = require("webpack");
 const { getRevision, getVersion, getAllResourceImages } = require("./buildutils");
 const lzString = require("lz-string");
 const CircularDependencyPlugin = require("circular-dependency-plugin");
-const MonacoEditorPlugin = require("monaco-editor-webpack-plugin");
 
 module.exports = ({ watch = false, standalone = false }) => {
     return {
@@ -60,22 +59,9 @@ module.exports = ({ watch = false, standalone = false }) => {
                 // set the current working directory for displaying module paths
                 cwd: path.join(__dirname, "..", "src", "js"),
             }),
-
-            new MonacoEditorPlugin({
-                languages: ["javascript"],
-                filename: "[name].worker-monaco.js",
-            }),
         ],
         module: {
             rules: [
-                {
-                    test: /\.css$/,
-                    use: ["style-loader", "css-loader"],
-                },
-                {
-                    test: /\.ttf$/,
-                    use: ["url-loader"],
-                },
                 {
                     test: /\.json$/,
                     enforce: "pre",
