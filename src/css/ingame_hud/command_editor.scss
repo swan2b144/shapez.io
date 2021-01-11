@@ -1,7 +1,29 @@
 textarea {
     white-space: nowrap;
     overflow: scroll;
-    height: 100px;
+    height: 645px;
     width: 645px;
     resize: none;
+    font-family: "Fira Mono";
+    box-sizing: border-box;
+    margin: auto;
+
+    padding: 20px;
+    background-color: #000;
+    color: #63de00;
+
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    line-height: 1.5rem;
+}
+
+body {
+    min-width: 100vw;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #eee;
 }

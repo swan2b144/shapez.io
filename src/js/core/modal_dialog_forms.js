@@ -133,6 +133,16 @@ export class FormCommandInput extends FormElement {
     }
 
     getHtml() {
+        const tab = function (e) {
+            if (e.keyCode === 9) {
+                var v = this.value,
+                    s = this.selectionStart,
+                    e = this.selectionEnd;
+                this.value = v.substring(0, s) + "\t" + v.substring(e);
+                this.selectionStart = this.selectionEnd = s + 1;
+                return false;
+            }
+        };
         return `
             <div class="formElement input">
                 ${this.label ? `<label>${this.label}</label>` : ""}
@@ -141,6 +151,7 @@ export class FormCommandInput extends FormElement {
                     type="text"
                     spellcheck="false"
                     class="input-text"
+                    onkeydown="${tab}"
                     placeholder="${this.placeholder.replace(/["\\]+/gi, "")}"
                     data-formId="${this.id}">${this.defaultValue.replace(/["\\]+/gi, "")}</textarea>
             </div>
