@@ -174,7 +174,11 @@ export class MapChunk {
     }
 
     internalGenerateFluidPatch(rng, fluidPatchSize, distanceToOriginInChunks) {
-        let availableFluids = [EnumFluids.water];
+        let availableFluids = [];
+
+        if (distanceToOriginInChunks > 10) {
+            availableFluids.push(EnumFluids.water);
+        }
     }
 
     /**
