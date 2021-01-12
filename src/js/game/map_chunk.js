@@ -10,6 +10,7 @@ import { COLOR_ITEM_SINGLETONS } from "./items/color_item";
 import { GameRoot } from "./root";
 import { enumSubShape } from "./shape_definition";
 import { Rectangle } from "../core/rectangle";
+import { EnumFluids } from "./base_fluid";
 
 const logger = createLogger("map_chunk");
 
@@ -170,6 +171,10 @@ export class MapChunk {
             availableColors.push(enumColors.blue);
         }
         this.internalGeneratePatch(rng, colorPatchSize, COLOR_ITEM_SINGLETONS[rng.choice(availableColors)]);
+    }
+
+    internalGenerateFluidPatch(rng, fluidPatchSize, distanceToOriginInChunks) {
+        let availableFluids = [EnumFluids.water];
     }
 
     /**

@@ -2,7 +2,9 @@ import { globalConfig } from "../core/config";
 import { DrawParameters } from "../core/draw_parameters";
 import { BasicSerializableObject } from "../savegame/serialization";
 
-export const fluidTypes = ["water"];
+export const EnumFluids = {
+    water: "water",
+};
 
 export class BaseFluid extends BasicSerializableObject {
     constructor() {
