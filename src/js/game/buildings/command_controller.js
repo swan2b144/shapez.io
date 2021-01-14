@@ -26,12 +26,12 @@ export class MetaCommandControllerBuilding extends MetaBuilding {
     }
 
     getDimensions() {
-        return new Vector(1, 1);
+        return new Vector(3, 3);
     }
 
     getRenderPins() {
         // We already have it included
-        return false;
+        return true;
     }
 
     /**
@@ -43,23 +43,8 @@ export class MetaCommandControllerBuilding extends MetaBuilding {
             new WiredPinsComponent({
                 slots: [
                     {
-                        pos: new Vector(0, 0),
-                        direction: enumDirection.right,
-                        type: enumPinSlotType.logicalAcceptor,
-                    },
-                    {
-                        pos: new Vector(0, 0),
+                        pos: new Vector(1, 2),
                         direction: enumDirection.bottom,
-                        type: enumPinSlotType.logicalAcceptor,
-                    },
-                    {
-                        pos: new Vector(0, 0),
-                        direction: enumDirection.left,
-                        type: enumPinSlotType.logicalAcceptor,
-                    },
-                    {
-                        pos: new Vector(0, 0),
-                        direction: enumDirection.top,
                         type: enumPinSlotType.logicalAcceptor,
                     },
                 ],

@@ -1,4 +1,5 @@
 import { globalConfig } from "../../core/config";
+import { DrawParameters } from "../../core/draw_parameters";
 import { gMetaBuildingRegistry } from "../../core/global_registries";
 import { DialogWithForm } from "../../core/modal_dialog_elements";
 import { FormCommandInput, FormElementInput } from "../../core/modal_dialog_forms";
@@ -12,11 +13,106 @@ import { GameSystemWithFilter } from "../game_system_with_filter";
 import { BOOL_TRUE_SINGLETON } from "../items/boolean_item";
 import { defaultBuildingVariant } from "../meta_building";
 
+const setTile = function ({
+    x = 0,
+    y = 0,
+    building = "empty",
+    variant = defaultBuildingVariant,
+    rotation = 0,
+    rotationVariant = 0,
+    layer = "regular",
+}) {
+    const root = CommandControllerSystem.root;
+    if (building == "empty") {
+        const contents = root.map.getTileContent(new Vector(x, y), layer);
+        if (contents) {
+            root.logic.tryDeleteBuilding(contents);
+        }
+    } else {
+        const contents = root.map.getTileContent(new Vector(x, y), layer);
+        if (contents) {
+            root.logic.tryDeleteBuilding(contents);
+        }
+        root.logic.tryPlaceBuilding({
+            origin: new Vector(x, y),
+            rotation,
+            rotationVariant,
+            originalRotation: 0,
+            building: gMetaBuildingRegistry.findById(building),
+            variant,
+        });
+    }
+};
+
+const lineBuilding = function ({
+    x1 = 0,
+    y1 = 0,
+    x2 = 0,
+    y2 = 0,
+    building = "empty",
+    variant = defaultBuildingVariant,
+    rotation = 0,
+    rotationVariant = 0,
+    layer = "regular",
+}) {
+    let dx = Math.abs(x2 - x1),
+        sx = x1 < x2 ? 1 : -1,
+        dy = -Math.abs(y2 - y1),
+        sy = y1 < y2 ? 1 : -1,
+        err = dx + dy;
+
+    while (true) {
+        setTile({
+            x: x1,
+            y: y1,
+            building,
+            variant,
+            rotation,
+            rotationVariant,
+            layer,
+        });
+
+        if (x1 == x2 && y1 == y2) {
+            break;
+        }
+
+        const e2 = 2 * err;
+
+        if (e2 >= dy) {
+            err += dy;
+            x1 += sx;
+        }
+
+        if (e2 <= dx) {
+            err += dx;
+            y1 += sy;
+        }
+    }
+};
+
+const foundEntity = function ({ x = 0, y = 0, layer = "regular" }) {
+    const root = CommandControllerSystem.root;
+    return root.map.getTileContent(new Vector(x, y), layer);
+};
+
+//  lineBuilding(root, {x1: 0, y1: -5, x2: 10, y2: -5, building: 'display'});
 export class CommandControllerSystem extends GameSystemWithFilter {
     constructor(root) {
         super(root, [CommandControllerComponent]);
 
         this.root.signals.entityManuallyPlaced.add(entity => this.editCommandController(entity));
+
+        this.variables = {};
+
+        CommandControllerSystem.root = this.root;
+
+        // FUNCTIONS
+
+        this.setTile = setTile;
+        this.lineBuilding = lineBuilding;
+        this.foundEntity = foundEntity;
+
+        DrawParameters.context;
     }
 
     update() {
@@ -39,15 +135,15 @@ export class CommandControllerSystem extends GameSystemWithFilter {
 
             if (status) {
                 try {
-                    this.getFunction(command)(this);
+                    this.getFunction(command)(this, Vector, entity);
                 } catch (error) {
                     if (error instanceof Error) {
                         console.log(error);
-                        return false;
+                        continue;
                     }
                 }
 
-                this.getFunction(command)(this);
+                this.getFunction(command)(this, Vector, entity);
             }
         }
     }
@@ -56,30 +152,7 @@ export class CommandControllerSystem extends GameSystemWithFilter {
      * @param {string} val
      */
     getFunction(val) {
-        try {
-            new Function("{ root, setTile }", val);
-        } catch (error) {
-            console.log(error);
-            if (error instanceof Error) {
-                return null;
-            }
-        }
-
-        return new Function("{ root, setTile }", val);
-    }
-
-    setTile(
-        root,
-        { x = 0, y = 0, building, variant = defaultBuildingVariant, rotation = 0, rotationVariant = 0 }
-    ) {
-        root.logic.tryPlaceBuilding({
-            origin: new Vector(x, y),
-            rotation,
-            rotationVariant,
-            originalRotation: 0,
-            building: gMetaBuildingRegistry.findById(building),
-            variant,
-        });
+        return new Function("{ root, variables, setTile, lineBuilding }, Vector, entity", val);
     }
 
     /**
@@ -106,9 +179,11 @@ export class CommandControllerSystem extends GameSystemWithFilter {
             title: T.dialogs.editSignal.title,
             desc: T.dialogs.editSignal.descItems,
             formElements: [signalValueInput],
+            buttons: ["ok:good"],
             closeButton: false,
         });
 
+        dialog.inputReciever.keydown.removeAll();
         this.root.hud.parts.dialogs.internalShowDialog(dialog);
 
         // When confirmed, set the signal
@@ -133,3 +208,5 @@ export class CommandControllerSystem extends GameSystemWithFilter {
         dialog.valueChosen.add(closeHandler);
     }
 }
+
+CommandControllerSystem.root = {};

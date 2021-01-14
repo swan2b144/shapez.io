@@ -442,7 +442,7 @@ export class MapChunk {
             oldContents = this.wireContents[localX][localY];
         }
 
-        assert(contents === null || !oldContents, "Tile already used: " + tileX + " / " + tileY);
+        //assert(contents === null || !oldContents, "Tile already used: " + tileX + " / " + tileY);
 
         if (oldContents) {
             // Remove from list (the old contents must be reigstered)

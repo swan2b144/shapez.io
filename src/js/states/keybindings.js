@@ -107,7 +107,6 @@ export class KeybindingsState extends TextualGameState {
                 // Enter
                 keyCode === 13
             ) {
-                console.log("sadsadasdasd");
                 // Ignore builtins
                 return;
             }
