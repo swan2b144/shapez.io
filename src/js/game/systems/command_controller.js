@@ -61,6 +61,7 @@ const lineBuilding = function ({
         sy = y1 < y2 ? 1 : -1,
         err = dx + dy;
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
         setTile({
             x: x1,
@@ -111,8 +112,6 @@ export class CommandControllerSystem extends GameSystemWithFilter {
         this.setTile = setTile;
         this.lineBuilding = lineBuilding;
         this.foundEntity = foundEntity;
-
-        DrawParameters.context;
     }
 
     update() {
@@ -152,7 +151,7 @@ export class CommandControllerSystem extends GameSystemWithFilter {
      * @param {string} val
      */
     getFunction(val) {
-        return new Function("{ root, variables, setTile, lineBuilding }, Vector, entity", val);
+        return new Function("{ root, variables, setTile, lineBuilding, foundEntity }, Vector, entity", val);
     }
 
     /**
