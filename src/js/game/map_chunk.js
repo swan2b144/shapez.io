@@ -10,7 +10,7 @@ import { COLOR_ITEM_SINGLETONS } from "./items/color_item";
 import { GameRoot } from "./root";
 import { enumSubShape } from "./shape_definition";
 import { Rectangle } from "../core/rectangle";
-import { EnumFluids } from "./base_fluid";
+import { enumFluids } from "./base_fluid";
 import { BaseFluid } from "./base_fluid";
 
 const logger = createLogger("map_chunk");
@@ -31,7 +31,7 @@ export class MapChunk {
 
         /**
          * Stores the contents of the lower (= map resources) layer
-         *  @type {Array<Array<?BaseItem>>}
+         *  @type {Array<Array<?BaseItem | BaseFluid>>}
          */
         this.lowerLayer = make2DUndefinedArray(globalConfig.mapChunkSize, globalConfig.mapChunkSize);
 
@@ -81,7 +81,7 @@ export class MapChunk {
 
         /**
          * Store which patches we have so we can render them in the overview
-         * @type {Array<{pos: Vector, item: BaseItem, size: number }>}
+         * @type {Array<{pos: Vector, item: BaseItem | BaseFluid, size: number }>}
          */
         this.patches = [];
 
@@ -92,7 +92,7 @@ export class MapChunk {
      * Generates a patch filled with the given item
      * @param {RandomNumberGenerator} rng
      * @param {number} patchSize
-     * @param {BaseItem} item
+     * @param {BaseItem|BaseFluid} item
      * @param {number=} overrideX Override the X position of the patch
      * @param {number=} overrideY Override the Y position of the patch
      */
@@ -178,9 +178,9 @@ export class MapChunk {
         let availableFluids = [];
 
         if (distanceToOriginInChunks > 10) {
-            availableFluids.push(EnumFluids.water);
+            availableFluids.push(enumFluids.water);
         }
-        this.internalGeneratePatch(rng, fluidPatchSize, fluid);
+        this.internalGeneratePatch(rng, fluidPatchSize, FLUID_SINGLETONS[rng.choice(availableFluids)]);
     }
 
     /**
@@ -341,7 +341,7 @@ export class MapChunk {
      *
      * @param {number} worldX
      * @param {number} worldY
-     * @returns {BaseItem=}
+     * @returns {BaseItem | BaseFluid=}
      */
     getLowerLayerFromWorldCoords(worldX, worldY) {
         const localX = worldX - this.tileX;

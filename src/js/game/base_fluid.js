@@ -3,13 +3,17 @@ import { DrawParameters } from "../core/draw_parameters";
 import { BasicSerializableObject } from "../savegame/serialization";
 import { THEME } from "../game/theme";
 
-export const EnumFluids = {
+export const enumFluids = {
     water: "water",
 };
 
 export class BaseFluid extends BasicSerializableObject {
-    constructor() {
+    /**
+     * @param {enumFluids} fluid
+     */
+    constructor(fluid) {
         super();
+        this.fluid = fluid;
     }
 
     static getId() {
@@ -47,4 +51,10 @@ export class BaseFluid extends BasicSerializableObject {
     getBackgroundColorAsResource() {
         return THEME.map.resources.fluids;
     }
+}
+
+export const FLUID_SINGLETONS = {};
+
+for (const fluid in enumFluids) {
+    FLUID_SINGLETONS[fluid] = new BaseFluid(enumFluids[fluid]);
 }
