@@ -6,6 +6,7 @@ import { enumDirection, enumDirectionToVector, enumInvertedDirections, Vector } 
 import { getBuildingDataFromCode } from "./building_codes";
 import { enumWireVariant } from "./components/wire";
 import { Entity } from "./entity";
+import { FluidItem } from "./items/fluid_item";
 import { CHUNK_OVERLAY_RES } from "./map_chunk_view";
 import { MetaBuilding } from "./meta_building";
 import { GameRoot } from "./root";
@@ -72,6 +73,17 @@ export class GameLogic {
                     const metaClass = otherEntity.components.StaticMapEntity.getMetaBuilding();
                     if (!metaClass.getIsReplaceable()) {
                         // This one is a direct blocker
+                        return false;
+                    }
+                }
+
+                // Check if there is any fluid underneath it
+                const tile = this.root.map.getLowerLayerContentXY(x, y);
+                if (tile && tile.getItemType() === "fluid") {
+                    const metaClass = entity.components.StaticMapEntity.getMetaBuilding();
+
+                    console.log(tile);
+                    if (!metaClass.placeableToFluids(tile.getAsCopyableKey())) {
                         return false;
                     }
                 }

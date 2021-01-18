@@ -190,6 +190,14 @@ export class MetaBuilding {
     }
 
     /**
+     * @param {string} fluid
+     * @returns {boolean}
+     */
+    placeableToFluids(fluid) {
+        return false;
+    }
+
+    /**
      * Creates the entity without placing it
      * @param {object} param0
      * @param {GameRoot} param0.root

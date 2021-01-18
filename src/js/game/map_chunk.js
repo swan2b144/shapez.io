@@ -10,8 +10,8 @@ import { COLOR_ITEM_SINGLETONS } from "./items/color_item";
 import { GameRoot } from "./root";
 import { enumSubShape } from "./shape_definition";
 import { Rectangle } from "../core/rectangle";
-import { enumFluids } from "./base_fluid";
-import { BaseFluid } from "./base_fluid";
+import { FLUID_ITEM_SINGLETONS } from "./items/fluid_item";
+import { enumFluids } from "./items/fluid_item";
 
 const logger = createLogger("map_chunk");
 
@@ -31,7 +31,7 @@ export class MapChunk {
 
         /**
          * Stores the contents of the lower (= map resources) layer
-         *  @type {Array<Array<?BaseItem | BaseFluid>>}
+         *  @type {Array<Array<?BaseItem>>}
          */
         this.lowerLayer = make2DUndefinedArray(globalConfig.mapChunkSize, globalConfig.mapChunkSize);
 
@@ -81,7 +81,7 @@ export class MapChunk {
 
         /**
          * Store which patches we have so we can render them in the overview
-         * @type {Array<{pos: Vector, item: BaseItem | BaseFluid, size: number }>}
+         * @type {Array<{pos: Vector, item: BaseItem, size: number }>}
          */
         this.patches = [];
 
@@ -92,7 +92,7 @@ export class MapChunk {
      * Generates a patch filled with the given item
      * @param {RandomNumberGenerator} rng
      * @param {number} patchSize
-     * @param {BaseItem|BaseFluid} item
+     * @param {BaseItem} item
      * @param {number=} overrideX Override the X position of the patch
      * @param {number=} overrideY Override the Y position of the patch
      */
@@ -175,12 +175,19 @@ export class MapChunk {
     }
 
     internalGenerateFluidPatch(rng, fluidPatchSize, distanceToOriginInChunks) {
+        // First, determine available fluids
         let availableFluids = [];
-
         if (distanceToOriginInChunks > 10) {
             availableFluids.push(enumFluids.water);
         }
-        this.internalGeneratePatch(rng, fluidPatchSize, FLUID_SINGLETONS[rng.choice(availableFluids)]);
+
+        if (availableFluids.length > 0) {
+            this.internalGeneratePatch(
+                rng,
+                fluidPatchSize,
+                FLUID_ITEM_SINGLETONS[rng.choice(availableFluids)]
+            );
+        }
     }
 
     /**
@@ -293,6 +300,14 @@ export class MapChunk {
             this.internalGenerateColorPatch(rng, colorPatchSize, distanceToOriginInChunks);
         }
 
+        // Determine how likely it is that there is a fluid patch
+        const fluidPatchChance = 0.9 - clamp(distanceToOriginInChunks / 25, 0, 1) * 0.5;
+
+        if (rng.next() < fluidPatchChance / 4) {
+            const fluidPatchSize = Math.max(2, Math.round(1 + clamp(distanceToOriginInChunks / 8, 0, 4)));
+            this.internalGenerateFluidPatch(rng, fluidPatchSize, distanceToOriginInChunks);
+        }
+
         // Determine how likely it is that there is a shape patch
         const shapePatchChance = 0.9 - clamp(distanceToOriginInChunks / 25, 0, 1) * 0.5;
         if (rng.next() < shapePatchChance / 4) {
@@ -341,7 +356,7 @@ export class MapChunk {
      *
      * @param {number} worldX
      * @param {number} worldY
-     * @returns {BaseItem | BaseFluid=}
+     * @returns {BaseItem=}
      */
     getLowerLayerFromWorldCoords(worldX, worldY) {
         const localX = worldX - this.tileX;
@@ -438,7 +453,8 @@ export class MapChunk {
      * @param {Entity=} contents
      * @param {Layer} layer
      */
-    setLayerContentFromWorldCords(tileX, tileY, layer, contents) {
+    // @ts-ignore
+    setLayerContentFromWorldCords(tileX, tileY, contents, layer) {
         const localX = tileX - this.tileX;
         const localY = tileY - this.tileY;
         assert(localX >= 0, "Local X is < 0");

@@ -6,7 +6,6 @@ import { Factory } from "./factory";
  * @typedef {import("../game/component").Component} Component
  * @typedef {import("../game/base_item").BaseItem} BaseItem
  * @typedef {import("../game/meta_building").MetaBuilding} MetaBuilding
-* @typedef {import("../game/base_fluid").BaseFluid} BaseFluid
 
 
 // These factories are here to remove circular dependencies
