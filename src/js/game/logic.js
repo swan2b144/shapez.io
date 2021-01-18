@@ -82,7 +82,6 @@ export class GameLogic {
                 if (tile && tile.getItemType() === "fluid") {
                     const metaClass = entity.components.StaticMapEntity.getMetaBuilding();
 
-                    console.log(tile);
                     if (!metaClass.placeableToFluids(tile.getAsCopyableKey())) {
                         return false;
                     }

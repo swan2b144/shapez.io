@@ -178,7 +178,9 @@ export class MapChunk {
         // First, determine available fluids
         let availableFluids = [];
         if (distanceToOriginInChunks > 10) {
-            availableFluids.push(enumFluids.water);
+            for (const fluid in enumFluids) {
+                availableFluids.push(fluid);
+            }
         }
 
         if (availableFluids.length > 0) {

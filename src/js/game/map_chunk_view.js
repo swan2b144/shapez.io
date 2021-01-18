@@ -112,7 +112,7 @@ export class MapChunkView extends MapChunk {
 
             for (let i = 0; i < this.patches.length; ++i) {
                 const patch = this.patches[i];
-                if (patch.item.getItemType() === "shape") {
+                if (patch.item.getItemType() === "shape" || patch.item.getItemType() === "fluid") {
                     const destX = this.x * dims + patch.pos.x * globalConfig.tileSize;
                     const destY = this.y * dims + patch.pos.y * globalConfig.tileSize;
                     patch.item.drawItemCenteredClipped(destX, destY, parameters, diameter);

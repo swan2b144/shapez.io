@@ -7,10 +7,12 @@ import { THEME } from "../theme";
 
 export const enumFluids = {
     water: "water",
+    //oil: "oil",
 };
 
 export const enumFluidsToHex = {
     water: "#5ba0fb",
+    //oil: "#373A36",
 };
 
 export class FluidItem extends BaseItem {
@@ -55,17 +57,17 @@ export class FluidItem extends BaseItem {
         return enumFluidsToHex[this.fluid];
     }
 
-    /**
-     * Draws the item to a canvas
-     * @param {CanvasRenderingContext2D} context
-     * @param {number} size
-     */
-    drawFullSizeOnCanvas(context, size) {
-        if (!this.cachedSprite) {
-            this.cachedSprite = Loader.getSprite("sprites/fluids/" + this.fluid + ".png");
-        }
-        this.cachedSprite.drawCentered(context, size / 2, size / 2, size);
-    }
+    // /**
+    //  * Draws the item to a canvas
+    //  * @param {CanvasRenderingContext2D} context
+    //  * @param {number} size
+    //  */
+    // drawFullSizeOnCanvas(context, size) {
+    //     if (!this.cachedSprite) {
+    //         this.cachedSprite = Loader.getSprite("sprites/fluids/" + this.fluid + ".png");
+    //     }
+    //     this.cachedSprite.drawCentered(context, size / 2, size / 2, size);
+    // }
 
     /**
      * @param {number} x
