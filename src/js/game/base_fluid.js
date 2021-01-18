@@ -1,6 +1,7 @@
 import { globalConfig } from "../core/config";
 import { DrawParameters } from "../core/draw_parameters";
 import { BasicSerializableObject } from "../savegame/serialization";
+import { THEME } from "../game/theme";
 
 export const EnumFluids = {
     water: "water",
@@ -31,5 +32,19 @@ export class BaseFluid extends BasicSerializableObject {
 
     drawFullSizeOnCanvas(context, size) {
         abstract;
+    }
+
+    drawItemCenteredClipped(x, y, parameters, diameter = globalConfig.defaultItemDiameter) {
+        if (parameters.visibleRect.containsCircle(x, y, diameter / 2)) {
+            this.drawItemCenteredImpl(x, y, parameters, diameter);
+        }
+    }
+
+    drawItemCenteredImpl(x, y, parameters, diameter = globalConfig.defaultItemDiameter) {
+        abstract;
+    }
+
+    getBackgroundColorAsResource() {
+        return THEME.map.resources.fluids;
     }
 }

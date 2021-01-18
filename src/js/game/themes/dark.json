@@ -24,7 +24,7 @@
 
         "colorBlindPickerTile": "rgba(255, 255, 255, 0.5)",
 
-        "resources": {
+        "": {
             "shape": "#5d5f6a",
             "red": "#854f56",
             "green": "#667964",

@@ -11,6 +11,7 @@ import { GameRoot } from "./root";
 import { enumSubShape } from "./shape_definition";
 import { Rectangle } from "../core/rectangle";
 import { EnumFluids } from "./base_fluid";
+import { BaseFluid } from "./base_fluid";
 
 const logger = createLogger("map_chunk");
 
@@ -179,6 +180,7 @@ export class MapChunk {
         if (distanceToOriginInChunks > 10) {
             availableFluids.push(EnumFluids.water);
         }
+        this.internalGeneratePatch(rng, fluidPatchSize, fluid);
     }
 
     /**

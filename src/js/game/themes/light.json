@@ -28,7 +28,10 @@
             "shape": "#eaebec",
             "red": "#ffbfc1",
             "green": "#cbffc4",
-            "blue": "#bfdaff"
+            "blue": "#bfdaff",
+            "fluids": {
+                "water": "#5ba0fb"
+            }
         },
 
         "chunkOverview": {

@@ -3,6 +3,7 @@ import { DrawParameters } from "../../core/draw_parameters";
 import { types } from "../../savegame/serialization";
 import { BaseFluid } from "../base_fluid";
 import { Loader } from "../../core/loader";
+import { THEME } from "../theme";
 
 export class WaterFluid extends BaseFluid {
     static getId() {
@@ -24,5 +25,17 @@ export class WaterFluid extends BaseFluid {
          * This property must not be modified on runtime, you have to clone the class in order to change the definition
          */
         this.definition = definition;
+    }
+
+    drawItemCenteredClipped(x, y, parameters, diameter = globalConfig.defaultItemDiameter) {
+        const realDiameter = diameter * 0.6;
+        if (!this.cachedSprite) {
+            this.cachedSprite = Loader.getSprite("sprites/fluids/water.png");
+        }
+        this.cachedSprite.drawCachedCentered(parameters, x, y, realDiameter);
+    }
+
+    drawItemCenteredImpl(x, y, parameters, diameter = globalConfig.defaultItemDiameter) {
+        this.definition.drawCentered(x, y, parameters, diameter);
     }
 }
