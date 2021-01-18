@@ -1,5 +1,14 @@
 export const CHANGELOG = [
     {
+        version: "0.0.1 (H2O)",
+        date: "01.18.2021",
+        entries: [
+            "Pilot demo build for sHape2O",
+            "You can now find water across the map! It will spawn 10 or more chunks away from hub",
+            "There's not much you can do with it, besides not buyild vanilla buildings on this layer (wires layer should be unrestricted)",
+        ],
+    },
+    {
         version: "1.2.3",
         date: "unreleased",
         entries: [
