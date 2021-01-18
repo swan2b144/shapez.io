@@ -134,7 +134,7 @@ export class CommandControllerSystem extends GameSystemWithFilter {
 
             if (status) {
                 try {
-                    this.getFunction(command)(this, Vector, entity);
+                    this.getFunction(command)(this, globalConfig, Vector, entity);
                 } catch (error) {
                     if (error instanceof Error) {
                         console.log(error);
@@ -142,7 +142,7 @@ export class CommandControllerSystem extends GameSystemWithFilter {
                     }
                 }
 
-                this.getFunction(command)(this, Vector, entity);
+                this.getFunction(command)(this, globalConfig, Vector, entity);
             }
         }
     }
@@ -151,7 +151,10 @@ export class CommandControllerSystem extends GameSystemWithFilter {
      * @param {string} val
      */
     getFunction(val) {
-        return new Function("{ root, variables, setTile, lineBuilding, foundEntity }, Vector, entity", val);
+        return new Function(
+            "{ root, variables, setTile, lineBuilding, foundEntity }, globalConfig, Vector, entity",
+            val
+        );
     }
 
     /**

@@ -369,9 +369,12 @@ export class HUDBuildingPlacer extends HUDBuildingPlacerLogic {
             parameters.context.fillStyle = "rgba(255, 0, 0, 0.2)";
         }
 
+        const mouseTileX = entityBounds.x; //(worldPos.x - globalConfig.tileSize / 2) / globalConfig.tileSize;
+        const mouseTileY = entityBounds.y; //(worldPos.y - globalConfig.tileSize / 2) / globalConfig.tileSize;
+
         parameters.context.beginRoundedRect(
-            entityBounds.x * globalConfig.tileSize - drawBorder,
-            entityBounds.y * globalConfig.tileSize - drawBorder,
+            mouseTileX * globalConfig.tileSize - drawBorder,
+            mouseTileY * globalConfig.tileSize - drawBorder,
             entityBounds.w * globalConfig.tileSize + 2 * drawBorder,
             entityBounds.h * globalConfig.tileSize + 2 * drawBorder,
             4
