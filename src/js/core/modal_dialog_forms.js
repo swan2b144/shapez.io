@@ -149,9 +149,9 @@ export class FormCommandInput extends FormElement {
                         this.selectionStart = this.selectionEnd = s + 4;
                         return false;
                     }"
-                    placeholder="${this.placeholder.replace(/["\\]+/gi, "")}"
+                    placeholder="${this.placeholder}"
                     data-formId="${this.id}"
-                >${this.defaultValue.replace(/["\\]+/gi, "")}</textarea>
+                >${this.defaultValue}</textarea>
             </div>
         `;
     }
