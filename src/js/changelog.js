@@ -1,11 +1,19 @@
 export const CHANGELOG = [
     {
+        version: "0.0.2 (H2O)",
+        date: "01.20.2021",
+        entries: [
+            "Fixed missing methods that prevented wires layer from being unrestricted to lake spawns",
+            "Fixed a typo in previous changelog",
+        ],
+    },
+    {
         version: "0.0.1 (H2O)",
         date: "01.19.2021",
         entries: [
             "Pilot demo build for sHape2O",
             "You can now find water across the map! It will spawn 10 or more chunks away from hub",
-            "There's not much you can do with it, besides not buyild vanilla buildings on this layer (wires layer should be unrestricted)",
+            "There's not much you can do with it, besides not building vanilla buildings on this layer (wires layer should be unrestricted)",
         ],
     },
     {

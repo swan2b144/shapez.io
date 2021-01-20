@@ -45,6 +45,9 @@ export class MetaLogicGateBuilding extends MetaBuilding {
         return colors[variant];
     }
 
+    isPlaceableToFluid() {
+        return true;
+    }
     /**
      * @param {GameRoot} root
      */
