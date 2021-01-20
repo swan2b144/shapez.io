@@ -1,7 +1,7 @@
 export const CHANGELOG = [
     {
         version: "0.0.1 (H2O)",
-        date: "01.18.2021",
+        date: "01.19.2021",
         entries: [
             "Pilot demo build for sHape2O",
             "You can now find water across the map! It will spawn 10 or more chunks away from hub",
