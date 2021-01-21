@@ -98,24 +98,59 @@ export class MapChunk {
      *
      * @param {RandomNumberGenerator} rng
      * @param {number} threashold
+     * @param {number} scale
      * @param {BaseItem} item
      */
-    internalGenerateOcean(rng, threashold, item) {
+    internalGenerateOcean(rng, threashold, scale, item) {
         var oceanTileCount = 0;
         var seed = rng.getSeedAsNumber();
         var noise = new CoherentNoise(seed);
-        noise.setGlobalScale(0.04);
-        //i think set up this nested loop correctly
+        noise.setGlobalScale(scale); //NOTE: make config later
+
         for (let x = 0; x < globalConfig.mapChunkSize; ++x) {
             for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
-                const globalPosX = this.tileX + x;
-                const globalPosY = this.tileY + y;
-                const noiseValue = noise.computeSimplex2();
+                let globalPosX = this.tileX + x;
+                let globalPosY = this.tileY + y;
+                let noiseValue = noise.computeSimplex2();
                 if (noiseValue > threashold) {
                     this.oceanLayer[globalPosX][globalPosY] = item;
+                    this.lowerLayer[globalPosX][globalPosY] = item;
                     oceanTileCount++;
                 }
             }
+        }
+        return oceanTileCount;
+    }
+    /**
+     *
+     * @param {RandomNumberGenerator} rng
+     * @param {number} distanceToOriginInChunks
+     */
+
+    internalGenerateLiquidOcean(rng, distanceToOriginInChunks) {
+        //noise gen values
+        let availableFluids = [];
+        let threashold = 0.5;
+        let scale = 0.04;
+
+        if (distanceToOriginInChunks > 10) {
+            for (const fluid in enumFluids) {
+                availableFluids.push(fluid);
+            }
+        }
+
+        if (availableFluids.length > 0) {
+            var oceanTileCount = this.internalGenerateOcean(
+                rng,
+                threashold,
+                scale,
+                FLUID_ITEM_SINGLETONS[rng.choice(availableFluids)]
+            );
+        }
+        if (oceanTileCount > 1) {
+            return true;
+        } else {
+            return false;
         }
     }
     /**
@@ -323,6 +358,11 @@ export class MapChunk {
 
         const chunkCenter = new Vector(this.x, this.y).addScalar(0.5);
         const distanceToOriginInChunks = Math.round(chunkCenter.length());
+
+        //this should kill the other color patch spawns if there is ocean in that chunk to prevent overlap
+        if (this.internalGenerateLiquidOcean(rng, distanceToOriginInChunks)) {
+            return;
+        }
 
         // Determine how likely it is that there is a color patch
         const colorPatchChance = 0.9 - clamp(distanceToOriginInChunks / 25, 0, 1) * 0.5;
