@@ -1,4 +1,14 @@
 // ALEA RNG
+function generateHash(string) {
+    var hash = 0;
+    if (string.length == 0) return hash;
+    for (let i = 0; i < string.length; i++) {
+        var charCode = string.charCodeAt(i);
+        hash = (hash << 7) - hash + charCode;
+        hash = hash & hash;
+    }
+    return hash;
+}
 
 function Mash() {
     var n = 0xefc8249d;
@@ -70,6 +80,7 @@ export class RandomNumberGenerator {
      * @param {number|string=} seed
      */
     constructor(seed) {
+        this.seed = seed;
         this.internalRng = makeNewRng(seed || Math.random());
     }
 
@@ -125,5 +136,12 @@ export class RandomNumberGenerator {
      */
     setSeed(seed) {
         this.internalRng = makeNewRng(seed);
+    }
+    /**
+     *Retreves the seed from rng obj
+     @returns {number}
+     */
+    getSeedAsNumber() {
+        return generateHash(this.seed);
     }
 }

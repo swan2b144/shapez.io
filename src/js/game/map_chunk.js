@@ -12,6 +12,7 @@ import { enumSubShape } from "./shape_definition";
 import { Rectangle } from "../core/rectangle";
 import { FLUID_ITEM_SINGLETONS } from "./items/fluid_item";
 import { enumFluids } from "./items/fluid_item";
+import { CoherentNoise } from "../core/coherentNoise";
 
 const logger = createLogger("map_chunk");
 
@@ -28,6 +29,12 @@ export class MapChunk {
         this.y = y;
         this.tileX = x * globalConfig.mapChunkSize;
         this.tileY = y * globalConfig.mapChunkSize;
+
+        /**
+         * Stores the contents of the ocean layer
+         * @type {Array<Array<?BaseItem>>}
+         */
+        this.oceanLayer = make2DUndefinedArray(globalConfig.mapChunkSize, globalConfig.mapChunkSize);
 
         /**
          * Stores the contents of the lower (= map resources) layer
@@ -87,7 +94,30 @@ export class MapChunk {
 
         this.generateLowerLayer();
     }
-
+    /**
+     *
+     * @param {RandomNumberGenerator} rng
+     * @param {number} threashold
+     * @param {BaseItem} item
+     */
+    internalGenerateOcean(rng, threashold, item) {
+        var oceanTileCount = 0;
+        var seed = rng.getSeedAsNumber();
+        var noise = new CoherentNoise(seed);
+        noise.setGlobalScale(0.04);
+        //i think set up this nested loop correctly
+        for (let x = 0; x < globalConfig.mapChunkSize; ++x) {
+            for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
+                const globalPosX = this.tileX + x;
+                const globalPosY = this.tileY + y;
+                const noiseValue = noise.computeSimplex2();
+                if (noiseValue > threashold) {
+                    this.oceanLayer[globalPosX][globalPosY] = item;
+                    oceanTileCount++;
+                }
+            }
+        }
+    }
     /**
      * Generates a patch filled with the given item
      * @param {RandomNumberGenerator} rng
