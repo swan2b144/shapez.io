@@ -193,11 +193,20 @@ export class MetaBuilding {
      * @param {string} fluid
      * @returns {boolean}
      */
-    placeableToFluids(fluid) {
+    isPlaceableToFluids(fluid) {
         return false;
     }
 
     /**
+     * @returns {boolean}
+     */
+    isPlaceableToGround() {
+        return true;
+    }
+
+    /**
+>>>>>>> Stashed changes
+>>>>>>> SHADOW/shadowsupdates20
      * Creates the entity without placing it
      * @param {object} param0
      * @param {GameRoot} param0.root
