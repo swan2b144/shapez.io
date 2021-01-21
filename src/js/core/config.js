@@ -56,11 +56,16 @@ export const globalConfig = {
     // Belt speeds
     // NOTICE: Update webpack.production.config too!
     beltSpeedItemsPerSecond: 2,
+
+    pipeSpeedItemsPerSecond: 2, //TODO
+
     minerSpeedItemsPerSecond: 0, // COMPUTED
 
     defaultItemDiameter: 20,
 
     itemSpacingOnBelts: 0.63,
+
+    itemSpacingOnPipes: 0.63,
 
     wiresSpeedItemsPerSecond: 6,
 

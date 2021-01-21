@@ -190,6 +190,24 @@ export class MetaBuilding {
     }
 
     /**
+<<<<<<< Updated upstream
+=======
+     * @param {string} fluid
+     * @returns {boolean}
+     */
+    isPlaceableToFluids(fluid) {
+        return false;
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    isPlaceableToGround() {
+        return true;
+    }
+
+    /**
+>>>>>>> Stashed changes
      * Creates the entity without placing it
      * @param {object} param0
      * @param {GameRoot} param0.root

@@ -24,6 +24,7 @@ import { ItemProcessorOverlaysSystem } from "./systems/item_processor_overlays";
 import { BeltReaderSystem } from "./systems/belt_reader";
 import { FilterSystem } from "./systems/filter";
 import { ItemProducerSystem } from "./systems/item_producer";
+import { PipeSystem } from "./systems/pipe";
 
 const logger = createLogger("game_system_manager");
 
@@ -39,6 +40,9 @@ export class GameSystemManager {
             /* typehints:start */
             /** @type {BeltSystem} */
             belt: null,
+
+            /** @type {PipeSystem} */
+            pipe: null,
 
             /** @type {ItemEjectorSystem} */
             itemEjector: null,
@@ -123,6 +127,8 @@ export class GameSystemManager {
         add("itemAcceptor", ItemAcceptorSystem);
 
         add("belt", BeltSystem);
+
+        add("pipe", PipeSystem);
 
         add("undergroundBelt", UndergroundBeltSystem);
 
