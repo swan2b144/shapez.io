@@ -23,6 +23,7 @@ import { Entity } from "../entity";
 import { GameSystemWithFilter } from "../game_system_with_filter";
 import { isTruthyItem } from "../items/boolean_item";
 import { MapChunkView } from "../map_chunk_view";
+import { drawSpriteClipped } from "../../core/draw_utils";
 
 const logger = createLogger("pipes");
 
@@ -67,11 +68,10 @@ export class PipeNetwork {
         this.currentValue = null;
 
         /**
-         * Whether this network has a value conflict, that is, more than one
-         * sender has sent a value
-         * @type {boolean}
+         * The current value of this network
+         * @type {number}
          */
-        this.valueConflict = false;
+        this.currentAmount = 0;
 
         /**
          * Unique network identifier
@@ -85,7 +85,7 @@ export class PipeNetwork {
      * @returns {boolean}
      */
     hasValue() {
-        return !!this.currentValue && !this.valueConflict;
+        return !!this.currentValue;
     }
 }
 
@@ -94,7 +94,7 @@ export class PipeSystem extends GameSystemWithFilter {
         super(root, [PipeComponent]);
 
         /**
-         * @type {Object<enumPipeType, AtlasSprite>>}
+         * @type {Object<enumPipeType, AtlasSprite>}
          */
         this.pipeSprites = {};
 
@@ -492,9 +492,6 @@ export class PipeSystem extends GameSystemWithFilter {
         for (let i = 0; i < this.networks.length; ++i) {
             const network = this.networks[i];
 
-            // Reset conflicts
-            network.valueConflict = false;
-
             // Aggregate values of all senders
             const senders = network.providers;
             let value = null;
@@ -520,47 +517,11 @@ export class PipeSystem extends GameSystemWithFilter {
                     continue;
                 }
 
-                // There is a conflict, this means the value will be null anyways
-                network.valueConflict = true;
                 break;
             }
 
-            // Assign value
-            if (network.valueConflict) {
-                network.currentValue = null;
-            } else {
-                network.currentValue = value;
-            }
+            network.currentValue = value;
         }
-    }
-
-    /**
-     * Returns the given tileset and opacity
-     * @param {PipeComponent} pipeComp
-     * @returns {{ spriteSet: Object<enumPipeType, import("../../core/draw_utils").AtlasSprite>, opacity: number}}
-     */
-    getSpriteSetAndOpacityForPipe(pipeComp) {
-        if (!pipeComp.linkedNetwork) {
-            // There is no network, it's empty
-            return {
-                spriteSet: this.pipeSprites,
-                opacity: 0.5,
-            };
-        }
-
-        const network = pipeComp.linkedNetwork;
-        if (network.valueConflict) {
-            // There is a conflict
-            return {
-                spriteSet: this.pipeSprites.conflict,
-                opacity: 1,
-            };
-        }
-
-        return {
-            spriteSet: this.pipeSprites,
-            opacity: isTruthyItem(network.currentValue) ? 1 : 0.5,
-        };
     }
 
     /**
@@ -569,23 +530,16 @@ export class PipeSystem extends GameSystemWithFilter {
      * @param {MapChunkView} chunk
      */
     drawChunk(parameters, chunk) {
-        const contents = chunk.containedEntitiesByLayer.regular;
-        console.log(chunk.wireContents);
-        console.log(contents);
+        const contents = chunk.contents;
         for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
             for (let x = 0; x < globalConfig.mapChunkSize; ++x) {
                 const entity = contents[x][y];
                 if (entity && entity.components.Pipe) {
                     const pipeComp = entity.components.Pipe;
                     const pipeType = pipeComp.type;
-
-                    const { opacity, spriteSet } = this.getSpriteSetAndOpacityForPipe(pipeComp);
-
-                    const sprite = spriteSet[pipeType];
-
-                    assert(sprite, "Unknown pipe type: " + pipeType);
+                    const sprite = this.pipeSprites[pipeType];
                     const staticComp = entity.components.StaticMapEntity;
-                    parameters.context.globalAlpha = opacity;
+                    parameters.context.globalAlpha = 1;
                     staticComp.drawSpriteOnBoundsClipped(parameters, sprite, 0);
 
                     // DEBUG Rendering
@@ -613,6 +567,14 @@ export class PipeSystem extends GameSystemWithFilter {
                                 (staticComp.origin.y + 0.5) * globalConfig.tileSize,
                                 globalConfig.tileSize,
                                 3
+                            );
+                        }
+
+                        if (entity.components.Pipe.linkedNetwork.currentAmount) {
+                            parameters.context.fillText(
+                                entity.components.Pipe.linkedNetwork.currentAmount,
+                                staticComp.origin.x * globalConfig.tileSize,
+                                staticComp.origin.y * globalConfig.tileSize + 5
                             );
                         }
                     }

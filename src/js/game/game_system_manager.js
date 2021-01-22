@@ -25,6 +25,7 @@ import { BeltReaderSystem } from "./systems/belt_reader";
 import { FilterSystem } from "./systems/filter";
 import { ItemProducerSystem } from "./systems/item_producer";
 import { PipeSystem } from "./systems/pipe";
+import { PumpSystem } from "./systems/pump";
 
 const logger = createLogger("game_system_manager");
 
@@ -170,6 +171,10 @@ export class GameSystemManager {
         add("display", DisplaySystem);
 
         add("itemProcessorOverlays", ItemProcessorOverlaysSystem);
+
+        add("Pipe", PipeSystem);
+
+        add("Pump", PumpSystem);
 
         logger.log("📦 There are", this.systemUpdateOrder.length, "game systems");
     }

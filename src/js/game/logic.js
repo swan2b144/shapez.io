@@ -405,13 +405,13 @@ export class GameLogic {
             }
         }
 
-        // const tunnelComp = entity.components.WireTunnel;
-        // if (tunnelComp) {
-        //     canConnectAtAll = true;
-        //     for (let i = 0; i < tunnelComp.linkedNetworks.length; ++i) {
-        //         networks.add(tunnelComp.linkedNetworks[i]);
-        //     }
-        // }
+        const tunnelComp = entity.components.PipeTunnel;
+        if (tunnelComp) {
+            canConnectAtAll = true;
+            for (let i = 0; i < tunnelComp.linkedNetworks.length; ++i) {
+                networks.add(tunnelComp.linkedNetworks[i]);
+            }
+        }
 
         const pinsComp = entity.components.FluidPins;
         if (pinsComp) {

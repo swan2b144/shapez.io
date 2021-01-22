@@ -40,7 +40,6 @@ export class FluidPinsComponent extends Component {
     }
 
     /**
-     *
      * @param {object} param0
      * @param {Array<FluidPinSlotDefinition>} param0.slots
      */
@@ -63,7 +62,7 @@ export class FluidPinsComponent extends Component {
                 pos: slotData.pos,
                 type: slotData.type,
                 direction: slotData.direction,
-                value: null,
+                value: 0,
                 linkedNetwork: null,
             });
         }

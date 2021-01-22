@@ -6,11 +6,11 @@ export class FluidComponent extends Component {
         return "Fluid";
     }
 
-    static getSchema() {
-        return {
-            system: types.object,
-        };
-    }
+    // static getSchema() {
+    //     return {
+    //         system: types.object,
+    //     };
+    // }
 
     constructor() {
         super();

@@ -8,6 +8,7 @@ import { formatItemsPerSecond, generateMatrixRotations } from "../../core/utils"
 import { PumpComponent } from "../components/pump";
 import { FluidComponent } from "../components/fluid";
 import { enumItemProcessorTypes } from "../components/item_processor";
+import { enumPinSlotType, FluidPinsComponent } from "../components/fluid_pins";
 
 export class MetaPumpBuilding extends MetaBuilding {
     constructor() {
@@ -42,5 +43,31 @@ export class MetaPumpBuilding extends MetaBuilding {
     setupEntityComponents(entity) {
         entity.addComponent(new PumpComponent());
         entity.addComponent(new FluidComponent());
+        entity.addComponent(
+            new FluidPinsComponent({
+                slots: [
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.top,
+                        type: enumPinSlotType.fluidEjector,
+                    },
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.right,
+                        type: enumPinSlotType.fluidEjector,
+                    },
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.bottom,
+                        type: enumPinSlotType.fluidEjector,
+                    },
+                    {
+                        pos: new Vector(0, 0),
+                        direction: enumDirection.left,
+                        type: enumPinSlotType.fluidEjector,
+                    },
+                ],
+            })
+        );
     }
 }

@@ -64,7 +64,7 @@ export class MetaPipeBuilding extends MetaBuilding {
      * @param {GameRoot} root
      */
     getIsUnlocked(root) {
-        return true; //root.hubGoals.isRewardUnlocked(enumHubGoalRewards.reward_wires_painter_and_levers);
+        return true;
     }
 
     /**
@@ -76,6 +76,15 @@ export class MetaPipeBuilding extends MetaBuilding {
     }
 
     /**
+     * @param {Entity} entity
+     * @param {number} rotationVariant
+     * @param {string} variant
+     */
+    updateVariants(entity, rotationVariant, variant) {
+        entity.components.Pipe.type = arrayPipeRotationVariantToType[rotationVariant];
+    }
+
+    /**
      *
      * @param {number} rotation
      * @param {number} rotationVariant
@@ -83,7 +92,7 @@ export class MetaPipeBuilding extends MetaBuilding {
      * @param {Entity} entity
      */
     getSpecialOverlayRenderMatrix(rotation, rotationVariant, variant, entity) {
-        return pipeOverlayMatrices[entity.components.Wire.type][rotation];
+        return pipeOverlayMatrices[entity.components.Pipe.type][rotation];
     }
 
     /**
@@ -105,9 +114,6 @@ export class MetaPipeBuilding extends MetaBuilding {
             }
             case enumPipeType.cross: {
                 return Loader.getSprite("sprites/pipes/pipe_cross.png");
-            }
-            default: {
-                assertAlways(false, "Invalid wire rotation variant");
             }
         }
     }
