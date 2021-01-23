@@ -49,7 +49,7 @@ export class MetaPipeBuilding extends MetaBuilding {
     }
 
     getRotateAutomaticallyWhilePlacing() {
-        return true;
+        return false;
     }
 
     getSprite() {
@@ -104,16 +104,16 @@ export class MetaPipeBuilding extends MetaBuilding {
     getPreviewSprite(rotationVariant, variant) {
         switch (arrayPipeRotationVariantToType[rotationVariant]) {
             case enumPipeType.forward: {
-                return Loader.getSprite("sprites/pipes/pipe_forward.png");
+                return Loader.getSprite("sprites/pipes/reguilar/pipe_forward.png");
             }
             case enumPipeType.turn: {
-                return Loader.getSprite("sprites/pipes/pipe_turn.png");
+                return Loader.getSprite("sprites/pipes/reguilar/pipe_turn.png");
             }
             case enumPipeType.split: {
-                return Loader.getSprite("sprites/pipes/pipe_split.png");
+                return Loader.getSprite("sprites/pipes/reguilar/pipe_split.png");
             }
             case enumPipeType.cross: {
-                return Loader.getSprite("sprites/pipes/pipe_cross.png");
+                return Loader.getSprite("sprites/pipes/reguilar/pipe_cross.png");
             }
         }
     }

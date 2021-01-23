@@ -100,7 +100,7 @@ export class PipeSystem extends GameSystemWithFilter {
 
         const sprites = {};
         for (const pipeType in enumPipeType) {
-            sprites[pipeType] = Loader.getSprite("sprites/pipes/pipe_" + pipeType + ".png");
+            sprites[pipeType] = Loader.getSprite("sprites/pipes/reguilar/pipe_" + pipeType + ".png");
         }
         this.pipeSprites = sprites;
 
