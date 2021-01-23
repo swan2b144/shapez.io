@@ -18,6 +18,9 @@ export class MetaConstantSignalBuilding extends MetaBuilding {
         return "#2b84fd";
     }
 
+    isPlaceableToFluid() {
+        return true;
+    }
     /**
      * @param {GameRoot} root
      */

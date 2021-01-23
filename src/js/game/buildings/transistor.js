@@ -26,6 +26,9 @@ export class MetaTransistorBuilding extends MetaBuilding {
         return "#bc3a61";
     }
 
+    isPlaceableToFluid() {
+        return true;
+    }
     /**
      * @param {GameRoot} root
      */

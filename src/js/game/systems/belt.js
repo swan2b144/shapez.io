@@ -537,6 +537,37 @@ export class BeltSystem extends GameSystemWithFilter {
 
                     // Culling happens within the static map entity component
                     entity.components.StaticMapEntity.drawSpriteOnBoundsClipped(parameters, sprite, 0);
+
+                    const staticComp = entity.components.StaticMapEntity;
+
+                    // DEBUG Rendering
+                    if (G_IS_DEV && globalConfig.debug.renderPipeRotations) {
+                        parameters.context.globalAlpha = 1;
+                        parameters.context.fillStyle = "red";
+                        parameters.context.font = "5px Tahoma";
+                        parameters.context.fillText(
+                            "" + staticComp.originalRotation,
+                            staticComp.origin.x * globalConfig.tileSize,
+                            staticComp.origin.y * globalConfig.tileSize + 5
+                        );
+
+                        parameters.context.fillStyle = "rgba(255, 0, 0, 0.2)";
+                        if (staticComp.originalRotation % 180 === 0) {
+                            parameters.context.fillRect(
+                                (staticComp.origin.x + 0.5) * globalConfig.tileSize,
+                                staticComp.origin.y * globalConfig.tileSize,
+                                3,
+                                globalConfig.tileSize
+                            );
+                        } else {
+                            parameters.context.fillRect(
+                                staticComp.origin.x * globalConfig.tileSize,
+                                (staticComp.origin.y + 0.5) * globalConfig.tileSize,
+                                globalConfig.tileSize,
+                                3
+                            );
+                        }
+                    }
                 }
             }
         }

@@ -1,7 +1,7 @@
 import { globalConfig } from "../core/config";
 import { createLogger } from "../core/logging";
 import { RandomNumberGenerator } from "../core/rng";
-import { clamp, fastArrayDeleteValueIfContained, make2DUndefinedArray } from "../core/utils";
+import { clamp, fastArrayDeleteValueIfContained, lerp, make2DUndefinedArray } from "../core/utils";
 import { Vector } from "../core/vector";
 import { BaseItem } from "./base_item";
 import { enumColors } from "./colors";
@@ -12,6 +12,7 @@ import { enumSubShape } from "./shape_definition";
 import { Rectangle } from "../core/rectangle";
 import { FLUID_ITEM_SINGLETONS } from "./items/fluid_item";
 import { enumFluids } from "./items/fluid_item";
+import { CoherentNoise } from "../core/coherentNoise";
 
 const logger = createLogger("map_chunk");
 
@@ -31,7 +32,7 @@ export class MapChunk {
 
         /**
          * Stores the contents of the lower (= map resources) layer
-         *  @type {Array<Array<?BaseItem>>}
+         *  @type {Array<Array<?BaseItem|?string>>}
          */
         this.lowerLayer = make2DUndefinedArray(globalConfig.mapChunkSize, globalConfig.mapChunkSize);
 
@@ -86,6 +87,124 @@ export class MapChunk {
         this.patches = [];
 
         this.generateLowerLayer();
+    }
+    /**
+     *
+     * @param {number} distanceLimit
+     * @param {number} threashold
+     * @param {number} scale
+     * @param {BaseItem} item
+     */
+    internalGenerateOcean(distanceLimit, threashold, scale, item) {
+        let oceanTileCount = false;
+        const noise = new CoherentNoise(this.root.map.seed);
+
+        const avgPos = new Vector(0, 0);
+        let patchesDrawn = 0;
+
+        for (let x = 0; x < globalConfig.mapChunkSize; ++x) {
+            for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
+                const globalPosX = this.tileX + x;
+                const globalPosY = this.tileY + y;
+                const distance = new Vector(globalPosX, globalPosY).length();
+
+                if (distance < distanceLimit * globalConfig.mapChunkSize) {
+                    continue;
+                }
+
+                noise.setGlobalScale(scale); //NOTE: make config later
+                let noiseValue_1 = noise.computeSimplex2(globalPosX, globalPosY) + distance / 16000;
+                noise.setGlobalScale(scale * 2); //NOTE: make config later
+                let noiseValue_2 = noise.computeSimplex2(globalPosX, globalPosY) + distance / 16000;
+
+                let noiseValue = noiseValue_1 * 0.5 + noiseValue_2 * 0.5;
+
+                let water = { r: 91, g: 160, b: 251 };
+                let sand = { r: 255, g: 229, b: 144 };
+                let grass = { r: 126, g: 200, b: 80 };
+
+                // noiseValue = noise.computePerlin2(globalPosX, globalPosY) + distance / 16000;
+                const blend = noiseValue / 3;
+
+                if (noiseValue < 0) {
+                    this.lowerLayer[x][y] = "#5ba0fb"; // Water
+                } else if (noiseValue < 0.2) {
+                    let color = Math.round(lerp(water.b, sand.b, blend));
+                    color += Math.round(lerp(water.g, sand.g, blend)) << 8;
+                    color += Math.round(lerp(water.r, sand.r, blend)) << 16;
+                    this.lowerLayer[x][y] = `#${color.toString(16).padStart(6, "0")}`;
+                } else if (noiseValue < 0.25) {
+                    this.lowerLayer[x][y] = "#ffe590"; // Sand
+                } else if (noiseValue < 0.5) {
+                    let color = Math.round(lerp(sand.b, grass.b, blend));
+                    color += Math.round(lerp(sand.g, grass.g, blend)) << 8;
+                    color += Math.round(lerp(sand.r, grass.r, blend)) << 16;
+                    this.lowerLayer[x][y] = `#${color.toString(16).padStart(6, "0")}`;
+                } else {
+                    this.lowerLayer[x][y] = "#7ec850"; // Grass
+                }
+
+                // if (noiseValue > -100) {
+                //     // ++patchesDrawn;
+                //     // avgPos.x += x;
+                //     // avgPos.y += y;
+                //     // this.lowerLayer[x][y] = item;
+                //     // oceanTileCount = true;
+
+                //     const blend = noiseValue / 3;
+                //     // here waterX and sandX are values between 0 and 255
+                //     let color = Math.round(lerp(water.b, sand.b, blend));
+                //     color += Math.round(lerp(water.g, sand.g, blend)) << 8;
+                //     color += Math.round(lerp(water.r, sand.r, blend)) << 16;
+
+                //     // console.log(color);
+
+                //     this.lowerLayer[x][y] = `#${color.toString(16).padStart(6, "0")}`;
+                // }
+                // } else if (noiseValue > threashold - 0.075) {
+                //     this.lowerLayer[x][y] = "#ffe590"; // Sand
+                // }
+            }
+        }
+
+        this.patches = [
+            {
+                pos: avgPos.divideScalar(patchesDrawn),
+                item,
+                size: 5,
+            },
+        ];
+
+        return oceanTileCount;
+    }
+    /**
+     *
+     * @param {RandomNumberGenerator} rng
+     * @param {number} distanceToOriginInChunks
+     */
+
+    internalGenerateLiquidOcean(rng, distanceToOriginInChunks) {
+        //noise gen values
+        const availableFluids = [];
+        const threashold = 0.75;
+        const scale = 0.01;
+
+        const distanceLimit = 10;
+
+        if (distanceToOriginInChunks > distanceLimit - 1) {
+            for (const fluid in enumFluids) {
+                availableFluids.push(fluid);
+            }
+        }
+
+        if (availableFluids.length > 0) {
+            return this.internalGenerateOcean(
+                distanceLimit,
+                threashold,
+                scale,
+                FLUID_ITEM_SINGLETONS[rng.choice(availableFluids)]
+            );
+        }
     }
 
     /**
@@ -172,24 +291,6 @@ export class MapChunk {
             availableColors.push(enumColors.blue);
         }
         this.internalGeneratePatch(rng, colorPatchSize, COLOR_ITEM_SINGLETONS[rng.choice(availableColors)]);
-    }
-
-    internalGenerateFluidPatch(rng, fluidPatchSize, distanceToOriginInChunks) {
-        // First, determine available fluids
-        let availableFluids = [];
-        if (distanceToOriginInChunks > 10) {
-            for (const fluid in enumFluids) {
-                availableFluids.push(fluid);
-            }
-        }
-
-        if (availableFluids.length > 0) {
-            this.internalGeneratePatch(
-                rng,
-                fluidPatchSize,
-                FLUID_ITEM_SINGLETONS[rng.choice(availableFluids)]
-            );
-        }
     }
 
     /**
@@ -302,20 +403,14 @@ export class MapChunk {
             this.internalGenerateColorPatch(rng, colorPatchSize, distanceToOriginInChunks);
         }
 
-        // Determine how likely it is that there is a fluid patch
-        const fluidPatchChance = 0.9 - clamp(distanceToOriginInChunks / 25, 0, 1) * 0.5;
-
-        if (rng.next() < fluidPatchChance / 4) {
-            const fluidPatchSize = Math.max(2, Math.round(1 + clamp(distanceToOriginInChunks / 8, 0, 4)));
-            this.internalGenerateFluidPatch(rng, fluidPatchSize, distanceToOriginInChunks);
-        }
-
         // Determine how likely it is that there is a shape patch
         const shapePatchChance = 0.9 - clamp(distanceToOriginInChunks / 25, 0, 1) * 0.5;
         if (rng.next() < shapePatchChance / 4) {
             const shapePatchSize = Math.max(2, Math.round(1 + clamp(distanceToOriginInChunks / 8, 0, 4)));
             this.internalGenerateShapePatch(rng, shapePatchSize, distanceToOriginInChunks);
         }
+
+        this.internalGenerateLiquidOcean(rng, distanceToOriginInChunks);
     }
 
     /**
@@ -358,7 +453,7 @@ export class MapChunk {
      *
      * @param {number} worldX
      * @param {number} worldY
-     * @returns {BaseItem=}
+     * @returns {BaseItem|string}
      */
     getLowerLayerFromWorldCoords(worldX, worldY) {
         const localX = worldX - this.tileX;
@@ -406,6 +501,7 @@ export class MapChunk {
             return this.wireContents[localX][localY] || null;
         }
     }
+
     /**
      * Returns the contents of this chunk from the given world space coordinates
      * @param {number} worldX

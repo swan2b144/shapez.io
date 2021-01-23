@@ -45,6 +45,10 @@ export class MetaWireBuilding extends MetaBuilding {
         return "#61ef6f";
     }
 
+    isPlaceableToFluid() {
+        return true;
+    }
+
     getAvailableVariants() {
         return [defaultBuildingVariant, wireVariants.second];
     }

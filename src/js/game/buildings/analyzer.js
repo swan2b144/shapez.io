@@ -18,6 +18,10 @@ export class MetaAnalyzerBuilding extends MetaBuilding {
         return "#3a52bc";
     }
 
+    isPlaceableToFluid() {
+        return true;
+    }
+
     /**
      * @param {GameRoot} root
      */

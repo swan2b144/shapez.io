@@ -17,6 +17,9 @@ export class MetaWireTunnelBuilding extends MetaBuilding {
         return "#777a86";
     }
 
+    isPlaceableToFluid() {
+        return true;
+    }
     /**
      * @param {GameRoot} root
      */
