@@ -31,14 +31,8 @@ export class MapChunk {
         this.tileY = y * globalConfig.mapChunkSize;
 
         /**
-         * Stores the contents of the ocean layer
-         * @type {Array<Array<?BaseItem>>}
-         */
-        this.oceanLayer = make2DUndefinedArray(globalConfig.mapChunkSize, globalConfig.mapChunkSize);
-
-        /**
          * Stores the contents of the lower (= map resources) layer
-         *  @type {Array<Array<?BaseItem>>}
+         *  @type {Array<Array<?BaseItem|?string>>}
          */
         this.lowerLayer = make2DUndefinedArray(globalConfig.mapChunkSize, globalConfig.mapChunkSize);
 
@@ -96,29 +90,51 @@ export class MapChunk {
     }
     /**
      *
-     * @param {RandomNumberGenerator} rng
+     * @param {number} distanceLimit
      * @param {number} threashold
      * @param {number} scale
      * @param {BaseItem} item
      */
-    internalGenerateOcean(rng, threashold, scale, item) {
-        var oceanTileCount = 0;
-        var seed = rng.getSeedAsNumber();
-        var noise = new CoherentNoise(seed);
+    internalGenerateOcean(distanceLimit, threashold, scale, item) {
+        let oceanTileCount = false;
+        const noise = new CoherentNoise(this.root.map.seed);
         noise.setGlobalScale(scale); //NOTE: make config later
+
+        const avgPos = new Vector(0, 0);
+        let patchesDrawn = 0;
 
         for (let x = 0; x < globalConfig.mapChunkSize; ++x) {
             for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
-                let globalPosX = this.tileX + x;
-                let globalPosY = this.tileY + y;
-                let noiseValue = noise.computeSimplex2();
+                const globalPosX = this.tileX + x;
+                const globalPosY = this.tileY + y;
+                const distance = new Vector(globalPosX, globalPosY).length();
+
+                if (distance < distanceLimit * globalConfig.mapChunkSize) {
+                    continue;
+                }
+
+                let noiseValue = noise.computeSimplex2(globalPosX, globalPosY) + distance / 16000;
+
                 if (noiseValue > threashold) {
-                    this.oceanLayer[globalPosX][globalPosY] = item;
-                    this.lowerLayer[globalPosX][globalPosY] = item;
-                    oceanTileCount++;
+                    ++patchesDrawn;
+                    avgPos.x += x;
+                    avgPos.y += y;
+                    this.lowerLayer[x][y] = item;
+                    oceanTileCount = true;
+                } else if (noiseValue > threashold - 0.075) {
+                    this.lowerLayer[x][y] = "#ffe590"; // Sand
                 }
             }
         }
+
+        this.patches = [
+            {
+                pos: avgPos.divideScalar(patchesDrawn),
+                item,
+                size: 5,
+            },
+        ];
+
         return oceanTileCount;
     }
     /**
@@ -129,30 +145,28 @@ export class MapChunk {
 
     internalGenerateLiquidOcean(rng, distanceToOriginInChunks) {
         //noise gen values
-        let availableFluids = [];
-        let threashold = 0.5;
-        let scale = 0.04;
+        const availableFluids = [];
+        const threashold = 0.75;
+        const scale = 0.01;
 
-        if (distanceToOriginInChunks > 10) {
+        const distanceLimit = 10;
+
+        if (distanceToOriginInChunks > distanceLimit - 1) {
             for (const fluid in enumFluids) {
                 availableFluids.push(fluid);
             }
         }
 
         if (availableFluids.length > 0) {
-            var oceanTileCount = this.internalGenerateOcean(
-                rng,
+            return this.internalGenerateOcean(
+                distanceLimit,
                 threashold,
                 scale,
                 FLUID_ITEM_SINGLETONS[rng.choice(availableFluids)]
             );
         }
-        if (oceanTileCount > 1) {
-            return true;
-        } else {
-            return false;
-        }
     }
+
     /**
      * Generates a patch filled with the given item
      * @param {RandomNumberGenerator} rng
@@ -359,11 +373,6 @@ export class MapChunk {
         const chunkCenter = new Vector(this.x, this.y).addScalar(0.5);
         const distanceToOriginInChunks = Math.round(chunkCenter.length());
 
-        //this should kill the other color patch spawns if there is ocean in that chunk to prevent overlap
-        if (this.internalGenerateLiquidOcean(rng, distanceToOriginInChunks)) {
-            return;
-        }
-
         // Determine how likely it is that there is a color patch
         const colorPatchChance = 0.9 - clamp(distanceToOriginInChunks / 25, 0, 1) * 0.5;
 
@@ -372,20 +381,14 @@ export class MapChunk {
             this.internalGenerateColorPatch(rng, colorPatchSize, distanceToOriginInChunks);
         }
 
-        // Determine how likely it is that there is a fluid patch
-        const fluidPatchChance = 0.9 - clamp(distanceToOriginInChunks / 25, 0, 1) * 0.5;
-
-        if (rng.next() < fluidPatchChance / 4) {
-            const fluidPatchSize = Math.max(2, Math.round(1 + clamp(distanceToOriginInChunks / 8, 0, 4)));
-            this.internalGenerateFluidPatch(rng, fluidPatchSize, distanceToOriginInChunks);
-        }
-
         // Determine how likely it is that there is a shape patch
         const shapePatchChance = 0.9 - clamp(distanceToOriginInChunks / 25, 0, 1) * 0.5;
         if (rng.next() < shapePatchChance / 4) {
             const shapePatchSize = Math.max(2, Math.round(1 + clamp(distanceToOriginInChunks / 8, 0, 4)));
             this.internalGenerateShapePatch(rng, shapePatchSize, distanceToOriginInChunks);
         }
+
+        this.internalGenerateLiquidOcean(rng, distanceToOriginInChunks);
     }
 
     /**
@@ -428,7 +431,7 @@ export class MapChunk {
      *
      * @param {number} worldX
      * @param {number} worldY
-     * @returns {BaseItem=}
+     * @returns {BaseItem|string}
      */
     getLowerLayerFromWorldCoords(worldX, worldY) {
         const localX = worldX - this.tileX;

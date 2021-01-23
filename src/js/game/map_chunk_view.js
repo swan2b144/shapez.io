@@ -112,9 +112,48 @@ export class MapChunkView extends MapChunk {
 
             for (let i = 0; i < this.patches.length; ++i) {
                 const patch = this.patches[i];
-                if (patch.item.getItemType() === "shape" || patch.item.getItemType() === "fluid") {
+                if (patch.item.getItemType() === "shape") {
                     const destX = this.x * dims + patch.pos.x * globalConfig.tileSize;
                     const destY = this.y * dims + patch.pos.y * globalConfig.tileSize;
+                    patch.item.drawItemCenteredClipped(destX, destY, parameters, diameter);
+                } else if (patch.item.getItemType() === "fluid") {
+                    const centerX = Math.round(patch.pos.x);
+                    const centerY = Math.round(patch.pos.y);
+
+                    const testNeigh = () => {
+                        for (let m = -1; m < 2; m++) {
+                            for (let n = -1; n < 2; n++) {
+                                const posX = centerX + m;
+                                const posY = centerY + n;
+                                if (
+                                    posX >= 0 &&
+                                    posX < globalConfig.mapChunkSize &&
+                                    posY >= 0 &&
+                                    posY < globalConfig.mapChunkSize
+                                ) {
+                                    if (
+                                        !this.lowerLayer[posX][posY] ||
+                                        this.lowerLayer[posX][posY] != patch.item
+                                    ) {
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+                        return true;
+                    };
+
+                    if (!testNeigh()) {
+                        continue;
+                    }
+
+                    const destX =
+                        this.x * globalConfig.mapChunkWorldSize + patch.pos.x * globalConfig.tileSize;
+                    const destY =
+                        this.y * globalConfig.mapChunkWorldSize + patch.pos.y * globalConfig.tileSize;
+
+                    const diameter = Math.min(80, 40 / parameters.zoomLevel);
+
                     patch.item.drawItemCenteredClipped(destX, destY, parameters, diameter);
                 }
             }
@@ -163,7 +202,11 @@ export class MapChunkView extends MapChunk {
                         // Draw lower content first since it "shines" through
                         const lowerContent = lowerArray[y];
                         if (lowerContent) {
-                            context.fillStyle = lowerContent.getBackgroundColorAsResource();
+                            if (typeof lowerContent === "string") {
+                                context.fillStyle = lowerContent;
+                            } else {
+                                context.fillStyle = lowerContent.getBackgroundColorAsResource();
+                            }
                             context.fillRect(
                                 x * CHUNK_OVERLAY_RES,
                                 y * CHUNK_OVERLAY_RES,
@@ -209,7 +252,11 @@ export class MapChunkView extends MapChunk {
 
                 const lowerContent = lowerArray[y];
                 if (lowerContent) {
-                    context.fillStyle = lowerContent.getBackgroundColorAsResource();
+                    if (typeof lowerContent === "string") {
+                        context.fillStyle = lowerContent;
+                    } else {
+                        context.fillStyle = lowerContent.getBackgroundColorAsResource();
+                    }
                     context.fillRect(
                         x * CHUNK_OVERLAY_RES,
                         y * CHUNK_OVERLAY_RES,
