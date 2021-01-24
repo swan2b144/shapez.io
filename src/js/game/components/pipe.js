@@ -29,20 +29,36 @@ export const FAKE_PIPE_EJECTOR_SLOT_BY_DIRECTION = {
     },
 };
 
+/** @enum {string} */
+export const enumPipeVariant = {
+    pipe: "pipe",
+    industrial: "industrial",
+};
+
 export class PipeComponent extends Component {
     static getId() {
-        return "Pipe";
+        return "pipe";
     }
 
     /**
      * @param {object} param0
      * @param {enumPipeType=} param0.type
+     * @param {enumPipeVariant=} param0.variant
      */
-    constructor({ type = enumPipeType.forward }) {
+    constructor({ type = enumPipeType.forward, variant = enumPipeVariant.pipe }) {
         super();
         this.type = type;
         this.direction = enumDirection.top;
 
+        /**
+         * The variant of the wire, different variants do not connect
+         * @type {enumPipeVariant}
+         */
+        this.variant = variant;
+
+        /**
+         * @type {import("../systems/pipe").PipeNetwork}
+         */
         this.linkedNetwork = null;
     }
 

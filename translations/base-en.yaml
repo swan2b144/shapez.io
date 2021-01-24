@@ -546,7 +546,10 @@ buildings:
     pipe:
         default:
             name: &pipe Pipe
-            description: Transports fluids, hold and drag to place multiple.
+            description: &pipe_desc Transports fluids, hold and drag to place multiple.
+        industrial:
+            name: *pipe
+            description: *pipe_desc
 
     # Internal name for the Extractor
     miner:

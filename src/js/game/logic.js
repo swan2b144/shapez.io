@@ -12,7 +12,11 @@ import { MetaBuilding } from "./meta_building";
 import { GameRoot } from "./root";
 import { WireNetwork } from "./systems/wire";
 import { PipeNetwork } from "./systems/pipe";
+
+import { enumPipeVariant } from "./components/pipe";
+
 import { enumPinSlotType } from "./components/fluid_pins";
+
 
 const logger = createLogger("ingame/logic");
 
@@ -327,10 +331,11 @@ export class GameLogic {
     /**
      * Computes the flag for a given tile
      * @param {object} param0
+     * @param {enumPipeVariant} param0.pipeVariant
      * @param {Vector} param0.tile The tile to check at
      * @param {enumDirection} param0.edge The edge to check for
      */
-    computePipeEdgeStatus({ tile, edge }) {
+    computePipeEdgeStatus({ pipeVariant, tile, edge }) {
         const offset = enumDirectionToVector[edge];
         const targetTile = tile.add(offset);
 
@@ -382,7 +387,8 @@ export class GameLogic {
             return false;
         }
 
-        return true;
+        // It's connected if its the same variant
+        return pipeComp.variant === pipeVariant;
     }
 
     /**
