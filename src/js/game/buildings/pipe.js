@@ -3,24 +3,27 @@ import { formatItemsPerSecond, generateMatrixRotations } from "../../core/utils"
 import { enumAngleToDirection, enumDirection, Vector } from "../../core/vector";
 import { SOUNDS } from "../../platform/sound";
 import { T } from "../../translations";
-import { PipeComponent, enumPipeType } from "../components/pipe";
+import { enumPipeType, PipeComponent, enumPipeVariant } from "../components/pipe";
 import { Entity } from "../entity";
-import { MetaBuilding } from "../meta_building";
+import { defaultBuildingVariant, MetaBuilding } from "../meta_building";
 import { GameRoot } from "../root";
 import { THEME } from "../theme";
 
-export const arrayPipeRotationVariantToType = [
-    enumPipeType.forward,
-    enumPipeType.turn,
-    enumPipeType.split,
-    enumPipeType.cross,
-];
+export const arrayPipeRotationVariantToType = [enumPipeType.forward, enumPipeType.turn];
 
 export const pipeOverlayMatrices = {
     [enumPipeType.forward]: generateMatrixRotations([0, 1, 0, 0, 1, 0, 0, 1, 0]),
-    [enumPipeType.split]: generateMatrixRotations([0, 0, 0, 1, 1, 1, 0, 1, 0]),
     [enumPipeType.turn]: generateMatrixRotations([0, 0, 0, 0, 1, 1, 0, 1, 0]),
-    [enumPipeType.cross]: generateMatrixRotations([0, 1, 0, 1, 1, 1, 0, 1, 0]),
+};
+
+/** @enum {string} */
+export const pipeVariants = {
+    industrial: "industrial",
+};
+
+const enumPipeVariantToVariant = {
+    [defaultBuildingVariant]: enumPipeVariant.pipe,
+    [pipeVariants.industrial]: enumPipeVariant.industrial,
 };
 
 export class MetaPipeBuilding extends MetaBuilding {
@@ -36,8 +39,17 @@ export class MetaPipeBuilding extends MetaBuilding {
         return "#61ef6f";
     }
 
-    isPlaceableToFluid() {
-        return true;
+    /**
+     *
+     *@param {string} variant
+     */
+    isPlaceableToFluid(variant) {
+        switch (variant) {
+            case defaultBuildingVariant:
+                return true;
+            case enumPipeVariant.industrial:
+                return false;
+        }
     }
 
     getStayInPlacementMode() {
@@ -49,7 +61,7 @@ export class MetaPipeBuilding extends MetaBuilding {
     }
 
     getRotateAutomaticallyWhilePlacing() {
-        return true;
+        return false;
     }
 
     getSprite() {
@@ -67,6 +79,12 @@ export class MetaPipeBuilding extends MetaBuilding {
         return true;
     }
 
+    getAvailableVariants(root) {
+        let variants = [defaultBuildingVariant, enumPipeVariant.industrial];
+        variants.push(enumPipeVariant.industrial);
+        return variants;
+    }
+
     /**
      * Creates the entity at the given location
      * @param {Entity} entity
@@ -76,12 +94,14 @@ export class MetaPipeBuilding extends MetaBuilding {
     }
 
     /**
+     *
      * @param {Entity} entity
      * @param {number} rotationVariant
      * @param {string} variant
      */
     updateVariants(entity, rotationVariant, variant) {
         entity.components.Pipe.type = arrayPipeRotationVariantToType[rotationVariant];
+        entity.components.Pipe.variant = enumPipeVariantToVariant[variant];
     }
 
     /**
@@ -102,18 +122,13 @@ export class MetaPipeBuilding extends MetaBuilding {
      * @returns {import("../../core/draw_utils").AtlasSprite}
      */
     getPreviewSprite(rotationVariant, variant) {
+        const pipeVariant = enumPipeVariantToVariant[variant];
         switch (arrayPipeRotationVariantToType[rotationVariant]) {
             case enumPipeType.forward: {
-                return Loader.getSprite("sprites/pipes/pipe_forward.png");
+                return Loader.getSprite("sprites/pipes/" + pipeVariant + "_forward.png");
             }
             case enumPipeType.turn: {
-                return Loader.getSprite("sprites/pipes/pipe_turn.png");
-            }
-            case enumPipeType.split: {
-                return Loader.getSprite("sprites/pipes/pipe_split.png");
-            }
-            case enumPipeType.cross: {
-                return Loader.getSprite("sprites/pipes/pipe_cross.png");
+                return Loader.getSprite("sprites/wires/" + pipeVariant + "_turn.png");
             }
         }
     }
@@ -133,11 +148,13 @@ export class MetaPipeBuilding extends MetaBuilding {
      * @return {{ rotation: number, rotationVariant: number, connectedEntities?: Array<Entity> }}
      */
     computeOptimalDirectionAndRotationVariantAtTile({ root, tile, rotation, variant, layer }) {
+        const pipeVariant = enumPipeVariantToVariant[variant];
+
         const connections = {
-            top: root.logic.computePipeEdgeStatus({ tile, edge: enumDirection.top }),
-            right: root.logic.computePipeEdgeStatus({ tile, edge: enumDirection.right }),
-            bottom: root.logic.computePipeEdgeStatus({ tile, edge: enumDirection.bottom }),
-            left: root.logic.computePipeEdgeStatus({ tile, edge: enumDirection.left }),
+            top: root.logic.computePipeEdgeStatus({ tile, pipeVariant, edge: enumDirection.top }),
+            right: root.logic.computePipeEdgeStatus({ tile, pipeVariant, edge: enumDirection.right }),
+            bottom: root.logic.computePipeEdgeStatus({ tile, pipeVariant, edge: enumDirection.bottom }),
+            left: root.logic.computePipeEdgeStatus({ tile, pipeVariant, edge: enumDirection.left }),
         };
 
         let flag = 0;
@@ -187,11 +204,6 @@ export class MetaPipeBuilding extends MetaBuilding {
                 targetType = enumPipeType.turn;
                 break;
 
-            case 0x0111:
-                // Right | Bottom | Left
-                targetType = enumPipeType.split;
-                break;
-
             case 0x1000:
                 // Top
                 break;
@@ -206,33 +218,10 @@ export class MetaPipeBuilding extends MetaBuilding {
                 // Top | Bottom
                 break;
 
-            case 0x1011:
-                // Top | Bottom | Left
-                targetType = enumPipeType.split;
-                rotation += 90;
-                break;
-
             case 0x1100:
                 // Top | Right
                 targetType = enumPipeType.turn;
                 rotation -= 90;
-                break;
-
-            case 0x1101:
-                // Top | Right | Left
-                targetType = enumPipeType.split;
-                rotation += 180;
-                break;
-
-            case 0x1110:
-                // Top | Right | Bottom
-                targetType = enumPipeType.split;
-                rotation -= 90;
-                break;
-
-            case 0x1111:
-                // Top | Right | Bottom | Left
-                targetType = enumPipeType.cross;
                 break;
         }
 

@@ -7,6 +7,6 @@
         "canvas": "^2.6.1"
     },
     "scripts": {
-        "generate": "node generate_pipe_sprites.js"
+        "generate": "node generate_industrial_pipe_sprites.js"
     }
 }

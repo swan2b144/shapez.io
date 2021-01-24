@@ -8,8 +8,8 @@ const fs = require("fs");
 const path = require("path");
 const outputFolder = path.join(__dirname, "..", "buildings");
 const dimensions = 192;
-const lineSize = 50;
-const lowerLineSize = 72;
+const lineSize = 92;
+const lowerLineSize = 120;
 const variantColor = "#6a7e98";
 async function run() {
     console.log("Running");
@@ -63,7 +63,7 @@ async function run() {
             context.stroke();
         });
 
-        const out = fs.createWriteStream(path.join(outputFolder, "pipe" + "_" + partId + ".png"));
+        const out = fs.createWriteStream(path.join(outputFolder, "industrial" + "_" + partId + ".png"));
         const stream = canvas.createPNGStream();
         stream.pipe(out);
         promises.push(new Promise(resolve => stream.on("end", resolve)));
