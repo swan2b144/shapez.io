@@ -65,6 +65,10 @@ export class MapResourcesSystem extends GameSystem {
                     }
 
                     if (lowerItem) {
+                        if (typeof lowerItem === "string") {
+                            continue;
+                        }
+
                         if (lowerItem.getItemType() === "fluid") {
                             let drawnPatches = [];
                             for (let i = 0; i < chunk.patches.length; ++i) {
@@ -74,12 +78,43 @@ export class MapResourcesSystem extends GameSystem {
                                         continue;
                                     }
 
+                                    const centerX = Math.round(patch.pos.x);
+                                    const centerY = Math.round(patch.pos.y);
+
+                                    const testNeigh = () => {
+                                        for (let m = -1; m < 2; m++) {
+                                            for (let n = -1; n < 2; n++) {
+                                                const posX = centerX + m;
+                                                const posY = centerY + n;
+                                                if (
+                                                    posX >= 0 &&
+                                                    posX < globalConfig.mapChunkSize &&
+                                                    posY >= 0 &&
+                                                    posY < globalConfig.mapChunkSize
+                                                ) {
+                                                    if (
+                                                        !chunk.lowerLayer[posX][posY] ||
+                                                        chunk.lowerLayer[posX][posY] != patch.item
+                                                    ) {
+                                                        return false;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        return true;
+                                    };
+
+                                    if (!testNeigh()) {
+                                        continue;
+                                    }
+
                                     const destX =
                                         chunk.x * globalConfig.mapChunkWorldSize +
                                         patch.pos.x * globalConfig.tileSize;
                                     const destY =
                                         chunk.y * globalConfig.mapChunkWorldSize +
                                         patch.pos.y * globalConfig.tileSize;
+
                                     const diameter = Math.min(80, 40 / parameters.zoomLevel);
 
                                     patch.item.drawItemCenteredClipped(destX, destY, parameters, diameter);
@@ -132,8 +167,14 @@ export class MapResourcesSystem extends GameSystem {
             for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
                 const item = row[y];
                 if (item) {
-                    context.fillStyle = item.getBackgroundColorAsResource();
+                    if (typeof item === "string") {
+                        context.globalAlpha = 1;
+                        context.fillStyle = item;
+                    } else {
+                        context.fillStyle = item.getBackgroundColorAsResource();
+                    }
                     context.fillRect(x, y, 1, 1);
+                    context.globalAlpha = 0.5;
                 }
             }
         }

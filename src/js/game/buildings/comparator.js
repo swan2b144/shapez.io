@@ -15,6 +15,9 @@ export class MetaComparatorBuilding extends MetaBuilding {
         return "#823cab";
     }
 
+    isPlaceableToFluid() {
+        return true;
+    }
     /**
      * @param {GameRoot} root
      */

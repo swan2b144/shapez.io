@@ -29,16 +29,6 @@ export class FluidPinsComponent extends Component {
         return "FluidPins";
     }
 
-    static getSchema() {
-        return {
-            slots: types.fixedSizeArray(
-                types.structured({
-                    value: types.nullable(typeItemSingleton),
-                })
-            ),
-        };
-    }
-
     /**
      * @param {object} param0
      * @param {Array<FluidPinSlotDefinition>} param0.slots
@@ -62,7 +52,7 @@ export class FluidPinsComponent extends Component {
                 pos: slotData.pos,
                 type: slotData.type,
                 direction: slotData.direction,
-                value: 0,
+                value: null,
                 linkedNetwork: null,
             });
         }

@@ -6,7 +6,7 @@
 const { createCanvas } = require("canvas");
 const fs = require("fs");
 const path = require("path");
-const outputFolder = path.join(__dirname, "..", "buildings");
+const outputFolder = path.join(__dirname, "..", "pipes");
 const dimensions = 192;
 const lineSize = 50;
 const lowerLineSize = 72;
@@ -38,7 +38,6 @@ async function run() {
         lineContext.lineCap = "round";
         lineContext.imageSmoothingEnabled = false;
 
-            // Draw lower lines
         partLines.forEach(([x1, y1, x2, y2]) => {
             lineContext.beginPath();
             lineContext.moveTo(x1 * dimensions, y1 * dimensions);

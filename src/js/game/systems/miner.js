@@ -52,7 +52,7 @@ export class MinerSystem extends GameSystemWithFilter {
                     staticComp.origin.x,
                     staticComp.origin.y
                 );
-                if (!tileBelow) {
+                if (!tileBelow || typeof tileBelow !== "object") {
                     continue;
                 }
                 minerComp.cachedMinedItem = tileBelow;

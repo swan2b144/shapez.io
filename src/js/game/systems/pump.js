@@ -15,29 +15,38 @@ export class PumpSystem extends GameSystemWithFilter {
         super(root, [PumpComponent]);
 
         this.needsRecompute = true;
+        this.root.signals.entityAdded.add(this.updateEntity, this);
     }
 
     update() {
-        for (let i = 0; i < this.allEntities.length; ++i) {
-            const entity = this.allEntities[i];
-            const pumpComp = entity.components.Pump;
+        // for (let i = 0; i < this.allEntities.length; ++i) {
+        //     const entity = this.allEntities[i];
+        //     const pumpComp = entity.components.Pump;
+        //     if (!pumpComp) {
+        //         continue;
+        //     }
+        //     const pins = entity.components.FluidPins;
+        //     for (let j = 0; j < pins.slots.length; ++j) {
+        //         const slot = pins.slots[j];
+        //         const linkedNetwork = slot.linkedNetwork;
+        //         // if (!linkedNetwork) {
+        //         //     continue;
+        //         // }
+        //         slot.value = FLUID_ITEM_SINGLETONS[enumFluids.water];
+        //         //slot.linkedNetwork.currentAmount += 0.1;
+        //     }
+        // }
+    }
 
-            if (!pumpComp) {
-                continue;
-            }
+    updateEntity(entity) {
+        if (!entity.components.FluidPins) {
+            return;
+        }
 
-            const pins = entity.components.FluidPins;
-            for (let j = 0; j < pins.slots.length; ++j) {
-                const slot = pins.slots[j];
-                const linkedNetwork = slot.linkedNetwork;
-
-                if (!linkedNetwork) {
-                    continue;
-                }
-
-                slot.linkedNetwork.currentValue = FLUID_ITEM_SINGLETONS[enumFluids.water];
-                slot.linkedNetwork.currentAmount += 0.1;
-            }
+        const pins = entity.components.FluidPins;
+        for (let j = 0; j < pins.slots.length; ++j) {
+            const slot = pins.slots[j];
+            slot.value = FLUID_ITEM_SINGLETONS[enumFluids.water];
         }
     }
 }
