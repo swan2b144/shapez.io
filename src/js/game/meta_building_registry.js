@@ -31,7 +31,7 @@ import { enumWireVariant } from "./components/wire";
 import { KEYMAPPINGS } from "./key_action_mapper";
 import { defaultBuildingVariant } from "./meta_building";
 import { MetaPumpBuilding } from "./buildings/pump";
-import { MetaPipeBuilding } from "./buildings/pipe";
+import { MetaPipeBuilding, pipeVariants } from "./buildings/pipe";
 
 const logger = createLogger("building_registry");
 
@@ -174,7 +174,9 @@ export function initMetaBuildingRegistry() {
     registerBuildingVariant(10001, MetaPipeBuilding, defaultBuildingVariant, 0);
     registerBuildingVariant(10002, MetaPipeBuilding, defaultBuildingVariant, 1);
     registerBuildingVariant(10003, MetaPipeBuilding, defaultBuildingVariant, 2);
-    registerBuildingVariant(10004, MetaPipeBuilding, defaultBuildingVariant, 3);
+    registerBuildingVariant(10004, MetaPipeBuilding, pipeVariants.industrial, 0);
+    registerBuildingVariant(10005, MetaPipeBuilding, pipeVariants.industrial, 1);
+    registerBuildingVariant(10006, MetaPipeBuilding, pipeVariants.industrial, 2);
 
     // Propagate instances
     for (const key in gBuildingVariants) {

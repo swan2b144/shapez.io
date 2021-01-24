@@ -47,7 +47,7 @@ export class PipeComponent extends Component {
      */
     constructor({ type = enumPipeType.forward, variant = enumPipeVariant.pipe }) {
         super();
-        this.type = type;
+        // this.type = type;
         this.direction = enumDirection.top;
 
         /**

@@ -19,12 +19,12 @@ const enumPipeVariantToVariant = {
     [pipeVariants.industrial]: enumPipeVariant.industrial,
 };
 
-export const arrayPipeRotationVariantToType = [enumPipeType.forward, enumPipeType.turn];
-export const arrayPipeVariantToRotation = [enumDirection.top, enumDirection.right];
+export const arrayPipeVariantToRotation = [enumDirection.top, enumDirection.left, enumDirection.right];
 
 export const pipeOverlayMatrices = {
-    [enumPipeType.forward]: generateMatrixRotations([0, 1, 0, 0, 1, 0, 0, 1, 0]),
-    [enumPipeType.turn]: generateMatrixRotations([0, 0, 0, 0, 1, 1, 0, 1, 0]),
+    [enumDirection.top]: generateMatrixRotations([0, 1, 0, 0, 1, 0, 0, 1, 0]),
+    [enumDirection.left]: generateMatrixRotations([0, 0, 0, 1, 1, 0, 0, 1, 0]),
+    [enumDirection.right]: generateMatrixRotations([0, 0, 0, 0, 1, 1, 0, 1, 0]),
 };
 
 export class MetaPipeBuilding extends MetaBuilding {
@@ -38,10 +38,6 @@ export class MetaPipeBuilding extends MetaBuilding {
 
     getSilhouetteColor() {
         return "#61ef6f";
-    }
-
-    isPlaceableToFluid() {
-        return true;
     }
 
     getStayInPlacementMode() {
@@ -84,6 +80,12 @@ export class MetaPipeBuilding extends MetaBuilding {
         return true;
     }
 
+    getAvailableVariants(root) {
+        let variants = [defaultBuildingVariant, enumPipeVariant.industrial];
+        // variants.push(enumPipeVariant.industrial);
+        return variants;
+    }
+
     /**
      * Creates the entity at the given location
      * @param {Entity} entity
@@ -98,7 +100,7 @@ export class MetaPipeBuilding extends MetaBuilding {
      * @param {string} variant
      */
     updateVariants(entity, rotationVariant, variant) {
-        entity.components.Pipe.type = arrayPipeRotationVariantToType[rotationVariant];
+        entity.components.Pipe.variant = enumPipeVariantToVariant[variant];
         entity.components.Pipe.direction = arrayPipeVariantToRotation[rotationVariant];
         console.log(entity.components.StaticMapEntity.rotation);
     }
@@ -111,7 +113,7 @@ export class MetaPipeBuilding extends MetaBuilding {
      * @param {Entity} entity
      */
     getSpecialOverlayRenderMatrix(rotation, rotationVariant, variant, entity) {
-        return pipeOverlayMatrices[entity.components.Pipe.type][rotation];
+        return pipeOverlayMatrices[entity.components.Pipe.direction][rotation];
     }
 
     /**
@@ -121,12 +123,19 @@ export class MetaPipeBuilding extends MetaBuilding {
      * @returns {import("../../core/draw_utils").AtlasSprite}
      */
     getPreviewSprite(rotationVariant, variant) {
-        switch (arrayPipeRotationVariantToType[rotationVariant]) {
-            case enumPipeType.forward: {
-                return Loader.getSprite("sprites/pipes/pipe_forward.png");
+        const pipeVariant = enumPipeVariantToVariant[variant];
+        switch (arrayPipeVariantToRotation[rotationVariant]) {
+            case enumDirection.top: {
+                return Loader.getSprite("sprites/pipes/" + pipeVariant + "_top.png");
             }
-            case enumPipeType.turn: {
-                return Loader.getSprite("sprites/pipes/pipe_turn.png");
+            case enumDirection.left: {
+                return Loader.getSprite("sprites/pipes/" + pipeVariant + "_left.png");
+            }
+            case enumDirection.right: {
+                return Loader.getSprite("sprites/pipes/" + pipeVariant + "_right.png");
+            }
+            default: {
+                assertAlways(false, "Invalid belt rotation variant");
             }
         }
     }
@@ -195,7 +204,7 @@ export class MetaPipeBuilding extends MetaBuilding {
             if (hasRightEjector && !hasLeftEjector) {
                 return {
                     rotation: (rotation + 270) % 360,
-                    rotationVariant: 1,
+                    rotationVariant: 2,
                 };
             }
 
@@ -203,7 +212,7 @@ export class MetaPipeBuilding extends MetaBuilding {
             // do a curve from the right to the top
             if (hasLeftEjector && !hasRightEjector) {
                 return {
-                    rotation: (rotation + 180) % 360,
+                    rotation: (rotation + 90) % 360,
                     rotationVariant: 1,
                 };
             }
@@ -217,7 +226,7 @@ export class MetaPipeBuilding extends MetaBuilding {
             if (hasRightAcceptor && !hasLeftAcceptor) {
                 return {
                     rotation,
-                    rotationVariant: 1,
+                    rotationVariant: 2,
                 };
             }
 
@@ -225,7 +234,7 @@ export class MetaPipeBuilding extends MetaBuilding {
             // do a turn to the left
             if (hasLeftAcceptor && !hasRightAcceptor) {
                 return {
-                    rotation: (rotation + 90) % 360,
+                    rotation,
                     rotationVariant: 1,
                 };
             }

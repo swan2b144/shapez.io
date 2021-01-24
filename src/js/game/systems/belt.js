@@ -25,6 +25,7 @@ const logger = createLogger("belt");
 export class BeltSystem extends GameSystemWithFilter {
     constructor(root) {
         super(root, [BeltComponent]);
+
         /**
          * @type {Object.<enumDirection, Array<AtlasSprite>>}
          */
