@@ -7,6 +7,12 @@ export const enumPipeType = {
     turn: "turn",
 };
 
+/** @enum {string} */
+export const enumPipeVariant = {
+    pipe: "pipe",
+    industrial: "industrial",
+};
+
 export const FAKE_PIPE_ACCEPTOR_SLOT = {
     pos: new Vector(0, 0),
     direction: enumDirection.bottom,
@@ -37,12 +43,22 @@ export class PipeComponent extends Component {
     /**
      * @param {object} param0
      * @param {enumPipeType=} param0.type
+     * @param {enumPipeVariant=} param0.variant
      */
-    constructor({ type = enumPipeType.forward }) {
+    constructor({ type = enumPipeType.forward, variant = enumPipeVariant.pipe }) {
         super();
         this.type = type;
         this.direction = enumDirection.top;
 
+        /**
+         * The variant of the wire, different variants do not connect
+         * @type {enumPipeVariant}
+         */
+        this.variant = variant;
+
+        /**
+         * @type {import("../systems/pipe").PipeNetwork}
+         */
         this.linkedNetwork = null;
     }
 

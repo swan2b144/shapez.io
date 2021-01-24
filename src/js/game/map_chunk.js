@@ -102,47 +102,76 @@ export class MapChunk {
         const avgPos = new Vector(0, 0);
         let patchesDrawn = 0;
 
-        for (let x = 0; x < globalConfig.mapChunkSize; ++x) {
-            for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
-                const globalPosX = this.tileX + x;
-                const globalPosY = this.tileY + y;
-                const distance = new Vector(globalPosX, globalPosY).length();
+        for (let offX = 0; offX < globalConfig.mapChunkSize; ++offX) {
+            for (let offY = 0; offY < globalConfig.mapChunkSize; ++offY) {
+                const x = this.tileX + offX;
+                const y = this.tileY + offY;
 
-                if (distance < distanceLimit * globalConfig.mapChunkSize) {
-                    continue;
+                const distance = new Vector(x, y).length();
+
+                const valOnPoint = (x, y) => {
+                    return (
+                        noise.computePerlin2(x * 0.01, y * 0.01) * 0.5 +
+                        noise.computePerlin2(x * 0.01, y * 0.01) * 0.3 +
+                        noise.computePerlin2(x * 0.04, y * 0.04) * 0.2 +
+                        noise.computePerlin2(x * 0.08, y * 0.08) * 0.1
+                    );
+                };
+
+                const val = valOnPoint(x, y);
+
+                if (val < 1110.1) {
+                    if (distance > distanceLimit * globalConfig.mapChunkSize) {
+                        if (val < 0.4) {
+                            this.lowerLayer[offX][offY] = noise.getColor(val);
+                        } else {
+                            this.lowerLayer[offX][offY] = noise.getColor(0.4);
+                        }
+                    } else {
+                        const map = function (n, start1, stop1, start2, stop2) {
+                            return ((n - start1) / (stop1 - start1)) * (stop2 - start2) + start2;
+                        };
+
+                        this.lowerLayer[offX][offY] = noise.getColor(
+                            map(distance, distanceLimit * globalConfig.mapChunkSize, 0, val, 0.2)
+                        );
+                    }
                 }
 
-                noise.setGlobalScale(scale); //NOTE: make config later
-                let noiseValue_1 = noise.computeSimplex2(globalPosX, globalPosY) + distance / 16000;
-                noise.setGlobalScale(scale * 2); //NOTE: make config later
-                let noiseValue_2 = noise.computeSimplex2(globalPosX, globalPosY) + distance / 16000;
+                // const noiseCount = 3;
+                // const maxScaleMult = 2;
 
-                let noiseValue = noiseValue_1 * 0.5 + noiseValue_2 * 0.5;
+                // let noiseValue = 0;
+                // for (let i = 0; i < noiseCount; ++i) {
+                //     noise.setGlobalScale(scale * (maxScaleMult / i)); //NOTE: make config later
+                //     noiseValue +=
+                //         (noise.computeSimplex2(globalPosX, globalPosY) + distance / 16000) / noiseCount;
+                // }
 
-                let water = { r: 91, g: 160, b: 251 };
-                let sand = { r: 255, g: 229, b: 144 };
-                let grass = { r: 126, g: 200, b: 80 };
+                // let water = { r: 91, g: 160, b: 251 };
+                // let sand = { r: 255, g: 229, b: 144 };
+                // let grass = { r: 126, g: 200, b: 80 };
 
-                // noiseValue = noise.computePerlin2(globalPosX, globalPosY) + distance / 16000;
-                const blend = noiseValue / 3;
+                // // noiseValue = noise.computePerlin2(globalPosX, globalPosY) + distance / 16000;
+                // const blend = noiseValue / 3;
 
-                if (noiseValue < 0) {
-                    this.lowerLayer[x][y] = "#5ba0fb"; // Water
-                } else if (noiseValue < 0.2) {
-                    let color = Math.round(lerp(water.b, sand.b, blend));
-                    color += Math.round(lerp(water.g, sand.g, blend)) << 8;
-                    color += Math.round(lerp(water.r, sand.r, blend)) << 16;
-                    this.lowerLayer[x][y] = `#${color.toString(16).padStart(6, "0")}`;
-                } else if (noiseValue < 0.25) {
-                    this.lowerLayer[x][y] = "#ffe590"; // Sand
-                } else if (noiseValue < 0.5) {
-                    let color = Math.round(lerp(sand.b, grass.b, blend));
-                    color += Math.round(lerp(sand.g, grass.g, blend)) << 8;
-                    color += Math.round(lerp(sand.r, grass.r, blend)) << 16;
-                    this.lowerLayer[x][y] = `#${color.toString(16).padStart(6, "0")}`;
-                } else {
-                    this.lowerLayer[x][y] = "#7ec850"; // Grass
-                }
+                // if (noiseValue < 0.1) {
+                //     this.lowerLayer[x][y] = "#5ba0fb"; // Water
+                // } else if (noiseValue < 0.15) {
+                //     let color = Math.round(lerp(water.b, sand.b, blend));
+                //     color += Math.round(lerp(water.g, sand.g, blend)) << 8;
+                //     color += Math.round(lerp(water.r, sand.r, blend)) << 16;
+                //     this.lowerLayer[x][y] = `#${color.toString(16).padStart(6, "0")}`;
+                // } else if (noiseValue < 0.2) {
+                //     this.lowerLayer[x][y] = "#ffe590"; // Sand
+                // } else if (noiseValue < 0.25) {
+                //     let color = Math.round(lerp(sand.b, grass.b, blend));
+                //     color += Math.round(lerp(sand.g, grass.g, blend)) << 8;
+                //     color += Math.round(lerp(sand.r, grass.r, blend)) << 16;
+                //     this.lowerLayer[x][y] = `#${color.toString(16).padStart(6, "0")}`;
+                // } else {
+                //     this.lowerLayer[x][y] = "#7ec850"; // Grass
+                // }
 
                 // if (noiseValue > -100) {
                 //     // ++patchesDrawn;
@@ -191,7 +220,7 @@ export class MapChunk {
 
         const distanceLimit = 10;
 
-        if (distanceToOriginInChunks > distanceLimit - 1) {
+        if (distanceToOriginInChunks > -1) {
             for (const fluid in enumFluids) {
                 availableFluids.push(fluid);
             }

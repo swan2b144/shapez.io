@@ -3,11 +3,21 @@ import { formatItemsPerSecond, generateMatrixRotations } from "../../core/utils"
 import { enumAngleToDirection, enumDirection, Vector } from "../../core/vector";
 import { SOUNDS } from "../../platform/sound";
 import { T } from "../../translations";
-import { PipeComponent, enumPipeType } from "../components/pipe";
+import { PipeComponent, enumPipeType, enumPipeVariant } from "../components/pipe";
 import { Entity } from "../entity";
-import { MetaBuilding } from "../meta_building";
+import { defaultBuildingVariant, MetaBuilding } from "../meta_building";
 import { GameRoot } from "../root";
 import { THEME } from "../theme";
+
+/** @enum {string} */
+export const pipeVariants = {
+    industrial: "industrial",
+};
+
+const enumPipeVariantToVariant = {
+    [defaultBuildingVariant]: enumPipeVariant.pipe,
+    [pipeVariants.industrial]: enumPipeVariant.industrial,
+};
 
 export const arrayPipeRotationVariantToType = [enumPipeType.forward, enumPipeType.turn];
 export const arrayPipeVariantToRotation = [enumDirection.top, enumDirection.right];
@@ -48,6 +58,19 @@ export class MetaPipeBuilding extends MetaBuilding {
 
     getSprite() {
         return null;
+    }
+
+    /**
+     *
+     *@param {string} variant
+     */
+    isPlaceableToFluid(variant) {
+        switch (variant) {
+            case defaultBuildingVariant:
+                return true;
+            case enumPipeVariant.industrial:
+                return false;
+        }
     }
 
     getIsReplaceable() {
