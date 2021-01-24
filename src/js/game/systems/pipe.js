@@ -16,7 +16,7 @@ import {
 import { BaseItem } from "../base_item";
 import { arrayPipeRotationVariantToType, MetaPipeBuilding } from "../buildings/pipe";
 import { getCodeFromBuildingData } from "../building_codes";
-import { enumPipeType, PipeComponent } from "../components/pipe";
+import { enumPipeType, enumPipeVariant, PipeComponent } from "../components/pipe";
 import { enumPinSlotType, FluidPinsComponent } from "../components/fluid_pins";
 import { PipeTunnelComponent } from "../components/pipe_tunnel";
 import { Entity } from "../entity";
@@ -94,15 +94,20 @@ export class PipeSystem extends GameSystemWithFilter {
         super(root, [PipeComponent]);
 
         /**
-         * @type {Object<enumPipeType, AtlasSprite>}
+         * @type {Object<enumPipeVariant, Object<enumPipeType, AtlasSprite>}
          */
         this.pipeSprites = {};
-
-        const sprites = {};
-        for (const pipeType in enumPipeType) {
-            sprites[pipeType] = Loader.getSprite("sprites/pipes/reguilar/pipe_" + pipeType + ".png");
+        const variants = ["industrial", ...Object.keys(enumPipeVariant)];
+        for (let i = 0; i < variants.length; ++i) {
+            const pipeVariant = variants[i];
+            const sprites = {};
+            for (const pipeType in enumPipeType) {
+                sprites[pipeType] = Loader.getSprite(
+                    "sprites/pipes/" + pipeVariant + "_" + pipeType + ".png"
+                );
+            }
+            this.pipeSprites[pipeVariant] = sprites;
         }
-        this.pipeSprites = sprites;
 
         this.root.signals.entityDestroyed.add(this.queuePlacementUpdate, this);
         this.root.signals.entityAdded.add(this.queuePlacementUpdate, this);
@@ -213,7 +218,12 @@ export class PipeSystem extends GameSystemWithFilter {
                 slot,
             },
         ];
-
+        /**
+         * Once we occur a wire, we store its variant so we don't connect to
+         * mismatching ones
+         * @type {enumPipeVariant}
+         */
+        let variantMask = null;
         while (entitiesToVisit.length > 0) {
             const nextData = entitiesToVisit.pop();
             const nextEntity = nextData.entity;
@@ -241,13 +251,18 @@ export class PipeSystem extends GameSystemWithFilter {
                 );
 
                 if (!pipeComp.linkedNetwork) {
-                    // This one is new! :D
-                    VERBOSE_WIRES && logger.log("  Visited new pipe:", staticComp.origin.toString());
-                    pipeComp.linkedNetwork = currentNetwork;
-                    currentNetwork.pipes.push(nextEntity);
+                    if (variantMask && pipeComp.variant !== variantMask) {
+                        // Mismatching variant
+                    } else {
+                        // This one is new! :D
+                        VERBOSE_WIRES && logger.log("  Visited new pipe:", staticComp.origin.toString());
+                        pipeComp.linkedNetwork = currentNetwork;
+                        currentNetwork.pipes.push(nextEntity);
 
-                    newSearchDirections = arrayAllDirections;
-                    newSearchTile = nextEntity.components.StaticMapEntity.origin;
+                        newSearchDirections = arrayAllDirections;
+                        newSearchTile = nextEntity.components.StaticMapEntity.origin;
+                        variantMask = pipeComp.variant;
+                    }
                 }
             }
 
@@ -345,13 +360,21 @@ export class PipeSystem extends GameSystemWithFilter {
      * @param {Vector} initialTile
      * @param {Array<enumDirection>} directions
      * @param {PipeNetwork} network
+     * @param {enumPipeVariant=} variantMask Only accept connections to this mask
      * @returns {Array<any>}
      */
-    findSurroundingPipeTargets(initialTile, directions, network) {
+    findSurroundingPipeTargets(initialTile, directions, network, variantMask = null) {
         let result = [];
 
         VERBOSE_WIRES &&
-            logger.log("    Searching for new targets at", initialTile.toString(), "and d=", directions);
+            logger.log(
+                "    Searching for new targets at",
+                initialTile.toString(),
+                "and d=",
+                directions,
+                "with mask=",
+                variantMask
+            );
 
         // Go over all directions we should search for
         for (let i = 0; i < directions.length; ++i) {
@@ -383,8 +406,13 @@ export class PipeSystem extends GameSystemWithFilter {
                 const pipeComp = entity.components.Pipe;
 
                 // Check for pipe
-                if (pipeComp && !pipeComp.linkedNetwork) {
-                    // Pipes accept connections from everywhere
+                // Check for wire
+                if (
+                    pipeComp &&
+                    !pipeComp.linkedNetwork &&
+                    (!variantMask || pipeComp.variant === variantMask)
+                ) {
+                    // Wires accept connections from everywhere
                     result.push({
                         entity,
                     });
