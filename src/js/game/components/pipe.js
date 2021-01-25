@@ -1,5 +1,6 @@
 import { enumDirection, Vector } from "../../core/vector";
 import { Component } from "../component";
+import { defaultBuildingVariant } from "../meta_building";
 
 /** @enum {string} */
 export const enumPipeType = {
@@ -45,7 +46,7 @@ export class PipeComponent extends Component {
      * @param {enumPipeType=} param0.type
      * @param {enumPipeVariant=} param0.variant
      */
-    constructor({ type = enumPipeType.forward, variant = enumPipeVariant.pipe }) {
+    constructor({ type = enumPipeType.forward, variant = defaultBuildingVariant }) {
         super();
         // this.type = type;
         this.direction = enumDirection.top;

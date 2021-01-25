@@ -5,6 +5,7 @@ import { MapChunkView } from "../map_chunk_view";
 import { THEME } from "../theme";
 import { drawSpriteClipped } from "../../core/draw_utils";
 import { FluidItem } from "../items/fluid_item";
+import { BaseItem } from "../base_item";
 
 export class MapResourcesSystem extends GameSystem {
     /**
@@ -56,7 +57,7 @@ export class MapResourcesSystem extends GameSystem {
                 const rowEntities = layerEntities[x];
                 const worldX = (chunk.tileX + x) * globalConfig.tileSize;
                 for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
-                    const lowerItem = row[y];
+                    let lowerItem = row[y];
 
                     const entity = rowEntities[y];
                     if (entity) {
@@ -65,8 +66,11 @@ export class MapResourcesSystem extends GameSystem {
                     }
 
                     if (lowerItem) {
-                        if (typeof lowerItem === "string") {
-                            continue;
+                        if (!(lowerItem instanceof BaseItem)) {
+                            lowerItem = lowerItem.item;
+                            if (!(lowerItem instanceof BaseItem)) {
+                                continue;
+                            }
                         }
 
                         if (lowerItem.getItemType() === "fluid") {
@@ -167,12 +171,14 @@ export class MapResourcesSystem extends GameSystem {
             for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
                 const item = row[y];
                 if (item) {
-                    if (typeof item === "string") {
-                        context.globalAlpha = 1;
-                        context.fillStyle = item;
-                    } else {
+                    if (item instanceof BaseItem) {
                         context.fillStyle = item.getBackgroundColorAsResource();
+                    } else if (typeof item === "string") {
+                        context.fillStyle = item;
+                    } else if (typeof item === "object") {
+                        context.fillStyle = item.color;
                     }
+
                     context.fillRect(x, y, 1, 1);
                     context.globalAlpha = 0.5;
                 }

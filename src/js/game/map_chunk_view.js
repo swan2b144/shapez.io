@@ -6,6 +6,7 @@ import { MapChunk } from "./map_chunk";
 import { GameRoot } from "./root";
 import { THEME } from "./theme";
 import { drawSpriteClipped } from "../core/draw_utils";
+import { BaseItem } from "./base_item";
 
 export const CHUNK_OVERLAY_RES = 3;
 
@@ -203,11 +204,14 @@ export class MapChunkView extends MapChunk {
                         // Draw lower content first since it "shines" through
                         const lowerContent = lowerArray[y];
                         if (lowerContent) {
-                            if (typeof lowerContent === "string") {
-                                context.fillStyle = lowerContent;
-                            } else {
+                            if (lowerContent instanceof BaseItem) {
                                 context.fillStyle = lowerContent.getBackgroundColorAsResource();
+                            } else if (typeof lowerContent === "string") {
+                                context.fillStyle = lowerContent;
+                            } else if (typeof lowerContent === "object") {
+                                context.fillStyle = lowerContent.color;
                             }
+
                             context.fillRect(
                                 x * CHUNK_OVERLAY_RES,
                                 y * CHUNK_OVERLAY_RES,
@@ -253,11 +257,14 @@ export class MapChunkView extends MapChunk {
 
                 const lowerContent = lowerArray[y];
                 if (lowerContent) {
-                    if (typeof lowerContent === "string") {
-                        context.fillStyle = lowerContent;
-                    } else {
+                    if (lowerContent instanceof BaseItem) {
                         context.fillStyle = lowerContent.getBackgroundColorAsResource();
+                    } else if (typeof lowerContent === "string") {
+                        context.fillStyle = lowerContent;
+                    } else if (typeof lowerContent === "object") {
+                        context.fillStyle = lowerContent.color;
                     }
+
                     context.fillRect(
                         x * CHUNK_OVERLAY_RES,
                         y * CHUNK_OVERLAY_RES,

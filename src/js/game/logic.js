@@ -16,6 +16,7 @@ import { PipeNetwork } from "./systems/pipe";
 import { enumPipeVariant } from "./components/pipe";
 
 import { enumPinSlotType } from "./components/fluid_pins";
+import { BaseItem } from "./base_item";
 
 const logger = createLogger("ingame/logic");
 
@@ -83,8 +84,15 @@ export class GameLogic {
                 }
 
                 // Check if there is any fluid underneath it
-                const tile = this.root.map.getLowerLayerContentXY(x, y);
-                if (tile && typeof tile === "object" && tile.getItemType() === "fluid") {
+                let tile = this.root.map.getLowerLayerContentXY(x, y);
+                if (tile && !(tile instanceof BaseItem)) {
+                    const fakeTile = tile.item;
+                    if (fakeTile instanceof BaseItem) {
+                        tile = fakeTile;
+                    }
+                }
+
+                if (tile && tile instanceof BaseItem && tile.getItemType() === "fluid") {
                     const metaClass = entity.components.StaticMapEntity.getMetaBuilding();
                     if (!metaClass.isPlaceableToFluids(tile.getAsCopyableKey())) {
                         return false;
@@ -560,91 +568,12 @@ export class GameLogic {
         return { ejectors, acceptors };
     }
 
-    // /**
-    //  * Returns the acceptors and ejectors which affect the current tile
-    //  * @param {Vector} tile
-    //  * @returns {AcceptorsAndEjectorsAffectingTile}
-    //  */
-    // getEjectorsAndAcceptorsAtTileForPipes(tile) {
-    //     let ejectors = [];
-    //     let acceptors = [];
-
-    //     // Well .. please ignore this code! :D
-    //     for (let dx = -1; dx <= 1; ++dx) {
-    //         for (let dy = -1; dy <= 1; ++dy) {
-    //             if (Math.abs(dx) + Math.abs(dy) !== 1) {
-    //                 continue;
-    //             }
-
-    //             const entity = this.root.map.getLayerContentXY(tile.x + dx, tile.y + dy, "regular");
-    //             if (entity) {
-    //                 const staticComp = entity.components.StaticMapEntity;
-    //                 const pinComp = entity.components.FluidPins;
-    //                 const pipeComp = entity.components.Pipe;
-
-    //                 const acceptorSlots = [];
-    //                 const ejectorSlots = [];
-
-    //                 if (pinComp) {
-    //                     for (let i = 0; i < pinComp.slots.length; ++i) {
-    //                         const slot = pinComp.slots[i];
-    //                         if (slot.type === enumPinSlotType.fluidAcceptor) {
-    //                             acceptorSlots.push(slot);
-    //                         } else {
-    //                             ejectorSlots.push(slot);
-    //                         }
-    //                     }
-    //                 }
-
-    //                 if (pipeComp) {
-    //                     const fakeEjectorSlot = pipeComp.getFakeEjectorSlot();
-    //                     const fakeAcceptorSlot = pipeComp.getFakeAcceptorSlot();
-    //                     ejectorSlots.push(fakeEjectorSlot);
-    //                     acceptorSlots.push(fakeAcceptorSlot);
-    //                 }
-
-    //                 for (let ejectorSlot = 0; ejectorSlot < ejectorSlots.length; ++ejectorSlot) {
-    //                     const slot = ejectorSlots[ejectorSlot];
-    //                     const wsTile = staticComp.localTileToWorld(slot.pos);
-    //                     const wsDirection = staticComp.localDirectionToWorld(slot.direction);
-    //                     const targetTile = wsTile.add(enumDirectionToVector[wsDirection]);
-    //                     if (targetTile.equals(tile)) {
-    //                         ejectors.push({
-    //                             entity,
-    //                             slot,
-    //                             fromTile: wsTile,
-    //                             toDirection: wsDirection,
-    //                         });
-    //                     }
-    //                 }
-
-    //                 for (let acceptorSlot = 0; acceptorSlot < acceptorSlots.length; ++acceptorSlot) {
-    //                     const slot = acceptorSlots[acceptorSlot];
-    //                     const wsTile = staticComp.localTileToWorld(slot.pos);
-    //                     const direction = slot.direction;
-    //                     const wsDirection = staticComp.localDirectionToWorld(direction);
-
-    //                     const sourceTile = wsTile.add(enumDirectionToVector[wsDirection]);
-    //                     if (sourceTile.equals(tile)) {
-    //                         acceptors.push({
-    //                             entity,
-    //                             slot,
-    //                             toTile: wsTile,
-    //                             fromDirection: wsDirection,
-    //                         });
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     return { ejectors, acceptors };
-    // }
-
     /**
      * Returns the acceptors and ejectors which affect the current tile
      * @param {Vector} tile
+     * @param {string} variant
      */
-    getEjectorsAndAcceptorsAtTileForPipes(tile) {
+    getEjectorsAndAcceptorsAtTileForPipes(tile, variant) {
         let ejectors = [];
         let acceptors = [];
 
@@ -673,8 +602,6 @@ export class GameLogic {
                                 ejectorSlots.push(slot);
                             }
                         }
-                        console.log(entity.components.FluidPins.slots);
-                        console.log(entity.components.FluidPins.slots.slice());
                     }
 
                     // let ejectorSlots = [];
@@ -693,7 +620,7 @@ export class GameLogic {
                     //     acceptorSlots = itemAcceptor.slots.slice();
                     // }
 
-                    if (pipeComp) {
+                    if (pipeComp && variant === pipeComp.variant) {
                         const fakeEjectorSlot = pipeComp.getFakeEjectorSlot();
                         const fakeAcceptorSlot = pipeComp.getFakeAcceptorSlot();
                         ejectorSlots.push(fakeEjectorSlot);

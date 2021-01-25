@@ -99,7 +99,7 @@ export class PipeSystem extends GameSystemWithFilter {
          * @type {Object.<enumDirection, Array<AtlasSprite>>}
          */
         this.pipeSprites = {
-            [enumPipeVariant.pipe]: {
+            [defaultBuildingVariant]: {
                 [enumDirection.top]: Loader.getSprite("sprites/pipes/pipe_top.png"),
                 [enumDirection.left]: Loader.getSprite("sprites/pipes/pipe_left.png"),
                 [enumDirection.right]: Loader.getSprite("sprites/pipes/pipe_right.png"),
@@ -644,78 +644,6 @@ export class PipeSystem extends GameSystemWithFilter {
         return entity.components.Pipe || entity.components.FluidPins || entity.components.PipeTunnel;
     }
 
-    // /**
-    //  * Updates the pipe placement after an entity has been added / deleted
-    //  * @param {Entity} entity
-    //  */
-    // updateSurroundingPipePlacement(entity) {
-    //     if (!this.root.gameInitialized) {
-    //         return;
-    //     }
-
-    //     const staticComp = entity.components.StaticMapEntity;
-    //     if (!staticComp) {
-    //         return;
-    //     }
-
-    //     const metaPipe = gMetaBuildingRegistry.findByClass(MetaPipeBuilding);
-    //     // Compute affected area
-    //     const originalRect = staticComp.getTileSpaceBounds();
-    //     const affectedArea = originalRect.expandedInAllDirections(1);
-
-    //     for (let x = affectedArea.x; x < affectedArea.right(); ++x) {
-    //         for (let y = affectedArea.y; y < affectedArea.bottom(); ++y) {
-    //             if (originalRect.containsPoint(x, y)) {
-    //                 // Make sure we don't update the original entity
-    //                 continue;
-    //             }
-
-    //             const targetEntities = this.root.map.getLayersContentsMultipleXY(x, y);
-    //             for (let i = 0; i < targetEntities.length; ++i) {
-    //                 const targetEntity = targetEntities[i];
-
-    //                 const targetPipeComp = targetEntity.components.Pipe;
-    //                 const targetStaticComp = targetEntity.components.StaticMapEntity;
-
-    //                 if (!targetPipeComp) {
-    //                     // Not a pipe
-    //                     continue;
-    //                 }
-
-    //                 const {
-    //                     rotation,
-    //                     rotationVariant,
-    //                 } = metaPipe.computeOptimalDirectionAndRotationVariantAtTile({
-    //                     root: this.root,
-    //                     tile: new Vector(x, y),
-    //                     rotation: targetStaticComp.originalRotation,
-    //                     variant: defaultBuildingVariant,
-    //                     layer: targetEntity.layer,
-    //                 });
-
-    //                 // Compute delta to see if anything changed
-    //                 const newDirection = arrayPipeVariantToRotation[rotationVariant];
-
-    //                 if (targetStaticComp.rotation !== rotation || newDirection !== targetPipeComp.direction) {
-    //                     // Change stuff
-    //                     targetStaticComp.rotation = rotation;
-    //                     metaPipe.updateVariants(targetEntity, rotationVariant, defaultBuildingVariant);
-
-    //                     // Update code as well
-    //                     targetStaticComp.code = getCodeFromBuildingData(
-    //                         metaPipe,
-    //                         defaultBuildingVariant,
-    //                         rotationVariant
-    //                     );
-
-    //                     // Make sure the chunks know about the update
-    //                     this.root.signals.entityChanged.dispatch(targetEntity);
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-
     /**
      * Updates the pipe placement after an entity has been added / deleted
      * @param {Entity} entity
@@ -761,7 +689,7 @@ export class PipeSystem extends GameSystemWithFilter {
                         root: this.root,
                         tile: new Vector(x, y),
                         rotation: targetStaticComp.originalRotation,
-                        variant: defaultBuildingVariant,
+                        variant: targetPipeComp.variant,
                         layer: targetEntity.layer,
                     });
 
@@ -773,14 +701,11 @@ export class PipeSystem extends GameSystemWithFilter {
                     if (targetStaticComp.rotation !== rotation || newDirection !== targetPipeComp.direction) {
                         // Change stuff
                         targetStaticComp.rotation = rotation;
-                        metaPipe.updateVariants(targetEntity, rotationVariant, defaultBuildingVariant);
+                        const variant = targetEntity.components.Pipe.variant;
+                        metaPipe.updateVariants(targetEntity, rotationVariant, variant);
 
                         // Update code as well
-                        targetStaticComp.code = getCodeFromBuildingData(
-                            metaPipe,
-                            defaultBuildingVariant,
-                            rotationVariant
-                        );
+                        targetStaticComp.code = getCodeFromBuildingData(metaPipe, variant, rotationVariant);
 
                         // Make sure the chunks know about the update
                         this.root.signals.entityChanged.dispatch(targetEntity);

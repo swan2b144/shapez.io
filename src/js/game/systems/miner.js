@@ -48,13 +48,21 @@ export class MinerSystem extends GameSystemWithFilter {
             // Check if miner is above an actual tile
             if (!minerComp.cachedMinedItem) {
                 const staticComp = entity.components.StaticMapEntity;
-                const tileBelow = this.root.map.getLowerLayerContentXY(
+                let tileBelow = this.root.map.getLowerLayerContentXY(
                     staticComp.origin.x,
                     staticComp.origin.y
                 );
-                if (!tileBelow || typeof tileBelow !== "object") {
+                if (!tileBelow) {
                     continue;
                 }
+
+                if (!(tileBelow instanceof BaseItem)) {
+                    const fakeTile = tileBelow.item;
+                    if (fakeTile instanceof BaseItem) {
+                        tileBelow = fakeTile;
+                    }
+                }
+
                 minerComp.cachedMinedItem = tileBelow;
             }
 

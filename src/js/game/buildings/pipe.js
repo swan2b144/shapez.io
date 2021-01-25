@@ -100,9 +100,8 @@ export class MetaPipeBuilding extends MetaBuilding {
      * @param {string} variant
      */
     updateVariants(entity, rotationVariant, variant) {
-        entity.components.Pipe.variant = enumPipeVariantToVariant[variant];
+        entity.components.Pipe.variant = variant;
         entity.components.Pipe.direction = arrayPipeVariantToRotation[rotationVariant];
-        console.log(entity.components.StaticMapEntity.rotation);
     }
 
     /**
@@ -160,7 +159,8 @@ export class MetaPipeBuilding extends MetaBuilding {
         const bottomDirection = enumAngleToDirection[(rotation + 180) % 360];
         const leftDirection = enumAngleToDirection[(rotation + 270) % 360];
 
-        const { ejectors, acceptors } = root.logic.getEjectorsAndAcceptorsAtTileForPipes(tile);
+        console.log(variant);
+        const { ejectors, acceptors } = root.logic.getEjectorsAndAcceptorsAtTileForPipes(tile, variant);
 
         let hasBottomEjector = false;
         let hasRightEjector = false;
