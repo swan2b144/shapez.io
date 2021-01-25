@@ -1,103 +1,28 @@
 import { globalConfig } from "../../core/config";
+import { DrawParameters } from "../../core/draw_parameters";
 import { gMetaBuildingRegistry } from "../../core/global_registries";
 import { Loader } from "../../core/loader";
 import { createLogger } from "../../core/logging";
-import { Rectangle } from "../../core/rectangle";
-import { AtlasSprite } from "../../core/sprites";
-import { StaleAreaDetector } from "../../core/stale_area_detector";
-import { fastArrayDeleteValueIfContained } from "../../core/utils";
-import {
-    arrayAllDirections,
-    enumDirection,
-    enumDirectionToVector,
-    enumInvertedDirections,
-    Vector,
-} from "../../core/vector";
-import { BaseItem } from "../base_item";
-import { arrayPipeVariantToRotation, MetaPipeBuilding, pipeVariants } from "../buildings/pipe";
+import { fastArrayDeleteValue } from "../../core/utils";
+import { enumDirection, enumDirectionToVector, enumInvertedDirections, Vector } from "../../core/vector";
+import { PipePath } from "../pipe_path";
+import { arrayPipeVariantToRotation, MetaPipeBuilding } from "../buildings/pipe";
 import { getCodeFromBuildingData } from "../building_codes";
-import { enumPipeType, enumPipeVariant, PipeComponent } from "../components/pipe";
-import { enumPinSlotType, FluidPinsComponent } from "../components/fluid_pins";
-import { PipeTunnelComponent } from "../components/pipe_tunnel";
+import { enumPipeVariant, PipeComponent } from "../components/pipe";
 import { Entity } from "../entity";
 import { GameSystemWithFilter } from "../game_system_with_filter";
-import { isTruthyItem } from "../items/boolean_item";
 import { MapChunkView } from "../map_chunk_view";
-import { drawSpriteClipped } from "../../core/draw_utils";
 import { defaultBuildingVariant } from "../meta_building";
-import { arrayBeltVariantToRotation } from "../buildings/belt";
 
-const logger = createLogger("pipes");
+const logger = createLogger("pipe");
 
-let networkUidCounter = 0;
-
-const VERBOSE_WIRES = G_IS_DEV && false;
-
-export class PipeNetwork {
-    constructor() {
-        /**
-         * Who contributes to this network
-         * @type {Array<{ entity: Entity, slot: import("../components/fluid_pins").FluidPinSlot }>} */
-        this.providers = [];
-
-        /**
-         * Who takes values from this network
-         * @type {Array<{ entity: Entity, slot: import("../components/fluid_pins").FluidPinSlot }>} */
-        this.receivers = [];
-
-        /**
-         * All connected slots
-         * @type {Array<{ entity: Entity, slot: import("../components/fluid_pins").FluidPinSlot }>}
-         */
-        this.allSlots = [];
-
-        /**
-         * All connected tunnels
-         * @type {Array<Entity>}
-         */
-        this.tunnels = [];
-
-        /**
-         * Which pipes are in this network
-         * @type {Array<Entity>}
-         */
-        this.pipes = [];
-
-        /**
-         * The current value of this network
-         * @type {BaseItem}
-         */
-        this.currentValue = null;
-
-        /**
-         * The current value of this network
-         * @type {number}
-         */
-        this.currentAmount = 0;
-
-        /**
-         * Unique network identifier
-         * @type {number}
-         */
-        this.uid = ++networkUidCounter;
-    }
-
-    /**
-     * Returns whether this network currently has a value
-     * @returns {boolean}
-     */
-    hasValue() {
-        return !!this.currentValue;
-    }
-}
-
+/**
+ * Manages all pipes
+ */
 export class PipeSystem extends GameSystemWithFilter {
     constructor(root) {
         super(root, [PipeComponent]);
 
-        /**
-         * @type {Object.<enumDirection, Array<AtlasSprite>>}
-         */
         this.pipeSprites = {
             [defaultBuildingVariant]: {
                 [enumDirection.top]: Loader.getSprite("sprites/pipes/pipe_top.png"),
@@ -112,536 +37,62 @@ export class PipeSystem extends GameSystemWithFilter {
             },
         };
 
-        this.root.signals.entityDestroyed.add(this.queueRecomputeIfPipe, this);
-        this.root.signals.entityChanged.add(this.queueRecomputeIfPipe, this);
-        this.root.signals.entityAdded.add(this.queueRecomputeIfPipe, this);
-
+        this.root.signals.entityDestroyed.add(this.onEntityDestroyed, this);
         this.root.signals.entityDestroyed.add(this.updateSurroundingPipePlacement, this);
+
+        // Notice: These must come *after* the entity destroyed signals
+        this.root.signals.entityAdded.add(this.onEntityAdded, this);
         this.root.signals.entityAdded.add(this.updateSurroundingPipePlacement, this);
 
-        this.needsRecompute = true;
-        this.isFirstRecompute = true;
+        /** @type {Array<PipePath>} */
+        this.pipePaths = [];
+    }
 
-        /**
-         * @type {Array<PipeNetwork>}
-         */
-        this.networks = [];
+    asd() {
+        console.log("something");
     }
 
     /**
-     * Invalidates the pipes network if the given entity is relevant for it
-     * @param {Entity} entity
+     * Serializes all pipe paths
+     * @returns {Array<object>}
      */
-    queueRecomputeIfPipe(entity) {
-        if (!this.root.gameInitialized) {
-            return;
+    serializePaths() {
+        let data = [];
+        for (let i = 0; i < this.pipePaths.length; ++i) {
+            data.push(this.pipePaths[i].serialize());
         }
-
-        if (this.isEntityRelevantForPipes(entity)) {
-            this.needsRecompute = true;
-            this.networks = [];
-        }
+        return data;
     }
 
     /**
-     * Recomputes the whole pipes network
+     * Deserializes all pipe paths
+     * @param {Array<any>} data
      */
-    recomputePipesNetwork() {
-        this.needsRecompute = false;
-        logger.log("Recomputing pipes network");
+    deserializePaths(data) {
+        if (!Array.isArray(data)) {
+            return "Pipe paths are not an array: " + typeof data;
+        }
 
-        this.networks = [];
-
-        const pipeEntities = this.root.entityMgr.getAllWithComponent(PipeComponent);
-        const tunnelEntities = this.root.entityMgr.getAllWithComponent(PipeTunnelComponent);
-        const pinEntities = this.root.entityMgr.getAllWithComponent(FluidPinsComponent);
-
-        // Clear all network references, but not on the first update since that's the deserializing one
-        if (!this.isFirstRecompute) {
-            for (let i = 0; i < pipeEntities.length; ++i) {
-                pipeEntities[i].components.Pipe.linkedNetwork = null;
+        for (let i = 0; i < data.length; ++i) {
+            const path = PipePath.fromSerialized(this.root, data[i]);
+            // If path is a string, that means its an error
+            if (!(path instanceof PipePath)) {
+                return "Failed to create path from pipe data: " + path;
             }
-            for (let i = 0; i < tunnelEntities.length; ++i) {
-                tunnelEntities[i].components.PipeTunnel.linkedNetworks = [];
-            }
+            this.pipePaths.push(path);
+        }
 
-            for (let i = 0; i < pinEntities.length; ++i) {
-                const slots = pinEntities[i].components.FluidPins.slots;
-                for (let k = 0; k < slots.length; ++k) {
-                    slots[k].linkedNetwork = null;
-                }
-            }
+        if (this.pipePaths.length === 0) {
+            // Old savegames might not have paths yet
+            logger.warn("Recomputing pipe paths (most likely the savegame is old or empty)");
+            this.recomputeAllPipePaths();
         } else {
-            logger.log("Recomputing pipes first time");
-            this.isFirstRecompute = false;
+            logger.warn("Restored", this.pipePaths.length, "pipe paths");
         }
 
-        VERBOSE_WIRES && logger.log("Recomputing slots");
-
-        // Iterate over all ejector slots
-        for (let i = 0; i < pinEntities.length; ++i) {
-            const entity = pinEntities[i];
-            const slots = entity.components.FluidPins.slots;
-            for (let k = 0; k < slots.length; ++k) {
-                const slot = slots[k];
-
-                // Ejectors are computed directly, acceptors are just set
-                if (slot.type === enumPinSlotType.fluidEjector && !slot.linkedNetwork) {
-                    this.findNetworkForEjector(entity, slot);
-                }
-            }
+        if (G_IS_DEV && globalConfig.debug.checkPipePaths) {
+            this.debug_verifyPipePaths();
         }
-    }
-
-    /**
-     * Finds the network for the given slot
-     * @param {Entity} initialEntity
-     * @param {import("../components/fluid_pins").FluidPinSlot} slot
-     */
-    findNetworkForEjector(initialEntity, slot) {
-        let currentNetwork = new PipeNetwork();
-        VERBOSE_WIRES &&
-            logger.log(
-                "Finding network for entity",
-                initialEntity.uid,
-                initialEntity.components.StaticMapEntity.origin.toString(),
-                "(nw-id:",
-                currentNetwork.uid,
-                ")"
-            );
-        const entitiesToVisit = [
-            {
-                entity: initialEntity,
-                slot,
-            },
-        ];
-        /**
-         * Once we occur a wire, we store its variant so we don't connect to
-         * mismatching ones
-         * @type {enumPipeVariant}
-         */
-        let variantMask = null;
-        while (entitiesToVisit.length > 0) {
-            const nextData = entitiesToVisit.pop();
-            const nextEntity = nextData.entity;
-
-            const pipeComp = nextEntity.components.Pipe;
-            const staticComp = nextEntity.components.StaticMapEntity;
-
-            VERBOSE_WIRES && logger.log("Visiting", staticComp.origin.toString(), "(", nextEntity.uid, ")");
-
-            // Where to search for neighbours
-            let newSearchDirections = [];
-            let newSearchTile = null;
-
-            //// WIRE
-            if (pipeComp) {
-                // Sanity check
-                assert(
-                    !pipeComp.linkedNetwork || pipeComp.linkedNetwork === currentNetwork,
-                    "Mismatching pipe network on pipe entity " +
-                        (pipeComp.linkedNetwork ? pipeComp.linkedNetwork.uid : "<empty>") +
-                        " vs " +
-                        currentNetwork.uid +
-                        " @ " +
-                        staticComp.origin.toString()
-                );
-
-                if (!pipeComp.linkedNetwork) {
-                    if (variantMask && pipeComp.variant !== variantMask) {
-                        // Mismatching variant
-                    } else {
-                        // This one is new! :D
-                        VERBOSE_WIRES && logger.log("  Visited new pipe:", staticComp.origin.toString());
-                        pipeComp.linkedNetwork = currentNetwork;
-                        currentNetwork.pipes.push(nextEntity);
-
-                        newSearchDirections = arrayAllDirections;
-                        newSearchTile = nextEntity.components.StaticMapEntity.origin;
-                        variantMask = pipeComp.variant;
-                    }
-                }
-            }
-
-            //// PINS
-            const pinsComp = nextEntity.components.FluidPins;
-            if (pinsComp) {
-                const slot = nextData.slot;
-                assert(slot, "No slot set for next entity");
-
-                if (slot.type === enumPinSlotType.fluidEjector) {
-                    VERBOSE_WIRES &&
-                        logger.log("  Visiting ejector slot", staticComp.origin.toString(), "->", slot.type);
-                } else if (slot.type === enumPinSlotType.fluidAcceptor) {
-                    VERBOSE_WIRES &&
-                        logger.log("  Visiting acceptor slot", staticComp.origin.toString(), "->", slot.type);
-                } else {
-                    assertAlways(false, "Bad slot type: " + slot.type);
-                }
-
-                // Sanity check
-                assert(
-                    !slot.linkedNetwork || slot.linkedNetwork === currentNetwork,
-                    "Mismatching pipe network on pin slot entity " +
-                        (slot.linkedNetwork ? slot.linkedNetwork.uid : "<empty>") +
-                        " vs " +
-                        currentNetwork.uid
-                );
-                if (!slot.linkedNetwork) {
-                    // This one is new
-                    VERBOSE_WIRES && logger.log("  Visited new slot:", staticComp.origin.toString());
-
-                    // Add to the right list
-                    if (slot.type === enumPinSlotType.fluidEjector) {
-                        currentNetwork.providers.push({ entity: nextEntity, slot });
-                    } else if (slot.type === enumPinSlotType.fluidAcceptor) {
-                        currentNetwork.receivers.push({ entity: nextEntity, slot });
-                    } else {
-                        assertAlways(false, "unknown slot type:" + slot.type);
-                    }
-
-                    // Register on the network
-                    currentNetwork.allSlots.push({ entity: nextEntity, slot });
-                    slot.linkedNetwork = currentNetwork;
-
-                    // Specify where to search next
-                    newSearchDirections = [staticComp.localDirectionToWorld(slot.direction)];
-                    newSearchTile = staticComp.localTileToWorld(slot.pos);
-                }
-            }
-
-            if (newSearchTile) {
-                // Find new surrounding pipe targets
-                const newTargets = this.findSurroundingPipeTargets(
-                    newSearchTile,
-                    newSearchDirections,
-                    currentNetwork
-                );
-
-                VERBOSE_WIRES && logger.log("   Found", newTargets, "new targets to visit!");
-                for (let i = 0; i < newTargets.length; ++i) {
-                    entitiesToVisit.push(newTargets[i]);
-                }
-            }
-        }
-
-        if (
-            currentNetwork.providers.length > 0 &&
-            (currentNetwork.pipes.length > 0 ||
-                currentNetwork.receivers.length > 0 ||
-                currentNetwork.tunnels.length > 0)
-        ) {
-            this.networks.push(currentNetwork);
-            VERBOSE_WIRES && logger.log("Attached new network with uid", currentNetwork);
-        } else {
-            // Unregister network again
-            for (let i = 0; i < currentNetwork.pipes.length; ++i) {
-                currentNetwork.pipes[i].components.Pipe.linkedNetwork = null;
-            }
-
-            for (let i = 0; i < currentNetwork.tunnels.length; ++i) {
-                fastArrayDeleteValueIfContained(
-                    currentNetwork.tunnels[i].components.PipeTunnel.linkedNetworks,
-                    currentNetwork
-                );
-            }
-
-            for (let i = 0; i < currentNetwork.allSlots.length; ++i) {
-                currentNetwork.allSlots[i].slot.linkedNetwork = null;
-            }
-        }
-    }
-
-    /**
-     * Finds surrounding entities which are not yet assigned to a network
-     * @param {Vector} initialTile
-     * @param {Array<enumDirection>} directions
-     * @param {PipeNetwork} network
-     * @param {enumPipeVariant=} variantMask Only accept connections to this mask
-     * @returns {Array<any>}
-     */
-    findSurroundingPipeTargets(initialTile, directions, network, variantMask = null) {
-        let result = [];
-
-        VERBOSE_WIRES &&
-            logger.log(
-                "    Searching for new targets at",
-                initialTile.toString(),
-                "and d=",
-                directions,
-                "with mask=",
-                variantMask
-            );
-
-        // Go over all directions we should search for
-        for (let i = 0; i < directions.length; ++i) {
-            const direction = directions[i];
-            const offset = enumDirectionToVector[direction];
-            const initialSearchTile = initialTile.add(offset);
-
-            // Store which tunnels we already visited to avoid infinite loops
-            const visitedTunnels = new Set();
-
-            // First, find the initial connected entities
-            const initialContents = this.root.map.getLayersContentsMultipleXY(
-                initialSearchTile.x,
-                initialSearchTile.y
-            );
-
-            // Link the initial tile to the initial entities, since it may change
-            /** @type {Array<{entity: Entity, tile: Vector}>} */
-            const contents = [];
-            for (let j = 0; j < initialContents.length; ++j) {
-                contents.push({
-                    entity: initialContents[j],
-                    tile: initialSearchTile,
-                });
-            }
-
-            for (let k = 0; k < contents.length; ++k) {
-                const { entity, tile } = contents[k];
-                const pipeComp = entity.components.Pipe;
-
-                // Check for pipe
-                // Check for wire
-                if (
-                    pipeComp &&
-                    !pipeComp.linkedNetwork &&
-                    (!variantMask || pipeComp.variant === variantMask)
-                ) {
-                    // Wires accept connections from everywhere
-                    result.push({
-                        entity,
-                    });
-                }
-
-                // Check for connected slots
-                const pinComp = entity.components.FluidPins;
-                if (pinComp) {
-                    const staticComp = entity.components.StaticMapEntity;
-
-                    // Go over all slots and see if they are connected
-                    const pinSlots = pinComp.slots;
-                    for (let j = 0; j < pinSlots.length; ++j) {
-                        const slot = pinSlots[j];
-
-                        // Check if the position matches
-                        const pinPos = staticComp.localTileToWorld(slot.pos);
-                        if (!pinPos.equals(tile)) {
-                            continue;
-                        }
-
-                        // Check if the direction (inverted) matches
-                        const pinDirection = staticComp.localDirectionToWorld(slot.direction);
-                        if (pinDirection !== enumInvertedDirections[direction]) {
-                            continue;
-                        }
-
-                        if (!slot.linkedNetwork) {
-                            result.push({
-                                entity,
-                                slot,
-                            });
-                        }
-                    }
-
-                    // Pin slots mean it can be nothing else
-                    continue;
-                }
-
-                // Check if it's a tunnel, if so, go to the forwarded item
-                const tunnelComp = entity.components.PipeTunnel;
-                if (tunnelComp) {
-                    if (visitedTunnels.has(entity.uid)) {
-                        continue;
-                    }
-
-                    const staticComp = entity.components.StaticMapEntity;
-
-                    // Compute where this tunnel connects to
-                    const forwardedTile = staticComp.origin.add(offset);
-                    VERBOSE_WIRES &&
-                        logger.log(
-                            "   Found tunnel",
-                            entity.uid,
-                            "at",
-                            tile,
-                            "-> forwarding to",
-                            forwardedTile
-                        );
-
-                    // Figure out which entities are connected
-                    const connectedContents = this.root.map.getLayersContentsMultipleXY(
-                        forwardedTile.x,
-                        forwardedTile.y
-                    );
-
-                    // Attach the entities and the tile we search at, because it may change
-                    for (let h = 0; h < connectedContents.length; ++h) {
-                        contents.push({
-                            entity: connectedContents[h],
-                            tile: forwardedTile,
-                        });
-                    }
-
-                    // Add the tunnel to the network
-                    if (tunnelComp.linkedNetworks.indexOf(network) < 0) {
-                        tunnelComp.linkedNetworks.push(network);
-                    }
-                    if (network.tunnels.indexOf(entity) < 0) {
-                        network.tunnels.push(entity);
-                    }
-
-                    // Remember this tunnel
-                    visitedTunnels.add(entity.uid);
-                }
-            }
-        }
-
-        VERBOSE_WIRES && logger.log("     -> Found", result.length);
-
-        return result;
-    }
-
-    /**
-     * Updates the pipes network
-     */
-    update() {
-        if (this.needsRecompute) {
-            this.recomputePipesNetwork();
-        }
-
-        // Re-compute values of all networks
-        for (let i = 0; i < this.networks.length; ++i) {
-            const network = this.networks[i];
-
-            // Aggregate values of all senders
-            const senders = network.providers;
-            1;
-            let value = null;
-            for (let k = 0; k < senders.length; ++k) {
-                const senderSlot = senders[k];
-                const slotValue = senderSlot.slot.value;
-
-                // The first sender can just put in his value
-                if (!value) {
-                    value = slotValue;
-                    continue;
-                }
-
-                // If the slot is empty itself, just skip it
-                if (!slotValue) {
-                    continue;
-                }
-
-                // If there is already an value, compare if it matches ->
-                // otherwise there is a conflict
-                if (value.equals(slotValue)) {
-                    // All good
-                    continue;
-                }
-
-                break;
-            }
-
-            network.currentValue = value;
-        }
-    }
-
-    /**
-     * Draws a given chunk
-     * @param {import("../../core/draw_utils").DrawParameters} parameters
-     * @param {MapChunkView} chunk
-     */
-    drawChunk(parameters, chunk) {
-        const contents = chunk.contents;
-        for (let y = 0; y < globalConfig.mapChunkSize; ++y) {
-            for (let x = 0; x < globalConfig.mapChunkSize; ++x) {
-                const entity = contents[x][y];
-                if (entity && entity.components.Pipe) {
-                    const pipeComp = entity.components.Pipe;
-                    const pipeVariant = pipeComp.variant;
-                    const pipeDirection = pipeComp.direction;
-                    const sprite = this.pipeSprites[pipeVariant][pipeDirection];
-                    // console.log(this.pipeSprites);
-                    // console.log(pipeVariants);
-                    // console.log(pipeDirection);
-                    // console.log(this.pipeSprites[pipeVariant]);
-                    const staticComp = entity.components.StaticMapEntity;
-                    parameters.context.globalAlpha = 1;
-                    staticComp.drawSpriteOnBoundsClipped(parameters, sprite, 0);
-
-                    // DEBUG Rendering
-                    if (G_IS_DEV && globalConfig.debug.renderPipeRotations) {
-                        parameters.context.globalAlpha = 1;
-                        parameters.context.fillStyle = "red";
-                        parameters.context.font = "5px Tahoma";
-                        parameters.context.fillText(
-                            "" + staticComp.originalRotation,
-                            staticComp.origin.x * globalConfig.tileSize,
-                            staticComp.origin.y * globalConfig.tileSize + 5
-                        );
-
-                        parameters.context.fillStyle = "rgba(255, 0, 0, 0.2)";
-                        if (staticComp.originalRotation % 180 === 0) {
-                            parameters.context.fillRect(
-                                (staticComp.origin.x + 0.5) * globalConfig.tileSize,
-                                staticComp.origin.y * globalConfig.tileSize,
-                                3,
-                                globalConfig.tileSize
-                            );
-                        } else {
-                            parameters.context.fillRect(
-                                staticComp.origin.x * globalConfig.tileSize,
-                                (staticComp.origin.y + 0.5) * globalConfig.tileSize,
-                                globalConfig.tileSize,
-                                3
-                            );
-                        }
-
-                        if (
-                            entity.components.Pipe.linkedNetwork &&
-                            entity.components.Pipe.linkedNetwork.currentAmount
-                        ) {
-                            parameters.context.fillText(
-                                entity.components.Pipe.linkedNetwork.currentAmount.toString(),
-                                staticComp.origin.x * globalConfig.tileSize,
-                                staticComp.origin.y * globalConfig.tileSize + 5
-                            );
-                        }
-                    }
-                }
-
-                // DEBUG Rendering
-                if (G_IS_DEV && globalConfig.debug.renderPipeNetworkInfos) {
-                    if (entity) {
-                        const staticComp = entity.components.StaticMapEntity;
-                        const pipeComp = entity.components.Pipe;
-
-                        // Draw network info for pipes
-                        if (pipeComp && pipeComp.linkedNetwork) {
-                            parameters.context.fillStyle = "red";
-                            parameters.context.font = "5px Tahoma";
-                            parameters.context.fillText(
-                                "W" + pipeComp.linkedNetwork.uid,
-                                (staticComp.origin.x + 0.5) * globalConfig.tileSize,
-                                (staticComp.origin.y + 0.5) * globalConfig.tileSize
-                            );
-                        }
-                    }
-                }
-            }
-        }
-
-        parameters.context.globalAlpha = 1;
-    }
-
-    /**
-     * Returns whether this entity is relevant for the pipes network
-     * @param {Entity} entity
-     */
-    isEntityRelevantForPipes(entity) {
-        return entity.components.Pipe || entity.components.FluidPins || entity.components.PipeTunnel;
     }
 
     /**
@@ -662,6 +113,9 @@ export class PipeSystem extends GameSystemWithFilter {
         // Compute affected area
         const originalRect = staticComp.getTileSpaceBounds();
         const affectedArea = originalRect.expandedInAllDirections(1);
+
+        /** @type {Set<PipePath>} */
+        const changedPaths = new Set();
 
         for (let x = affectedArea.x; x < affectedArea.right(); ++x) {
             for (let y = affectedArea.y; y < affectedArea.bottom(); ++y) {
@@ -696,22 +150,407 @@ export class PipeSystem extends GameSystemWithFilter {
                     // Compute delta to see if anything changed
                     const newDirection = arrayPipeVariantToRotation[rotationVariant];
 
-                    console.log(targetPipeComp.direction);
-
                     if (targetStaticComp.rotation !== rotation || newDirection !== targetPipeComp.direction) {
+                        const originalPath = targetPipeComp.assignedPath;
+
+                        // Ok, first remove it from its current path
+                        this.deleteEntityFromPath(targetPipeComp.assignedPath, targetEntity);
+
                         // Change stuff
                         targetStaticComp.rotation = rotation;
-                        const variant = targetEntity.components.Pipe.variant;
-                        metaPipe.updateVariants(targetEntity, rotationVariant, variant);
+                        metaPipe.updateVariants(targetEntity, rotationVariant, targetPipeComp.variant);
 
                         // Update code as well
-                        targetStaticComp.code = getCodeFromBuildingData(metaPipe, variant, rotationVariant);
+                        targetStaticComp.code = getCodeFromBuildingData(
+                            metaPipe,
+                            targetPipeComp.variant,
+                            rotationVariant
+                        );
+
+                        // Update the original path since it might have picked up the entit1y
+                        originalPath.onPathChanged();
+
+                        // Now add it again
+                        this.addEntityToPaths(targetEntity);
+
+                        // Sanity
+                        if (G_IS_DEV && globalConfig.debug.checkPipePaths) {
+                            this.debug_verifyPipePaths();
+                        }
 
                         // Make sure the chunks know about the update
                         this.root.signals.entityChanged.dispatch(targetEntity);
                     }
+
+                    if (targetPipeComp.assignedPath) {
+                        changedPaths.add(targetPipeComp.assignedPath);
+                    }
                 }
             }
+        }
+
+        // notify all paths *afterwards* to avoid multi-updates
+        changedPaths.forEach(path => path.onSurroundingsChanged());
+
+        if (G_IS_DEV && globalConfig.debug.checkPipePaths) {
+            this.debug_verifyPipePaths();
+        }
+    }
+
+    /**
+     * Called when an entity got destroyed
+     * @param {Entity} entity
+     */
+    onEntityDestroyed(entity) {
+        if (!this.root.gameInitialized) {
+            return;
+        }
+
+        if (!entity.components.Pipe) {
+            return;
+        }
+
+        const assignedPath = entity.components.Pipe.assignedPath;
+        assert(assignedPath, "Entity has no pipe path assigned");
+        this.deleteEntityFromPath(assignedPath, entity);
+        if (G_IS_DEV && globalConfig.debug.checkPipePaths) {
+            this.debug_verifyPipePaths();
+        }
+    }
+
+    /**
+     * Attempts to delete the pipe from its current path
+     * @param {PipePath} path
+     * @param {Entity} entity
+     */
+    deleteEntityFromPath(path, entity) {
+        if (path.entityPath.length === 1) {
+            // This is a single entity path, easy to do, simply erase whole path
+            fastArrayDeleteValue(this.pipePaths, path);
+            return;
+        }
+
+        // Notice: Since there might be circular references, it is important to check
+        // which role the entity has
+        if (path.isStartEntity(entity)) {
+            // We tried to delete the start
+            path.deleteEntityOnStart(entity);
+        } else if (path.isEndEntity(entity)) {
+            // We tried to delete the end
+            path.deleteEntityOnEnd(entity);
+        } else {
+            // We tried to delete something inbetween
+            const newPath = path.deleteEntityOnPathSplitIntoTwo(entity);
+            this.pipePaths.push(newPath);
+        }
+
+        // Sanity
+        entity.components.Pipe.assignedPath = null;
+    }
+
+    /**
+     * Adds the given entity to the appropriate paths
+     * @param {Entity} entity
+     */
+    addEntityToPaths(entity) {
+        const fromEntity = this.findSupplyingEntity(entity);
+        const toEntity = this.findFollowUpEntity(entity);
+
+        // console.log(fromEntity);
+        // console.log(toEntity);
+
+        // Check if we can add the entity to the previous path
+        if (fromEntity) {
+            const fromPath = fromEntity.components.Pipe.assignedPath;
+            fromPath.extendOnEnd(entity);
+
+            // console.log(fromPath);
+
+            // Check if we now can extend the current path by the next path
+            if (toEntity) {
+                const toPath = toEntity.components.Pipe.assignedPath;
+
+                if (fromPath === toPath) {
+                    // This is a circular dependency -> Ignore
+                } else {
+                    fromPath.extendByPath(toPath);
+
+                    // Delete now obsolete path
+                    fastArrayDeleteValue(this.pipePaths, toPath);
+                }
+            }
+        } else {
+            if (toEntity) {
+                // Prepend it to the other path
+                const toPath = toEntity.components.Pipe.assignedPath;
+                toPath.extendOnBeginning(entity);
+            } else {
+                // This is an empty pipe path
+                const path = new PipePath(this.root, [entity]);
+                this.pipePaths.push(path);
+            }
+        }
+    }
+
+    /**
+     * Called when an entity got added
+     * @param {Entity} entity
+     */
+    onEntityAdded(entity) {
+        if (!this.root.gameInitialized) {
+            return;
+        }
+
+        if (!entity.components.Pipe) {
+            return;
+        }
+
+        this.addEntityToPaths(entity);
+        if (G_IS_DEV && globalConfig.debug.checkPipePaths) {
+            this.debug_verifyPipePaths();
+        }
+    }
+
+    /**
+     * Draws all pipe paths
+     * @param {DrawParameters} parameters
+     */
+    drawPipeFluids(parameters) {
+        for (let i = 0; i < this.pipePaths.length; ++i) {
+            this.pipePaths[i].draw(parameters);
+        }
+    }
+
+    /**
+     * Verifies all pipe paths
+     */
+    debug_verifyPipePaths() {
+        for (let i = 0; i < this.pipePaths.length; ++i) {
+            this.pipePaths[i].debug_checkIntegrity("general-verify");
+        }
+
+        const pipes = this.root.entityMgr.getAllWithComponent(PipeComponent);
+        for (let i = 0; i < pipes.length; ++i) {
+            const path = pipes[i].components.Pipe.assignedPath;
+            if (!path) {
+                throw new Error("Pipe has no path: " + pipes[i].uid);
+            }
+            if (this.pipePaths.indexOf(path) < 0) {
+                throw new Error("Path of entity not contained: " + pipes[i].uid);
+            }
+        }
+    }
+
+    /**
+     * Finds the follow up entity for a given pipe. Used for building the dependencies
+     * @param {Entity} entity
+     * @returns {Entity|null}
+     */
+    findFollowUpEntity(entity) {
+        const staticComp = entity.components.StaticMapEntity;
+        const pipeComp = entity.components.Pipe;
+
+        const followUpDirection = staticComp.localDirectionToWorld(pipeComp.direction);
+        const followUpVector = enumDirectionToVector[followUpDirection];
+
+        const followUpTile = staticComp.origin.add(followUpVector);
+        const followUpEntity = this.root.map.getLayerContentXY(followUpTile.x, followUpTile.y, entity.layer);
+
+        // Check if there's a pipe at the tile we point to
+        if (followUpEntity) {
+            const followUpPipeComp = followUpEntity.components.Pipe;
+            if (followUpPipeComp) {
+                const followUpStatic = followUpEntity.components.StaticMapEntity;
+
+                const acceptedDirection = followUpStatic.localDirectionToWorld(enumDirection.top);
+                if (acceptedDirection === followUpDirection) {
+                    return followUpEntity;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Finds the supplying pipe for a given pipe. Used for building the dependencies
+     * @param {Entity} entity
+     * @returns {Entity|null}
+     */
+    findSupplyingEntity(entity) {
+        const staticComp = entity.components.StaticMapEntity;
+
+        const supplyDirection = staticComp.localDirectionToWorld(enumDirection.bottom);
+        const supplyVector = enumDirectionToVector[supplyDirection];
+
+        const supplyTile = staticComp.origin.add(supplyVector);
+        const supplyEntity = this.root.map.getLayerContentXY(supplyTile.x, supplyTile.y, entity.layer);
+
+        // Check if there's a pipe at the tile we point to
+        if (supplyEntity) {
+            const supplyPipeComp = supplyEntity.components.Pipe;
+            if (supplyPipeComp) {
+                const supplyStatic = supplyEntity.components.StaticMapEntity;
+                const otherDirection = supplyStatic.localDirectionToWorld(
+                    enumInvertedDirections[supplyPipeComp.direction]
+                );
+
+                if (otherDirection === supplyDirection) {
+                    return supplyEntity;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Recomputes the pipe path network. Only required for old savegames
+     */
+    recomputeAllPipePaths() {
+        logger.warn("Recomputing all pipe paths");
+        const visitedUids = new Set();
+
+        const result = [];
+
+        for (let i = 0; i < this.allEntities.length; ++i) {
+            const entity = this.allEntities[i];
+            if (visitedUids.has(entity.uid)) {
+                continue;
+            }
+
+            // Mark entity as visited
+            visitedUids.add(entity.uid);
+
+            // Compute path, start with entity and find precedors / successors
+            const path = [entity];
+
+            // Prevent infinite loops
+            let maxIter = 99999;
+
+            // Find precedors
+            let prevEntity = this.findSupplyingEntity(entity);
+            while (prevEntity && --maxIter > 0) {
+                if (visitedUids.has(prevEntity.uid)) {
+                    break;
+                }
+                path.unshift(prevEntity);
+                visitedUids.add(prevEntity.uid);
+                prevEntity = this.findSupplyingEntity(prevEntity);
+            }
+
+            // Find succedors
+            let nextEntity = this.findFollowUpEntity(entity);
+            while (nextEntity && --maxIter > 0) {
+                if (visitedUids.has(nextEntity.uid)) {
+                    break;
+                }
+
+                path.push(nextEntity);
+                visitedUids.add(nextEntity.uid);
+                nextEntity = this.findFollowUpEntity(nextEntity);
+            }
+
+            assert(maxIter > 1, "Ran out of iterations");
+            result.push(new PipePath(this.root, path));
+        }
+
+        logger.log("Found", this.pipePaths.length, "pipe paths");
+        this.pipePaths = result;
+    }
+
+    /**
+     * Updates all pipes
+     */
+    update() {
+        if (G_IS_DEV && globalConfig.debug.checkPipePaths) {
+            this.debug_verifyPipePaths();
+        }
+
+        for (let i = 0; i < this.pipePaths.length; ++i) {
+            this.pipePaths[i].update();
+        }
+
+        if (G_IS_DEV && globalConfig.debug.checkPipePaths) {
+            this.debug_verifyPipePaths();
+        }
+    }
+
+    /**
+     * Draws a given chunk
+     * @param {DrawParameters} parameters
+     * @param {MapChunkView} chunk
+     */
+    drawChunk(parameters, chunk) {
+        // Limit speed to avoid pipes going backwards
+        const speedMultiplier = Math.min(this.root.hubGoals.getPipeBaseSpeed(), 10);
+        const contents = chunk.containedEntitiesByLayer.regular;
+
+        if (this.root.app.settings.getAllSettings().simplifiedBelts) {
+            for (let i = 0; i < contents.length; ++i) {
+                const entity = contents[i];
+                if (entity.components.Pipe) {
+                    const variant = entity.components.Pipe.variant;
+                    const rotationVariant = entity.components.Pipe.direction;
+                    let sprite = this.pipeSprites[variant][rotationVariant];
+
+                    // Culling happens within the static map entity component
+                    entity.components.StaticMapEntity.drawSpriteOnBoundsClipped(parameters, sprite, 0);
+                }
+            }
+        } else {
+            for (let i = 0; i < contents.length; ++i) {
+                const entity = contents[i];
+                if (entity.components.Pipe) {
+                    const variant = entity.components.Pipe.variant;
+                    const rotationVariant = entity.components.Pipe.direction;
+                    const sprite = this.pipeSprites[variant][rotationVariant];
+
+                    // Culling happens within the static map entity component
+                    entity.components.StaticMapEntity.drawSpriteOnBoundsClipped(parameters, sprite, 0);
+
+                    const staticComp = entity.components.StaticMapEntity;
+
+                    // DEBUG Rendering
+                    if (G_IS_DEV && globalConfig.debug.renderPipeRotations) {
+                        parameters.context.globalAlpha = 1;
+                        parameters.context.fillStyle = "red";
+                        parameters.context.font = "5px Tahoma";
+                        parameters.context.fillText(
+                            "" + staticComp.originalRotation,
+                            staticComp.origin.x * globalConfig.tileSize,
+                            staticComp.origin.y * globalConfig.tileSize + 5
+                        );
+
+                        parameters.context.fillStyle = "rgba(255, 0, 0, 0.2)";
+                        if (staticComp.originalRotation % 180 === 0) {
+                            parameters.context.fillRect(
+                                (staticComp.origin.x + 0.5) * globalConfig.tileSize,
+                                staticComp.origin.y * globalConfig.tileSize,
+                                3,
+                                globalConfig.tileSize
+                            );
+                        } else {
+                            parameters.context.fillRect(
+                                staticComp.origin.x * globalConfig.tileSize,
+                                (staticComp.origin.y + 0.5) * globalConfig.tileSize,
+                                globalConfig.tileSize,
+                                3
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Draws the pipe path debug overlays
+     * @param {DrawParameters} parameters
+     */
+    drawPipePathDebug(parameters) {
+        for (let i = 0; i < this.pipePaths.length; ++i) {
+            this.pipePaths[i].drawDebug(parameters);
         }
     }
 }

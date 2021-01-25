@@ -148,7 +148,7 @@ export class MapChunk {
                             ++patchesDrawn;
                             avgPos.x += offX;
                             avgPos.y += offY;
-                            this.lowerLayer[offX][offY] = { item, color: noise.getColor(val) };
+                            this.lowerLayer[offX][offY] = { item, color };
                         } else {
                             this.lowerLayer[offX][offY] = color;
                         }

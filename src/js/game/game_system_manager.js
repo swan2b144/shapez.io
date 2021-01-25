@@ -129,8 +129,6 @@ export class GameSystemManager {
 
         add("belt", BeltSystem);
 
-        add("pipe", PipeSystem);
-
         add("undergroundBelt", UndergroundBeltSystem);
 
         add("miner", MinerSystem);
@@ -172,7 +170,7 @@ export class GameSystemManager {
 
         add("itemProcessorOverlays", ItemProcessorOverlaysSystem);
 
-        add("Pipe", PipeSystem);
+        add("pipe", PipeSystem);
 
         add("Pump", PumpSystem);
 

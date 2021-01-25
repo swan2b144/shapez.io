@@ -3,7 +3,7 @@ import { formatItemsPerSecond, generateMatrixRotations } from "../../core/utils"
 import { enumAngleToDirection, enumDirection, Vector } from "../../core/vector";
 import { SOUNDS } from "../../platform/sound";
 import { T } from "../../translations";
-import { PipeComponent, enumPipeType, enumPipeVariant } from "../components/pipe";
+import { PipeComponent, enumPipeVariant } from "../components/pipe";
 import { Entity } from "../entity";
 import { defaultBuildingVariant, MetaBuilding } from "../meta_building";
 import { GameRoot } from "../root";
@@ -159,7 +159,6 @@ export class MetaPipeBuilding extends MetaBuilding {
         const bottomDirection = enumAngleToDirection[(rotation + 180) % 360];
         const leftDirection = enumAngleToDirection[(rotation + 270) % 360];
 
-        console.log(variant);
         const { ejectors, acceptors } = root.logic.getEjectorsAndAcceptorsAtTileForPipes(tile, variant);
 
         let hasBottomEjector = false;

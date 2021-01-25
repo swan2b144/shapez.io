@@ -462,6 +462,10 @@ export class GameCore {
             systems.belt.drawBeltPathDebug(params);
         }
 
+        if (G_IS_DEV && globalConfig.debug.renderPipePaths) {
+            systems.pipe.drawPipePathDebug(params);
+        }
+
         // END OF GAME CONTENT
         // -----
 

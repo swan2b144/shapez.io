@@ -87,13 +87,16 @@ export default {
     // renderChanges: true,
     // -----------------------------------------------------------------------------------
     // Whether to render belt paths
-    // renderBeltPaths: true,
+    renderBeltPaths: true,
+    // -----------------------------------------------------------------------------------
+    // Whether to render belt paths
+    renderPipePaths: true,
     // -----------------------------------------------------------------------------------
     // Whether to check belt paths
     // checkBeltPaths: true,
     // -----------------------------------------------------------------------------------
     // Whether to check pipes paths
-    checkPipesPaths: true,
+    // checkPipesPaths: true,
     // -----------------------------------------------------------------------------------
     // Whether to items / s instead of items / m in stats
     // detailedStatistics: true,
@@ -102,13 +105,13 @@ export default {
     // showAtlasInfo: true,
     // -----------------------------------------------------------------------------------
     // Renders the rotation of all wires
-    renderWireRotations: true,
+    // renderWireRotations: true,
     // -----------------------------------------------------------------------------------
     // Renders the rotation of all pipes
-    renderPipeRotations: true,
+    // renderPipeRotations: true,
     // -----------------------------------------------------------------------------------
     // Renders the rotation of all pipes
-    renderBeltRotations: true,
+    // renderBeltRotations: true,
     // -----------------------------------------------------------------------------------
     // Renders information about wire networks
     // renderWireNetworkInfos: true,

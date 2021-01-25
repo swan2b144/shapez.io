@@ -19,10 +19,11 @@ import { DisplayComponent } from "./components/display";
 import { BeltReaderComponent } from "./components/belt_reader";
 import { FilterComponent } from "./components/filter";
 import { ItemProducerComponent } from "./components/item_producer";
-import { FluidPinsComponent } from "./components/fluid_pins";
 import { PumpComponent } from "./components/pump";
 import { PipeComponent } from "./components/pipe";
 import { PipeTunnelComponent } from "./components/pipe_tunnel";
+import { FluidAcceptorComponent } from "./components/fluid_acceptor";
+import { FluidEjectorComponent } from "./components/fluid_ejector";
 
 export function initComponentRegistry() {
     gComponentRegistry.register(StaticMapEntityComponent);
@@ -47,7 +48,8 @@ export function initComponentRegistry() {
     gComponentRegistry.register(ItemProducerComponent);
 
     // Water Mod
-    gComponentRegistry.register(FluidPinsComponent);
+    gComponentRegistry.register(FluidAcceptorComponent);
+    gComponentRegistry.register(FluidEjectorComponent);
     gComponentRegistry.register(PumpComponent);
     gComponentRegistry.register(PipeComponent);
     gComponentRegistry.register(PipeTunnelComponent);

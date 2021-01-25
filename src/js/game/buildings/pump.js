@@ -3,7 +3,6 @@ import { Entity } from "../entity";
 import { MetaBuilding } from "../meta_building";
 import { GameRoot } from "../root";
 import { PumpComponent } from "../components/pump";
-import { enumPinSlotType, FluidPinsComponent } from "../components/fluid_pins";
 
 export class MetaPumpBuilding extends MetaBuilding {
     constructor() {
@@ -37,31 +36,32 @@ export class MetaPumpBuilding extends MetaBuilding {
      */
     setupEntityComponents(entity) {
         entity.addComponent(new PumpComponent());
-        entity.addComponent(
-            new FluidPinsComponent({
-                slots: [
-                    {
-                        pos: new Vector(0, 0),
-                        direction: enumDirection.top,
-                        type: enumPinSlotType.fluidEjector,
-                    },
-                    {
-                        pos: new Vector(0, 0),
-                        direction: enumDirection.right,
-                        type: enumPinSlotType.fluidEjector,
-                    },
-                    {
-                        pos: new Vector(0, 0),
-                        direction: enumDirection.bottom,
-                        type: enumPinSlotType.fluidEjector,
-                    },
-                    {
-                        pos: new Vector(0, 0),
-                        direction: enumDirection.left,
-                        type: enumPinSlotType.fluidEjector,
-                    },
-                ],
-            })
-        );
+        //     entity.addComponent(
+        //         new FluidPinsComponent({
+        //             slots: [
+        //                 {
+        //                     pos: new Vector(0, 0),
+        //                     direction: enumDirection.top,
+        //                     type: enumPinSlotType.fluidEjector,
+        //                 },
+        //                 {
+        //                     pos: new Vector(0, 0),
+        //                     direction: enumDirection.right,
+        //                     type: enumPinSlotType.fluidEjector,
+        //                 },
+        //                 {
+        //                     pos: new Vector(0, 0),
+        //                     direction: enumDirection.bottom,
+        //                     type: enumPinSlotType.fluidEjector,
+        //                 },
+        //                 {
+        //                     pos: new Vector(0, 0),
+        //                     direction: enumDirection.left,
+        //                     type: enumPinSlotType.fluidEjector,
+        //                 },
+        //             ],
+        //         })
+        //     );
+        // }
     }
 }

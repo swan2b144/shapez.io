@@ -19,11 +19,11 @@ import { DisplayComponent } from "./components/display";
 import { BeltReaderComponent } from "./components/belt_reader";
 import { FilterComponent } from "./components/filter";
 import { ItemProducerComponent } from "./components/item_producer";
-import { FluidPinsComponent } from "./components/fluid_pins";
-import { FluidComponent } from "./components/fluid";
 import { PumpComponent } from "./components/pump";
 import { PipeComponent } from "./components/pipe";
 import { PipeTunnelComponent } from "./components/pipe_tunnel";
+import { FluidEjectorComponent } from "./components/fluid_ejector";
+import { FluidAcceptorComponent } from "./components/fluid_acceptor";
 
 /* typehints:end */
 
@@ -95,11 +95,11 @@ export class EntityComponentStorage {
         /** @type {ItemProducerComponent} */
         this.ItemProducer;
 
-        /** @type {FluidPinsComponent} */
-        this.FluidPins;
+        /** @type {FluidEjectorComponent} */
+        this.FluidEjector;
 
-        /** @type {FluidComponent} */
-        this.Fluid;
+        /** @type {FluidAcceptorComponent} */
+        this.FluidAcceptor;
 
         /** @type {PumpComponent} */
         this.Pump;
