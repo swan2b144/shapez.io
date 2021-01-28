@@ -4,6 +4,9 @@ import { MetaBuilding } from "../meta_building";
 import { GameRoot } from "../root";
 import { PumpComponent } from "../components/pump";
 import { FluidEjectorComponent } from "../components/fluid_ejector";
+import { enumPipeVariant } from "../components/pipe";
+import { T } from "../../translations";
+import { formatItemsPerSecond } from "../../core/utils";
 
 export class MetaPumpBuilding extends MetaBuilding {
     constructor() {
@@ -25,10 +28,11 @@ export class MetaPumpBuilding extends MetaBuilding {
     /**
      * @param {GameRoot} root
      * @param {string} variant
-     * @returns {number}
+     * @returns {Array<[string, string]>}
      */
     getPumpSpeed(root, variant) {
-        return 5; //globalConfig.pumpSpeedLPerSecond * HubGoals.upgradeImprovements.fluids;
+        const speed = root.hubGoals.getPipeBaseSpeed();
+        return [[T.ingame.buildingPlacement.infoTexts.speed, formatItemsPerSecond(speed)]];
     }
 
     /**
@@ -43,18 +47,6 @@ export class MetaPumpBuilding extends MetaBuilding {
                     {
                         pos: new Vector(0, 0),
                         direction: enumDirection.top,
-                    },
-                    {
-                        pos: new Vector(0, 0),
-                        direction: enumDirection.right,
-                    },
-                    {
-                        pos: new Vector(0, 0),
-                        direction: enumDirection.bottom,
-                    },
-                    {
-                        pos: new Vector(0, 0),
-                        direction: enumDirection.left,
                     },
                 ],
             })

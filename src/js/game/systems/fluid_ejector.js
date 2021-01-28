@@ -405,7 +405,7 @@ export class FluidEjectorSystem extends GameSystemWithFilter {
                     worldX,
                     worldY,
                     parameters,
-                    globalConfig.defaultFluidDiameter
+                    globalConfig.defaultItemDiameter
                 );
             }
         }

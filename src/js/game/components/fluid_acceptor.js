@@ -19,7 +19,7 @@ import { Component } from "../component";
 
 /** @typedef {{
  * pos: Vector,
- * directions: enumDirection[],
+ * direction: enumDirection[],
  * filter?: ItemType
  * }} FluidAcceptorSlotConfig */
 
@@ -37,7 +37,7 @@ export class FluidAcceptorComponent extends Component {
         super();
 
         /**
-         * Fixes belt animations
+         * Fixes pipe animations
          * @type {Array<{
          *  fluid: BaseItem,
          * slotIndex: number,
@@ -61,7 +61,7 @@ export class FluidAcceptorComponent extends Component {
             const slot = slots[i];
             this.slots.push({
                 pos: slot.pos,
-                directions: slot.directions,
+                directions: slot.direction,
 
                 // Which type of fluid to accept (shape | color | all) @see FluidType
                 filter: slot.filter,

@@ -571,6 +571,16 @@ buildings:
             name: Tunnel Tier II
             description: Allows you to tunnel resources under buildings and belts.
 
+    underground_pipe:
+        default:
+            name: &underground_pipe Tunnel
+            description: Allows you to tunnel resources under buildings belts and pipes.
+
+        tier2:
+            name: Tunnel Tier II
+            description: Allows you to tunnel resources under buildings belts and pipes.
+
+
     # Balancer
     balancer:
         default:
@@ -798,6 +808,10 @@ storyRewards:
     reward_underground_belt_tier_2:
         title: Tunnel Tier II
         desc: You have unlocked a new variant of the <strong>tunnel</strong> - It has a <strong>bigger range</strong>, and you can also mix-n-match those tunnels now!
+
+    reward_underground_pipe_tier_2:
+        title: Pipe Tunnel Tier II
+        desc: You have unlocked a new variant of the <strong>tunnel</strong> - It has a <strong>bigger range</strong>, and you can also mix-n-match those pipe tunnels now!
 
     reward_merger:
         title: Compact Merger
@@ -1153,6 +1167,7 @@ keybindings:
         belt: *belt
         balancer: *balancer
         underground_belt: *underground_belt
+        underground_pipe: *underground_pipe
         miner: *miner
         cutter: *cutter
         rotater: *rotater

@@ -44,7 +44,7 @@ export class MetaVirtualProcessorBuilding extends MetaBuilding {
         return colors[variant];
     }
 
-    isPlaceableToFluid() {
+    isPlaceableToFluids() {
         return true;
     }
     /**

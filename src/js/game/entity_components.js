@@ -24,6 +24,7 @@ import { PipeComponent } from "./components/pipe";
 import { PipeTunnelComponent } from "./components/pipe_tunnel";
 import { FluidEjectorComponent } from "./components/fluid_ejector";
 import { FluidAcceptorComponent } from "./components/fluid_acceptor";
+import { UndergroundPipeComponent } from "./components/underground_pipe";
 
 /* typehints:end */
 
@@ -109,6 +110,9 @@ export class EntityComponentStorage {
 
         /** @type {PipeTunnelComponent} */
         this.PipeTunnel;
+
+        /** @type {UndergroundPipeComponent} */
+        this.UndergroundPipe;
 
         /* typehints:end */
     }

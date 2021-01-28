@@ -317,7 +317,9 @@ export function generateLevelDefinitions(limitedVersion = false) {
         {
             shape: "RpRpRpRp:CwCwCwCw", // painting t3
             required: 3800,
-            reward: enumHubGoalRewards.reward_underground_belt_tier_2,
+            reward:
+                enumHubGoalRewards.reward_underground_belt_tier_2 ||
+                enumHubGoalRewards.reward_underground_pipe_tier_2,
         },
 
         // DEMO STOPS HERE

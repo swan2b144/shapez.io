@@ -28,6 +28,7 @@ import { PipeSystem } from "./systems/pipe";
 import { PumpSystem } from "./systems/pump";
 import { FluidAcceptorSystem } from "./systems/fluid_acceptor";
 import { FluidEjectorSystem } from "./systems/fluid_ejector";
+import { UndergroundPipeSystem } from "./systems/underground_pipe";
 
 const logger = createLogger("game_system_manager");
 
@@ -115,6 +116,9 @@ export class GameSystemManager {
 
             /** @type {FluidEjectorSystem} */
             fluidEjector: null,
+
+            /** @type {UndergroundPipeSystem} */
+            undergroundPipe: null,
 
             /* typehints:end */
         };

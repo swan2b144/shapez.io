@@ -63,15 +63,15 @@ export const globalConfig = {
 
     defaultItemDiameter: 20,
 
-    defualtFluidDiameter: 20,
-
     itemSpacingOnBelts: 0.63,
 
-    fluidSpacingOnPipes: 0.63,
+    fluidSpacingOnPipes: 0.1,
 
     wiresSpeedItemsPerSecond: 6,
 
     undergroundBeltMaxTilesByTier: [5, 9],
+
+    undergroundPipeMaxTilesByTier: [5, 9],
 
     readerAnalyzeIntervalSeconds: 10,
 

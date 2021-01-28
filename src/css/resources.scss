@@ -1,4 +1,4 @@
-$buildings: belt, cutter, miner, mixer, painter, rotater, balancer, stacker, trash, underground_belt, wire,
+$buildings: belt, cutter, miner, mixer, painter, rotater, balancer, stacker, trash, underground_belt, underground_pipe,wire,
     constant_signal, logic_gate, lever, filter, wire_tunnel, display, virtual_processor, reader, storage,
     transistor, analyzer, comparator, item_producer, pipe;
 
@@ -9,7 +9,7 @@ $buildings: belt, cutter, miner, mixer, painter, rotater, balancer, stacker, tra
     }
 }
 
-$buildingsAndVariants: belt, balancer, underground_belt, underground_belt-tier2, miner, miner-chainable,
+$buildingsAndVariants: belt, balancer, underground_belt, underground_belt-tier2, underground_pipe, underground_pipe-tier2,miner, miner-chainable,
     cutter, cutter-quad, rotater, rotater-ccw, stacker, mixer, painter-double, painter-quad, trash, storage,
     reader, rotater-rotate180, display, constant_signal, wire, wire_tunnel, logic_gate-or, logic_gate-not,
     logic_gate-xor, analyzer, virtual_processor-rotater, virtual_processor-unstacker, item_producer,

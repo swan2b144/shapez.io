@@ -15,6 +15,7 @@ export const enumHubGoalRewards = {
     reward_rotater_180: "reward_rotater_180",
     reward_miner_chainable: "reward_miner_chainable",
     reward_underground_belt_tier_2: "reward_underground_belt_tier_2",
+    reward_underground_pipe_tier_2: "reward_underground_pipe_tier_2",
     reward_belt_reader: "reward_belt_reader",
     reward_splitter: "reward_splitter",
     reward_cutter_quad: "reward_cutter_quad",

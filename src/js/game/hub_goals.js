@@ -500,6 +500,14 @@ export class HubGoals extends BasicSerializableObject {
     }
 
     /**
+     * Underground pipe speed
+     * @returns {number} items / sec
+     */
+    getUndergroundPipeBaseSpeed() {
+        return globalConfig.pipeSpeedItemsPerSecond * this.upgradeImprovements.pipe;
+    }
+
+    /**
      * Processor speed
      * @param {enumItemProcessorTypes} processorType
      * @returns {number} items / sec

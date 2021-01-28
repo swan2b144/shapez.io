@@ -32,6 +32,7 @@ import { KEYMAPPINGS } from "./key_action_mapper";
 import { defaultBuildingVariant } from "./meta_building";
 import { MetaPumpBuilding } from "./buildings/pump";
 import { MetaPipeBuilding, pipeVariants } from "./buildings/pipe";
+import { enumUndergroundPipeVariants, MetaUndergroundPipeBuilding } from "./buildings/underground_pipe";
 
 const logger = createLogger("building_registry");
 
@@ -63,6 +64,7 @@ export function initMetaBuildingRegistry() {
     gMetaBuildingRegistry.register(MetaItemProducerBuilding);
     gMetaBuildingRegistry.register(MetaPumpBuilding);
     gMetaBuildingRegistry.register(MetaPipeBuilding);
+    gMetaBuildingRegistry.register(MetaUndergroundPipeBuilding);
 
     // Belt
     registerBuildingVariant(1, MetaBeltBuilding, defaultBuildingVariant, 0);
@@ -177,6 +179,12 @@ export function initMetaBuildingRegistry() {
     registerBuildingVariant(10004, MetaPipeBuilding, pipeVariants.industrial, 0);
     registerBuildingVariant(10005, MetaPipeBuilding, pipeVariants.industrial, 1);
     registerBuildingVariant(10006, MetaPipeBuilding, pipeVariants.industrial, 2);
+
+    // Underground belt
+    registerBuildingVariant(10007, MetaUndergroundPipeBuilding, defaultBuildingVariant, 0);
+    registerBuildingVariant(10008, MetaUndergroundPipeBuilding, defaultBuildingVariant, 1);
+    registerBuildingVariant(10009, MetaUndergroundPipeBuilding, enumUndergroundPipeVariants.tier2, 0);
+    registerBuildingVariant(10010, MetaUndergroundPipeBuilding, enumUndergroundPipeVariants.tier2, 1);
 
     // Propagate instances
     for (const key in gBuildingVariants) {

@@ -24,6 +24,7 @@ import { PipeComponent } from "./components/pipe";
 import { PipeTunnelComponent } from "./components/pipe_tunnel";
 import { FluidAcceptorComponent } from "./components/fluid_acceptor";
 import { FluidEjectorComponent } from "./components/fluid_ejector";
+import { UndergroundPipeComponent } from "./components/underground_pipe";
 
 export function initComponentRegistry() {
     gComponentRegistry.register(StaticMapEntityComponent);
@@ -53,6 +54,7 @@ export function initComponentRegistry() {
     gComponentRegistry.register(PumpComponent);
     gComponentRegistry.register(PipeComponent);
     gComponentRegistry.register(PipeTunnelComponent);
+    gComponentRegistry.register(UndergroundPipeComponent);
 
     // IMPORTANT ^^^^^ UPDATE ENTITY COMPONENT STORAGE AFTERWARDS
 

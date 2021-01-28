@@ -13,6 +13,8 @@ import { enumRotaterVariants, MetaRotaterBuilding } from "./buildings/rotater";
 import { MetaStackerBuilding } from "./buildings/stacker";
 import { MetaStorageBuilding } from "./buildings/storage";
 import { enumUndergroundBeltVariants, MetaUndergroundBeltBuilding } from "./buildings/underground_belt";
+import { enumUndergroundPipeVariants, MetaUndergroundPipeBuilding } from "./buildings/underground_pipe";
+
 import { defaultBuildingVariant, MetaBuilding } from "./meta_building";
 /** @typedef {Array<[typeof MetaBuilding, string]>} TutorialGoalReward */
 import { enumHubGoalRewards } from "./tutorial_goals";
@@ -41,6 +43,9 @@ export const enumHubGoalRewardsToContentUnlocked = {
     [enumHubGoalRewards.reward_miner_chainable]: typed([[MetaMinerBuilding, enumMinerVariants.chainable]]),
     [enumHubGoalRewards.reward_underground_belt_tier_2]: typed([
         [MetaUndergroundBeltBuilding, enumUndergroundBeltVariants.tier2],
+    ]),
+    [enumHubGoalRewards.reward_underground_pipe_tier_2]: typed([
+        [MetaUndergroundPipeBuilding, enumUndergroundPipeVariants.tier2],
     ]),
     [enumHubGoalRewards.reward_splitter]: typed([[MetaBalancerBuilding, enumBalancerVariants.splitter]]),
     [enumHubGoalRewards.reward_merger]: typed([[MetaBalancerBuilding, enumBalancerVariants.merger]]),

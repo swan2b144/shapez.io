@@ -14,6 +14,7 @@ import { MetaBalancerBuilding } from "../../buildings/balancer";
 import { MetaStackerBuilding } from "../../buildings/stacker";
 import { MetaTrashBuilding } from "../../buildings/trash";
 import { MetaUndergroundBeltBuilding } from "../../buildings/underground_belt";
+import { MetaUndergroundPipeBuilding } from "../../buildings/underground_pipe";
 import { HUDBaseToolbar } from "./base_toolbar";
 import { MetaStorageBuilding } from "../../buildings/storage";
 import { MetaItemProducerBuilding } from "../../buildings/item_producer";
@@ -27,6 +28,7 @@ export class HUDBuildingsToolbar extends HUDBaseToolbar {
                 MetaPipeBuilding,
                 MetaBalancerBuilding,
                 MetaUndergroundBeltBuilding,
+                MetaUndergroundPipeBuilding,
                 MetaMinerBuilding,
                 MetaPumpBuilding,
                 MetaCutterBuilding,

@@ -1416,7 +1416,7 @@ export class PipePath extends BasicSerializableObject {
                     worldPos.x,
                     worldPos.y,
                     parameters,
-                    globalConfig.defaultFluidDiameter
+                    globalConfig.defaultItemDiameter
                 );
 
                 // Check for the next fluid

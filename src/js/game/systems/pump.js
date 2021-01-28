@@ -177,7 +177,7 @@ export class PumpSystem extends GameSystemWithFilter {
                 (0.5 + staticComp.origin.x) * globalConfig.tileSize,
                 (0.5 + staticComp.origin.y) * globalConfig.tileSize,
                 parameters,
-                globalConfig.defaultFluidDiameter
+                globalConfig.defaultItemDiameter
             );
         }
     }

@@ -15,7 +15,7 @@ export class MetaComparatorBuilding extends MetaBuilding {
         return "#823cab";
     }
 
-    isPlaceableToFluid() {
+    isPlaceableToFluids() {
         return true;
     }
     /**

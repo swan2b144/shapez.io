@@ -98,7 +98,7 @@ export class FluidAcceptorSystem extends GameSystemWithFilter {
                     (finalTile.x + 0.5) * globalConfig.tileSize,
                     (finalTile.y + 0.5) * globalConfig.tileSize,
                     parameters,
-                    globalConfig.defaultFluidDiameter
+                    globalConfig.defaultItemDiameter
                 );
             }
         }

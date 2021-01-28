@@ -79,6 +79,7 @@ export const KEYMAPPINGS = {
         analyzer: { keyCode: key("6") },
         comparator: { keyCode: key("7") },
         transistor: { keyCode: key("8") },
+        underground_pipe: { keyCode: key("106") },
     },
 
     placement: {
